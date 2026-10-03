@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Jeux d'Oliv</title>
-<meta name="description" content="Réservez votre place aux parties de jeux de société du midi.">
+<meta name="description" content="Réservez votre place aux parties de jeux de société.">
 <meta name="theme-color" content="#0B0D1F" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#E6ECF8" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -714,6 +714,40 @@ html{overflow-x:hidden;max-width:100%}
 
 .malus-note{display:flex;gap:12px;align-items:flex-start;margin:-10px 0 24px;padding:14px 16px;border-radius:18px;background:var(--hair);border:1px dashed var(--muted);font-size:.9rem;color:var(--muted)}
 .malus-note b{color:var(--ink)}.malus-note>span{font-size:1.4rem;line-height:1}.malus-note.hot{border-color:var(--tomato)}
+
+.reset-list{display:grid;gap:8px}.reset-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:16px;background:var(--hair);flex-wrap:wrap}
+.reset-who{flex:1;min-width:120px;display:grid}.reset-who small{color:var(--muted);font-size:.78rem}
+
+/* ----- Groupes Pro / Perso ----- */
+.gswitch{display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:var(--hair);margin:0 0 14px}
+.gswitch button{border:0;padding:8px 18px;border-radius:999px;font:700 14px/1 var(--font-b);color:var(--muted);background:none;cursor:pointer}
+.gswitch button[aria-pressed="true"]{background:var(--ink);color:var(--bg);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.gchips{display:inline-flex;gap:4px;vertical-align:middle;margin-left:4px}
+.gchip{font:800 10.5px/1 var(--font-b);letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:99px;background:#CFE0FF;color:#15132E}
+.gchip.g-perso{background:#FFD9A8}
+.gpick{display:flex;gap:8px;flex-wrap:wrap}
+.gpick-b{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:2px solid var(--hair);background:none;font:700 14px/1 var(--font-b);color:var(--muted);cursor:pointer}
+.gpick-b .tick{display:none}.gpick-b[aria-pressed="true"]{color:#15132E;border-color:#15132E;background:#CFE0FF}.gpick-b.g-perso[aria-pressed="true"]{background:#FFD9A8}
+.gpick-b[aria-pressed="true"] .tick{display:inline-grid}
+.sess-groups{margin-bottom:14px}
+.ptile[hidden]{display:none}
+.gsearch{position:relative;display:flex;align-items:center;margin-top:10px}
+.gsearch>svg{position:absolute;left:14px;color:var(--muted);pointer-events:none}
+.gsearch .input{padding-left:42px;padding-right:64px}
+.gsearch small{position:absolute;right:14px;color:var(--muted);font-weight:700;font-size:12px}
+.gsearch-none{margin:14px 2px 0}
+.opt-single{display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;margin-top:10px;padding:14px 16px;border-radius:18px;border:2px solid var(--hair);background:var(--glass-2);transition:border-color .15s}
+.opt-single[aria-checked="true"]{border-color:var(--teal,#0a9a85)}
+.opt-single .sw{flex:none;position:relative;width:44px;height:26px;border-radius:99px;background:var(--hair);transition:background .15s;margin-top:2px}
+.opt-single .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.3);transition:transform .15s}
+.opt-single[aria-checked="true"] .sw{background:var(--teal,#0a9a85)}
+.opt-single[aria-checked="true"] .sw::after{transform:translateX(18px)}
+.opt-single strong{display:block;font:700 15px/1.2 var(--font-d)}
+.opt-single small{display:block;margin-top:4px;color:var(--muted);font-size:13px;font-weight:500;line-height:1.4}
+.pill-single{background:var(--sun,#ffc72c);color:#17172b}
+.single-note{display:flex;gap:12px;align-items:flex-start;margin:0 0 16px;padding:12px 16px;border-radius:16px;background:var(--glass-2);border:2px solid var(--hair);font-weight:600;font-size:14px}
+.single-note svg{flex:none;margin-top:2px}
+.full{white-space:pre-line}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -747,7 +781,8 @@ html{overflow-x:hidden;max-width:100%}
    - une table ouverte doit atteindre son minimum de joueurs (sinon la combinaison est écartée) ;
    - le regret croît vite avec le rang (1er choix = 0, 2e = 2, 3e = 6...) pour répartir les déceptions ;
    - dépasser le nombre idéal coûte de plus en plus cher ;
-   - chaque table ouverte a un coût : plus il est élevé, moins il y a de tables. */
+   - chaque table ouverte a un coût : plus il est élevé, moins il y a de tables ;
+   - option single : une seule table (un seul jeu retenu), celui qui convient le mieux au nombre de joueurs et à leurs préférences. */
 (function (root) {
   var PLACE = 10000, BONUS = 2000000, DEV = 8, EPS = 1e-9;
 
@@ -830,7 +865,7 @@ html{overflow-x:hidden;max-width:100%}
     var elig = games.map(function (g) { return players.filter(function (p) { return rankIn(p, g.id) > 0; }).length; });
     var cand = [];
     games.forEach(function (g, ix) { if (elig[ix] >= g.min) cand.push(ix); });
-    var m = cand.length, maxSize = m > 10 ? 4 : m, best = null;
+    var m = cand.length, maxSize = opts && opts.single ? 1 : (m > 10 ? 4 : m), best = null;
     for (var mask = 1; mask < (1 << m); mask++) {
       var S = [];
       for (i = 0; i < m; i++) if (mask & (1 << i)) S.push(cand[i]);
@@ -843,7 +878,7 @@ html{overflow-x:hidden;max-width:100%}
       if (best && best.S.indexOf(ix) >= 0) return;
       out.notes[g.id] = elig[ix] < g.min
         ? 'Seulement ' + elig[ix] + ' joueur' + (elig[ix] > 1 ? 's' : '') + ' intéressé' + (elig[ix] > 1 ? 's' : '') + ', ' + g.min + ' minimum'
-        : 'Les joueurs sont mieux placés sur d’autres tables';
+        : (opts && opts.single ? 'Un autre jeu convient mieux au groupe' : 'Les joueurs sont mieux placés sur d’autres tables');
     });
     if (!best) { out.unplaced = players.map(function (p) { return p.name; }); return out; }
     best.S.slice().sort(function (x, y) { return x - y; }).forEach(function (gi) {
@@ -1094,24 +1129,30 @@ html{overflow-x:hidden;max-width:100%}
       var r = await sb.rpc('my_status');
       if (r.error) throw r.error;
       var d = r.data || {};
-      return { admin: !!d.admin, member: !!d.member };
+      return { admin: !!d.admin, member: !!d.member, groups: Array.isArray(d.groups) ? d.groups : [] };
     } catch (e) { return { error: friendly(e) }; }
   };
   B.join = async function (code) {
     try { var r = await sb.rpc('join_team', { p_code: code }); return !r.error && r.data === true; } catch (e) { return false; }
   };
-  B.teamCode = async function () {
-    try { var r = await sb.rpc('get_team_code'); return r.error ? null : r.data; } catch (e) { return null; }
+  B.groupCodes = async function () {
+    try { var r = await sb.rpc('get_group_codes'); return r.error ? null : (r.data || {}); } catch (e) { return null; }
   };
-  B.setTeamCode = async function (code) {
-    try { var r = await sb.rpc('set_team_code', { p_code: code }); return !r.error && r.data === true; } catch (e) { return false; }
+  B.setGroupCode = async function (grp, code) {
+    try { var r = await sb.rpc('set_group_code', { p_grp: grp, p_code: code }); return !r.error && r.data === true; } catch (e) { return false; }
   };
-  B.pushAudience = async function () {
-    try { var r = await sb.rpc('jdo_push_audience'); return r.error ? null : r.data; } catch (e) { return null; }
+  B.adminMembers = async function () {
+    try { var r = await sb.rpc('jdo_admin_members'); return r.error ? null : (r.data || []); } catch (e) { return null; }
   };
-  B.broadcast = async function (title, body, image) {
+  B.setMemberGroup = async function (uid, grp, on) {
+    try { var r = await sb.rpc('jdo_set_member_group', { p_uid: uid, p_grp: grp, p_on: !!on }); return !r.error && r.data === true; } catch (e) { return false; }
+  };
+  B.pushAudience = async function (groups) {
+    try { var r = await sb.rpc('jdo_push_audience', { p_groups: groups && groups.length ? groups : null }); return r.error ? null : r.data; } catch (e) { return null; }
+  };
+  B.broadcast = async function (title, body, image, groups) {
     try {
-      var r = await sb.rpc('jdo_push_broadcast', { p_title: title, p_body: body, p_image: image || null });
+      var r = await sb.rpc('jdo_push_broadcast', { p_title: title, p_body: body, p_image: image || null, p_groups: groups && groups.length ? groups : null });
       if (r.error) { var m = String(r.error.message || ''); return { error: /does not exist|schema cache|could not find/i.test(m) ? 'Fonction absente : exécutez le script SQL des notifications dans Supabase.' : /réservé/.test(m) ? 'Réservé à l’administrateur.' : m }; }
       return { n: r.data };
     } catch (e) { return { error: friendly(e) }; }
@@ -1404,19 +1445,20 @@ var Badges = (function () {
   var ic = function (n, s) { return '<svg class="ic" width="' + (s || 18) + '" height="' + (s || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[n] + '</svg>'; };
 
   /* ---------- État ---------- */
-  var M = { games: [], sessions: [], regs: {}, results: {}, drafts: {}, auto: {}, settings: { balance: 30 } };
-  var ST = { db: null, auth: 'boot', cfgErr: '', ready: false, loaded: {}, error: '', uid: null, profileName: '', admin: false, canWrite: true, teamCode: null, started: false };
+  var M = { groupCfg: {}, games: [], sessions: [], regs: {}, results: {}, drafts: {}, auto: {}, settings: { balance: 30 } };
+  var ST = { db: null, auth: 'boot', cfgErr: '', ready: false, loaded: {}, error: '', uid: null, profileName: '', admin: false, canWrite: true, teamCode: null, groups: [], codes: null, members: null, started: false };
   var NAMEKEY = 'jdo-name', NAME = '';
   try { NAME = localStorage.getItem(NAMEKEY) || ''; } catch (e) {}
   var tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
-  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null }, route: 'home', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
-    form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [] }, imp: { q: '', hit: null, miss: false },
+  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'] }, route: 'home', grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
+    form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false },
     auth: { mode: 'in', email: '', name: '', code: '', msg: '', ok: false, busy: false }, addMode: 'manual', gf: null };
 
   var G = function (id) { return M.games.filter(function (g) { return g.id === id; })[0]; };
   var sessionById = function (id) { return M.sessions.filter(function (s) { return s.id === id; })[0]; };
   var gamesOf = function (s) { return (s.gameIds || []).map(G).filter(Boolean); };
-  var seatsOf = function (s) { return gamesOf(s).reduce(function (a, g) { return a + g.max; }, 0); };
+  var seatsFor = function (games, single) { return games.reduce(function (a, g) { return single ? Math.max(a, g.max) : a + g.max; }, 0); };
+  var seatsOf = function (s) { return seatsFor(gamesOf(s), !!s.single); };
   var norm = function (n) { return String(n || '').trim().replace(/\s+/g, ' '); };
   var key = function (n) { return norm(n).toLowerCase(); };
   var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
@@ -1521,19 +1563,19 @@ var Badges = (function () {
   }
   function viewLogin() {
     var a = ui.auth, up = a.mode === 'up';
-    return authBox('lock', up ? 'Créer mon compte' : 'Connexion', up ? 'Une fois le compte créé, vous pourrez vous inscrire aux parties du midi.' : 'Connectez-vous pour réserver votre place à table.',
+    return authBox('lock', up ? 'Créer mon compte' : 'Connexion', up ? 'Une fois le compte créé, vous pourrez vous inscrire aux parties.' : 'Connectez-vous pour réserver votre place à table.',
       '<div class="seg" role="group" aria-label="Mode"><button type="button" aria-pressed="' + !up + '" data-act="authMode" data-mode="in">Se connecter</button><button type="button" aria-pressed="' + up + '" data-act="authMode" data-mode="up">Créer un compte</button></div>' +
       '<form id="auth-form" class="auth-form" novalidate>' +
       (up ? '<div class="field"><label for="a-name">Votre nom à table</label><input class="input" id="a-name" name="name" autocomplete="given-name" maxlength="30" placeholder="Prénom ou surnom" value="' + esc(a.name) + '"></div>' : '') +
       '<div class="field"><label for="a-email">E-mail</label><input class="input" id="a-email" name="email" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="prenom.nom@entreprise.fr" value="' + esc(a.email) + '"></div>' +
       '<div class="field"><label for="a-pw">Mot de passe</label><input class="input" id="a-pw" name="password" type="password" autocomplete="' + (up ? 'new-password' : 'current-password') + '" placeholder="' + (up ? '6 caractères minimum' : 'Votre mot de passe') + '"></div>' +
-      (up ? '<div class="field"><label for="a-code">Code d’équipe</label><input class="input" id="a-code" name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Donné par l’organisateur" value="' + esc(a.code) + '"></div>' : '') +
+      (up ? '<div class="field"><label for="a-code">Code d’inscription</label><input class="input" id="a-code" name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Donné par l’organisateur" value="' + esc(a.code) + '"></div>' : '') +
       authMsg() +
       '<button class="btn btn-lg btn-block" type="submit"' + (a.busy ? ' disabled' : '') + '>' + ic('check', 20) + ' ' + (a.busy ? 'Un instant…' : up ? 'Créer mon compte' : 'Me connecter') + '</button></form>');
   }
   function viewJoin() {
     var a = ui.auth;
-    return authBox('users', 'Rejoindre l’équipe', 'Saisissez le code d’équipe donné par l’organisateur. Vous ne le ferez qu’une fois.',
+    return authBox('users', 'Rejoindre l’équipe', 'Saisissez le code d’inscription donné par l’organisateur. Vous ne le ferez qu’une fois.',
       '<form id="join-form" class="auth-form" novalidate><div class="field"><label for="a-code">Code d’équipe</label><input class="input" id="a-code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Ex. 7K2P9XQA" value="' + esc(a.code) + '"></div>' + authMsg() +
       '<button class="btn btn-lg btn-block" type="submit"' + (a.busy ? ' disabled' : '') + '>' + ic('check', 20) + ' Rejoindre</button></form>' +
       '<button class="link" data-act="logout" type="button">Utiliser un autre compte</button>');
@@ -1611,7 +1653,7 @@ var Badges = (function () {
     markSeen(s.id); ui.modal = { type: 'reveal', sid: s.id };
   }
   function viewHome() {
-    var list = sorted(), fan = fanGames(), steps = [['Je m’inscris', 'et je classe les jeux'], ['La session se clôture', 'les tables se composent'], ['Je découvre ma table', 'et j’y vais']];
+    var list = sorted().filter(function (x) { return inGroup(x, ui.grp); }), fan = fanGames(), steps = [['Je m’inscris', 'et je classe les jeux'], ['La session se clôture', 'les tables se composent'], ['Je découvre ma table', 'et j’y vais']];
     var today = D.iso(new Date()), tod = [], up = [], arch = [];
     list.forEach(function (x) { (x.date === today ? tod : x.date > today ? up : arch).push(x); });
     arch.reverse();
@@ -1620,7 +1662,7 @@ var Badges = (function () {
     var secToday = tod.length ? '<section><div class="sec-head"><h2>Sessions du jour</h2><p>' + plural(tod.length, 'session aujourd’hui', 'sessions aujourd’hui') + '</p></div>' + grid(tod) + '</section>' : '';
     var secUp = '<section><div class="sec-head"><h2>Sessions à venir</h2><p>' + plural(up.length, 'session programmée', 'sessions programmées') + '</p></div>' + (up.length ? grid(up) : (tod.length || arch.length ? '<p class="hint">Aucune autre session programmée pour le moment.</p>' : empty)) + '</section>';
     var secArch = arch.length ? '<section class="archives"><button class="arch-toggle" data-act="toggleArch" aria-expanded="' + (ui.archOpen ? 'true' : 'false') + '">' + ic('cal', 18) + '<span>Sessions archivées</span><small>' + arch.length + '</small><i class="chev">' + (ui.archOpen ? '–' : '+') + '</i></button>' + (ui.archOpen ? grid(arch) : '') + '</section>' : '';
-    return myDayCard() + notifyCard() + '<section class="intro"><div><p class="eyebrow">Parties du midi - DSC tour Saint Gobain</p>' +
+    return myDayCard() + notifyCard() + groupSwitch() + '<section class="intro"><div><p class="eyebrow">' + esc(grpTitle(ui.grp)) + '</p>' +
       '<h1>Une place à table, <span class="mark">ça se réserve.</span></h1>' +
       '<p class="lede">Choisissez une session, classez les jeux qui vous tentent, et les tables se composent pour que chacun joue à ce qu’il aime.</p>' +
       '<ol class="steps">' + steps.map(function (t, i) { return '<li><b><i>' + (i + 1) + '</i>' + t[0] + '</b><span>' + t[1] + '</span></li>'; }).join('') + '</ol></div>' +
@@ -1636,7 +1678,7 @@ var Badges = (function () {
     else if (ph === 'published' || ph === 'auto') { label = 'Voir les tables'; cls += ' btn-teal'; }
     else { label = 'Voir la session'; cls += ' btn-glass'; }
     return '<article class="scard glass" style="--bgimg:url(' + bgOf(games[0]) + ')"><span class="scard-bg"></span>' +
-      '<div class="scard-top">' + ticket(s) + '<div class="scard-meta">' + statusPill(s) + (mine ? (waitPos(s, ST.uid) ? '<span class="pill pill-wait">' + ic('clock', 13) + ' En attente · n°' + waitPos(s, ST.uid) + '</span>' : '<span class="pill pill-me">' + ic('check', 13) + ' Inscrit·e</span>') : '') + '</div></div>' +
+      '<div class="scard-top">' + ticket(s) + '<div class="scard-meta">' + statusPill(s) + (s.single ? '<span class="pill pill-single">Un seul jeu</span>' : '') + (mine ? (waitPos(s, ST.uid) ? '<span class="pill pill-wait">' + ic('clock', 13) + ' En attente · n°' + waitPos(s, ST.uid) + '</span>' : '<span class="pill pill-me">' + ic('check', 13) + ' Inscrit·e</span>') : '') + '</div></div>' +
       '<div class="fan">' + games.map(function (g, j) { return '<div class="fan-i" style="--j:' + j + ';--n:' + games.length + '">' + box(g) + '</div>'; }).join('') + '</div>' +
       '<p class="scard-games">' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</p>' + (s.note && s.note.trim() ? '<p class="scard-note">' + esc(s.note.trim()) + '</p>' : '') +
       '<div class="seats-row">' + seatStrip(n, seats) + '<span class="seat-num"><b>' + n + '</b> / ' + seats + ' places' + (waitList(s).length ? ' · ' + waitList(s).length + ' en attente' : '') + '</span></div>' +
@@ -1662,7 +1704,7 @@ var Badges = (function () {
     else main = closedPanel(s, mine, games, ph === 'pending');
     return '<button class="back" data-act="home">' + ic('back', 18) + ' Toutes les sessions</button>' +
       '<div class="sess-head">' + ticket(s, 'big') + '<div><h1>' + longDate(s.date) + '</h1><div class="sub">' + statusPill(s) + '<span>' + (ph === 'open' ? 'Inscriptions jusqu’à ' + hm(s.time) : hm(s.time)) + '</span><span>' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</span></div></div></div>' +
-      noteBox(s) + (ph === 'open' ? roBanner() : '') + '<div class="cols"><div>' + main + '</div><aside class="aside">' + asidePanels(s) + '</aside></div>';
+      noteBox(s) + (s.single && ph === 'open' ? '<p class="single-note">' + ic('dice', 18) + '<span>Un seul jeu sera joué par tout le monde. Il est choisi à la clôture selon le nombre de joueurs et vos préférences : classez donc tous les jeux honnêtement.</span></p>' : '') + (ph === 'open' ? roBanner() : '') + '<div class="cols"><div>' + main + '</div><aside class="aside">' + asidePanels(s) + '</aside></div>';
   }
   function rankingPanel(s, games, mine) {
     var d = ui.draft, k = games.length, handled = d.order.length + d.veto.length;
@@ -1731,7 +1773,7 @@ var Badges = (function () {
     } else if (un) {
       banner = '<div class="panel glass-2"><div class="ok-head" style="margin:0"><span class="ok-ico" style="background:var(--tomato);color:var(--on-tomato);box-shadow:0 3px 0 var(--tomato-edge)">' + ic('x', 22) + '</span><div><h2>Pas de table cette fois</h2><p class="hint" style="margin:4px 0 0">Aucune table ouverte ne correspondait à vos choix. Parlez-en à l’organisateur.</p></div></div></div>';
     }
-    return banner + '<div class="panel glass-2"><div class="panel-head"><h2>Les tables du midi</h2><p>' + (auto ? 'Composées automatiquement à l’heure de la session. ' : '') + 'Voici qui joue à quoi.</p></div>' +
+    return banner + '<div class="panel glass-2"><div class="panel-head"><h2>Les tables</h2><p>' + (auto ? 'Composées automatiquement à l’heure de la session. ' : '') + 'Voici qui joue à quoi.</p></div>' +
       (r.tables.length ? '<div class="tables">' + r.tables.map(function (t, i) { return tableCard(s, t, { edit: false, i: i }); }).join('') + '</div>' : '<p class="hint" style="margin:0">Aucune table n’a pu être ouverte : pas assez de joueurs pour les jeux proposés.</p>') + '</div>';
   }
   function asidePanels(s) {
@@ -1819,7 +1861,7 @@ var Badges = (function () {
   function tabNotif() {
     var n = ui.nt, ok = n.title.trim() && n.text.trim() && !n.busy, aud = n.aud;
     return '<div class="cols"><div class="panel glass-2 nt-form"><div class="panel-head"><h2>Envoyer une annonce</h2><p>Une notification arrive sur le téléphone de chaque personne qui a activé les notifications. Utile pour prévenir d’un changement de salle, d’une soirée jeux, d’un nouveau jeu…</p></div>' +
-      '<div class="field"><label for="nt-title">Titre</label><input class="input" id="nt-title" maxlength="80" autocomplete="off" placeholder="Ex. Nouveau jeu en salle Cèdre" value="' + esc(n.title) + '"></div>' +
+      '<div class="label">Destinataires</div>' + groupPicker(n.groups, 'ntGroup') + '<div class="field" style="margin-top:14px"><label for="nt-title">Titre</label><input class="input" id="nt-title" maxlength="80" autocomplete="off" placeholder="Ex. Nouveau jeu en salle Cèdre" value="' + esc(n.title) + '"></div>' +
       '<div class="field" style="margin-top:14px"><label for="nt-text">Texte</label><textarea class="input" id="nt-text" rows="4" maxlength="300" placeholder="Votre message (300 caractères max.)">' + esc(n.text) + '</textarea></div>' +
       '<div class="gf-photo-btns" style="margin-top:14px"><label class="btn btn-sm btn-glass" for="nt-file">' + ic('camera', 17) + ' ' + (n.preview ? 'Changer l’image' : 'Ajouter une image (facultatif)') + '</label><input type="file" id="nt-file" accept="image/*" hidden>' + (n.preview ? '<button class="link danger" type="button" data-act="ntClearImg">Retirer l’image</button>' : '') + '</div>' +
       (n.err ? '<p class="auth-msg bad" role="alert">' + esc(n.err) + '</p>' : '') + '</div>' +
@@ -1850,34 +1892,63 @@ var Badges = (function () {
   }
   function tabTeam() {
     var link = location.href.split('#')[0].split('?')[0];
-    return '<div class="panel glass-2 team"><div class="panel-head"><h2>Inviter vos collègues</h2><p>Chacun crée son compte sur le lien ci-dessous, puis saisit le code d’équipe. Sans ce code, personne ne voit ni ne modifie rien.</p></div>' +
+    return '<div class="panel glass-2 team"><div class="panel-head"><h2>Inviter vos collègues</h2><p>Chacun crée son compte sur le lien ci-dessous, puis saisit le code d’inscription de son groupe (Pro ou Perso). Sans code, personne ne voit ni ne modifie rien.</p></div>' +
       '<div class="label">Lien de l’application</div><div class="copyrow"><code>' + esc(link) + '</code><button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(link) + '">' + ic('copy', 16) + ' Copier</button></div>' +
-      '<div class="label" style="margin-top:20px">Code d’équipe</div><div class="copyrow"><code class="bigcode">' + (ST.teamCode === null ? '…' : esc(ST.teamCode || 'indisponible')) + '</code>' + (ST.teamCode ? '<button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(ST.teamCode) + '">' + ic('copy', 16) + ' Copier</button>' : '') + '</div>' +
-      '<div class="field" style="margin-top:20px;max-width:360px"><label for="t-code">Changer le code</label><div class="import-row"><input class="input" id="t-code" maxlength="30" autocomplete="off" autocapitalize="characters" placeholder="Nouveau code (4 caractères min.)"><button class="btn" data-act="saveCode">Enregistrer</button></div></div>' +
-      '<p class="hint" style="margin:16px 0 0">Les personnes déjà inscrites restent dans l’équipe quand vous changez le code : il ne sert qu’aux nouveaux arrivants. Mot de passe oublié : réinitialisation depuis Supabase (Authentication, Users).</p></div>';
+      GROUPS.map(function (g) {
+        var cd = ST.codes && ST.codes[g[0]];
+        return '<div class="label" style="margin-top:20px">Code d’inscription · ' + grpChips([g[0]]) + '</div><div class="copyrow"><code class="bigcode">' + (ST.codes === null ? '…' : esc(cd || 'indisponible')) + '</code>' + (cd ? '<button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(cd) + '">' + ic('copy', 16) + ' Copier</button>' : '') + '</div>' +
+          '<div class="field" style="margin-top:10px;max-width:360px"><div class="import-row"><input class="input" id="t-code-' + g[0] + '" maxlength="30" autocomplete="off" autocapitalize="characters" placeholder="Nouveau code ' + g[1] + ' (4 caractères min.)" aria-label="Nouveau code ' + g[1] + '"><button class="btn" data-act="saveCode" data-g="' + g[0] + '">Enregistrer</button></div></div>';
+      }).join('') +
+      '<p class="hint" style="margin:16px 0 0">Le code utilisé à l’inscription décide du groupe. Les deux codes doivent être différents. Les personnes déjà inscrites restent dans leur groupe quand vous changez un code : il ne sert qu’aux nouveaux arrivants. Mot de passe oublié : réinitialisation depuis Supabase (Authentication, Users).</p></div>' +
+      '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Titre de l’accueil</h2><p>Le texte affiché en haut de l’accueil, propre à chaque groupe.</p></div>' +
+      GROUPS.map(function (g) { return '<div class="field" style="margin-top:12px"><label for="t-title-' + g[0] + '">' + grpChips([g[0]]) + ' Titre</label><div class="import-row"><input class="input" id="t-title-' + g[0] + '" maxlength="80" autocomplete="off" value="' + esc(grpTitle(g[0])) + '"><button class="btn" data-act="saveTitle" data-g="' + g[0] + '">Enregistrer</button></div></div>'; }).join('') + '</div>' +
+      '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Personnes et groupes</h2><p>Ajoutez une personne à l’autre groupe pour qu’elle soit dans les deux. L’admin est toujours dans les deux groupes. Une personne reste dans au moins un groupe.</p></div>' +
+      (ST.members === null ? '<p class="hint">Chargement…</p>' : !ST.members.length ? '<p class="hint">Aucune personne pour l’instant.</p>' : '<div class="reset-list">' + ST.members.map(function (m) {
+        return '<div class="reset-row">' + avatar(m.name || '?', 'sm') + '<div class="reset-who"><b>' + esc(m.name || 'Sans nom') + '</b><small>' + (m.admin ? 'Admin · les deux groupes' : '') + '</small></div>' +
+          (m.admin ? '' : '<div class="gpick">' + GROUPS.map(function (g) { return '<button type="button" class="gpick-b g-' + g[0] + '" aria-pressed="' + (m.groups.indexOf(g[0]) >= 0) + '" data-act="memberGroup" data-uid="' + esc(m.id) + '" data-g="' + g[0] + '"><span class="tick">' + ic('check', 14) + '</span>' + g[1] + '</button>'; }).join('') + '</div>') + '</div>';
+      }).join('') + '</div>') + '</div>' +
+      '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Badges et compteurs</h2><p>Remet à zéro, pour tout le monde, les badges, les compteurs de sessions jouées et manquées, et le malus d’absence. Les sessions et les absences déjà saisies ne sont pas supprimées : seules celles d’avant la remise à zéro sont ignorées. Chacun reverra l’écran de célébration pour ses nouveaux badges.</p></div>' +
+      (M.settings.badgesReset ? '<p class="hint" style="margin:0 0 12px">Dernière remise à zéro : ' + esc(new Date(M.settings.badgesReset).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })) + '.</p>' : '') +
+      '<div class="small-h" style="margin-top:22px">Par personne</div><div class="reset-list">' + Object.keys(M.regs).filter(function (u) { return M.regs[u].name && !M.regs[u].fake; }).sort(function (a, b) { return M.regs[a].name.localeCompare(M.regs[b].name, 'fr'); }).map(function (u) {
+        var rs = Badges.compute(badgeEvents(u)), nm = M.regs[u].name, conf = ui.confirm === 'ru:' + u;
+        return '<div class="reset-row">' + avatar(nm, 'sm') + '<div class="reset-who"><b>' + esc(nm) + '</b><small>' + rs.played + ' jouée' + (rs.played > 1 ? 's' : '') + ' · ' + rs.missed + ' manquée' + (rs.missed > 1 ? 's' : '') + ' · ' + rs.earned.length + ' badge' + (rs.earned.length > 1 ? 's' : '') + '</small></div>' +
+          (conf ? '<button class="btn btn-red btn-sm" data-act="resetUser" data-uid="' + esc(u) + '">Confirmer</button><button class="link" data-act="resetBadgesNo">Annuler</button>' : '<button class="btn btn-glass btn-sm" data-act="resetUserAsk" data-uid="' + esc(u) + '">' + ic('undo', 14) + ' Remettre à zéro</button>') + '</div>';
+      }).join('') + '</div>' +
+      (ui.confirm === 'rb' ? '<div class="tools"><button class="btn btn-red" data-act="resetBadges">' + ic('trash', 16) + ' Oui, tout remettre à zéro</button><button class="link" data-act="resetBadgesNo">Annuler</button></div>' : '<button class="btn btn-glass" data-act="resetBadgesAsk">' + ic('undo', 16) + ' Réinitialiser les badges</button>') + '</div>';
   }
   function tabSessions() {
     var list = sorted().reverse();   /* du plus récent au plus ancien */
     if (!list.length) return '<div class="panel glass empty"><svg class="meeple" viewBox="0 0 100 100"><use href="#meeple"/></svg><h2>Aucune session</h2><p>Programmez la première dans l’onglet « Programmer ».</p></div>';
     return '<div class="arows">' + list.map(function (s) {
       var games = gamesOf(s), seats = seatsOf(s), confirming = ui.confirm === 'del:' + s.id;
-      return '<article class="arow glass">' + ticket(s, 'mini') + '<div><h3>' + longDate(s.date) + ' · ' + hm(s.time) + '</h3><div class="minis">' + games.map(function (g) { return '<div title="' + esc(g.name) + '">' + box(g) + '</div>'; }).join('') + '</div></div>' +
+      return '<article class="arow glass">' + ticket(s, 'mini') + '<div><h3>' + longDate(s.date) + ' · ' + hm(s.time) + ' ' + grpChips(groupsOf(s)) + '</h3><div class="minis">' + games.map(function (g) { return '<div title="' + esc(g.name) + '">' + box(g) + '</div>'; }).join('') + '</div></div>' +
         '<div class="arow-side">' + statusPill(s) + '<span class="seat-num"><b>' + regList(s).length + '</b> / ' + seats + ' places</span><div class="row"><button class="link danger" data-act="delSession" data-sid="' + s.id + '">' + ic('trash', 15) + ' ' + (confirming ? 'Confirmer' : 'Supprimer') + '</button>' +
         '<button class="btn btn-sm" data-act="manage" data-sid="' + s.id + '">Gérer ' + ic('arrow', 16) + '</button></div></div></article>';
     }).join('') + '</div>';
   }
+  function normQ(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  function filterPicker() {
+    var q = normQ((ui.form.q || '').trim()), tiles = document.querySelectorAll('#f-picker .ptile'), n = 0, i;
+    for (i = 0; i < tiles.length; i++) { var ok = !q || tiles[i].getAttribute('data-q').indexOf(q) >= 0; tiles[i].hidden = !ok; if (ok) n++; }
+    var none = document.getElementById('f-qnone'); if (none) none.hidden = n > 0 || !tiles.length;
+    var c = document.getElementById('f-qn'); if (c) c.textContent = q ? n + ' / ' + tiles.length : '';
+  }
   function tabNew() {
-    var f = ui.form, sel = f.gameIds.map(G).filter(Boolean), total = sel.reduce(function (a, g) { return a + g.max; }, 0);
+    var f = ui.form, sel = f.gameIds.map(G).filter(Boolean), total = seatsFor(sel, !!f.single);
     return '<div class="form"><div class="panel glass-2"><div class="panel-head"><h2>Nouvelle session</h2><p>Choisissez le jour, l’heure, puis les jeux proposés.</p></div>' +
       '<div class="form-row"><div class="field"><label for="f-date">Date</label><input class="input" id="f-date" type="date" value="' + esc(f.date) + '"></div><div class="field"><label for="f-time">Heure</label><input class="input" id="f-time" type="time" value="' + esc(f.time) + '"></div></div>' +
       '<p class="hint" style="margin:10px 0 0">À cette heure, les inscriptions se ferment et les tables se composent toutes seules si vous n’avez pas clôturé avant.</p>' +
       '<div class="field" style="margin-top:18px"><label for="f-note">Commentaire pour les joueurs (facultatif)</label><textarea class="input" id="f-note" rows="3" maxlength="280" placeholder="Ex. Salle Cèdre, on commence à 12h20. Apportez votre déjeuner !">' + esc(f.note) + '</textarea></div>' +
-      '<div class="label" style="margin-top:24px">Jeux proposés</div><div class="picker">' + M.games.map(function (g) {
-        return '<button class="ptile" aria-pressed="' + (f.gameIds.indexOf(g.id) >= 0) + '" data-act="pickGame" data-gid="' + g.id + '"><span class="tick">' + ic('check', 16) + '</span>' + box(g) + '<strong>' + esc(g.name) + '</strong><small>' + g.min + '–' + g.max + ' joueurs</small></button>';
+      '<div class="label" style="margin-top:24px">Pour quel groupe ?</div>' + groupPicker(f.groups, 'pickGroup') + '<p class="hint" style="margin:8px 0 0">Seules les personnes du ou des groupes choisis voient la session.</p>' +
+      '<div class="label" style="margin-top:24px">Type de session</div><button class="opt-single" type="button" role="switch" aria-checked="' + (!!f.single) + '" data-act="pickSingle"><span class="sw"></span><span><strong>Un seul jeu retenu</strong><small>Tout le monde joue au même jeu, choisi à la clôture selon le nombre de joueurs et les préférences. Les places sont celles du jeu qui en accepte le plus.</small></span></button>' +
+      '<div class="label" style="margin-top:24px">Jeux proposés</div>' +
+      '<div class="gsearch">' + ic('search', 18) + '<input class="input" id="f-q" type="search" placeholder="Rechercher un jeu (nom, catégorie…)" autocomplete="off" value="' + esc(f.q || '') + '"><small id="f-qn"></small></div>' +
+      '<p class="hint gsearch-none" id="f-qnone" hidden>Aucun jeu ne correspond à cette recherche.</p><div class="picker" id="f-picker">' + M.games.map(function (g) {
+        return '<button class="ptile" data-q="' + esc(normQ(g.name + ' ' + (g.tags || '') + ' ' + (g.year || ''))) + '" aria-pressed="' + (f.gameIds.indexOf(g.id) >= 0) + '" data-act="pickGame" data-gid="' + g.id + '"><span class="tick">' + ic('check', 16) + '</span>' + box(g) + '<strong>' + esc(g.name) + '</strong><small>' + g.min + '–' + g.max + ' joueurs</small></button>';
       }).join('') + '</div></div>' +
       '<aside class="panel glass sumbox"><div class="small-h" style="margin:0">Places bloquées</div><div class="big">' + total + '<small> places</small></div>' +
-      '<div class="eq">' + (sel.length ? sel.map(function (g) { return '<span><b>' + g.max + '</b> ' + esc(g.name) + '</span>'; }).join('<span>+</span>') : 'Aucun jeu sélectionné.') + '</div>' +
-      '<p class="hint" style="margin:0">Le total est la somme du nombre maximum de joueurs de chaque jeu.</p>' +
+      '<div class="eq">' + (sel.length ? sel.map(function (g) { return '<span><b>' + g.max + '</b> ' + esc(g.name) + '</span>'; }).join(f.single ? '<span>ou</span>' : '<span>+</span>') : 'Aucun jeu sélectionné.') + '</div>' +
+      '<p class="hint" style="margin:0">' + (f.single ? 'Un seul jeu sera retenu : le total est le plus grand nombre maximum de joueurs parmi les jeux.' : 'Le total est la somme du nombre maximum de joueurs de chaque jeu.') + '</p>' +
       '<button class="btn btn-lg btn-block" data-act="createSession"' + (sel.length && f.date && f.time ? '' : ' disabled') + '>' + ic('plus', 20) + ' Programmer la session</button></aside></div>';
   }
   function stepper(g, f, l) {
@@ -1899,7 +1970,7 @@ var Badges = (function () {
       '<div class="form-row3">' + gfField('gf-time', 'Durée (min)', gfInput('gf-time', 'number', '45', ' min="1" max="600"')) + gfField('gf-age', 'Âge dès', gfInput('gf-age', 'number', '8', ' min="1" max="99"')) + gfField('gf-year', 'Année', gfInput('gf-year', 'number', '2004', ' min="1800" max="2100"')) + '</div>' +
       gfField('gf-weight', 'Complexité, de 1 (facile) à 5 (expert)', gfInput('gf-weight', 'number', '2.2', ' min="1" max="5" step="0.1"'), 'gf-narrow') +
       gfField('gf-tags', 'Catégories, séparées par des virgules', gfInput('gf-tags', 'text', 'Ex. Familial, Stratégie', ' maxlength="80"')) +
-      gfField('gf-summary', 'Résumé', '<textarea class="input" id="gf-summary" rows="5" maxlength="600" placeholder="Décrivez le jeu en quelques phrases.">' + esc(f.summary) + '</textarea>') +
+      gfField('gf-summary', 'Résumé', '<textarea class="input" id="gf-summary" rows="8" placeholder="Décrivez le jeu : règles, déroulement, ambiance… (sans limite de longueur)">' + esc(f.summary) + '</textarea>') +
       (f.err ? '<p class="auth-msg bad" role="alert">' + esc(f.err) + '</p>' : '') +
       '<div class="gf-actions"><button class="btn btn-teal" type="button" data-act="gfSave"' + (f.busy ? ' disabled' : '') + '>' + ic(edit ? 'check' : 'plus', 18) + ' ' + (f.busy ? 'Enregistrement…' : edit ? 'Enregistrer les modifications' : 'Ajouter à la ludothèque') + '</button>' +
       (edit ? '<button class="btn btn-glass" type="button" data-act="gfCancel">Annuler</button>' : '') + '</div></div></div>';
@@ -1961,11 +2032,14 @@ var Badges = (function () {
       (free.length ? '<div class="ag-list">' + free.map(function (g) { return '<button class="ag-item" data-act="addGame" data-sid="' + s.id + '" data-gid="' + esc(g.id) + '">' + box(g) + '<span><strong>' + esc(g.name) + '</strong><em>+' + g.max + ' places</em></span>' + ic('plus', 16) + '</button>'; }).join('') + '</div>'
         : '<p class="small">Tous les jeux de la ludothèque sont déjà proposés.</p>') + '</div>';
   }
+  function singlePanel(s) {
+    return '<div class="panel glass-2"><div class="small-h">Type de session</div><button class="opt-single" type="button" role="switch" aria-checked="' + (!!s.single) + '" data-act="toggleSingle" data-sid="' + s.id + '"><span class="sw"></span><span><strong>Un seul jeu retenu</strong><small>' + (s.single ? 'À la clôture, un seul jeu est choisi pour tout le monde.' : 'Plusieurs jeux peuvent être joués en parallèle.') + '</small></span></button></div>';
+  }
   function viewManage() {
     var s = sessionById(ui.msid);
     if (!s) { ui.msid = null; return viewAdmin(); }
     var games = gamesOf(s), seats = seatsOf(s), regs = regList(s), n = regs.length, ph = phase(s);
-    var head = '<button class="back" data-act="mBack">' + ic('back', 18) + ' Toutes les sessions</button><div class="sess-head">' + ticket(s, 'big') + '<div><h1>' + longDate(s.date) + '</h1><div class="sub">' + statusPill(s) + '<span>' + hm(s.time) + '</span><span>' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</span></div></div></div>' + noteEditor(s);
+    var head = '<button class="back" data-act="mBack">' + ic('back', 18) + ' Toutes les sessions</button><div class="sess-head">' + ticket(s, 'big') + '<div><h1>' + longDate(s.date) + '</h1><div class="sub">' + statusPill(s) + '<span>' + hm(s.time) + '</span><span>' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</span></div></div></div>' + '<div class="panel glass-2 sess-groups"><div class="small-h">Groupes destinataires</div>' + groupPicker(groupsOf(s), 'sessGroup').replace(/data-act="sessGroup"/g, 'data-act="sessGroup" data-sid="' + s.id + '"') + '</div>' + noteEditor(s);
     if (ph === 'open' || ph === 'pending') {
       var p = seats ? Math.min(100, Math.round(n / seats * 100)) : 0, fakes = Object.keys(M.regs).some(function (u) { return M.regs[u].fake && M.regs[u].s && M.regs[u].s[s.id]; });
       return head + '<div class="cols"><div class="panel glass-2"><div class="panel-head"><h2>Inscrits (' + n + ')</h2><p>Pour chaque inscrit : l’ordre de ses jeux, du préféré au moins préféré. La croix indique un jeu refusé.</p></div>' +
@@ -1974,7 +2048,7 @@ var Badges = (function () {
         '<aside class="aside"><div class="panel glass-2"><div class="small-h">Clôture et affectation</div><div class="gauge"><div class="ring ' + (n >= seats ? 'full' : '') + '" style="--p:' + p + '"><div><b>' + n + '</b><span>sur ' + seats + '</span></div></div><p>' + (ph === 'pending' ? 'L’heure est passée : la clôture automatique se déclenche dès qu’une personne a la page ouverte.' : 'Clôture automatique à <b>' + hm(s.time) + '</b> si vous ne l’avez pas faite avant. Les tables sont alors publiées tout de suite.') + '</p></div>' +
         '<div class="field" style="margin-top:22px"><label for="balance">Équilibre de l’affectation</label><input class="range" id="balance" type="range" min="0" max="100" step="5" value="' + M.settings.balance + '"><div class="range-l"><span>Une table par envie</span><span>Moins de tables</span></div></div>' +
         '<button class="btn btn-red btn-lg btn-block" style="margin-top:22px" data-act="closeSession" data-sid="' + s.id + '"' + (n ? '' : ' disabled') + '>' + ic('lock', 19) + ' Clôturer et affecter maintenant</button></div>' +
-        addGamePanel(s) +
+        singlePanel(s) + addGamePanel(s) +
         '<div class="panel glass"><div class="small-h">Outils de test</div><div class="tools"><button class="btn btn-glass btn-sm" data-act="fake" data-sid="' + s.id + '" data-n="6"' + (n >= seats ? ' disabled' : '') + '>' + ic('plus', 15) + ' 6 inscrits fictifs</button><button class="btn btn-glass btn-sm" data-act="fake" data-sid="' + s.id + '" data-n="14"' + (n >= seats ? ' disabled' : '') + '>' + ic('plus', 15) + ' 14</button>' + (fakes ? '<button class="link" data-act="clearFakes" data-sid="' + s.id + '">Retirer les fictifs</button>' : '') + '</div></div></aside></div>';
     }
     return head + resultsView(s, games, ph);
@@ -1998,12 +2072,41 @@ var Badges = (function () {
     return stats + absHint + '<div class="tables">' + r.tables.map(function (t, i) { return tableCard(s, t, { edit: edit, i: i, abs: canAbs }); }).join('') + '</div>' + un + nr + bar;
   }
 
+  /* ---------- Groupes Pro / Perso ---------- */
+  var GROUPS = [['pro', 'Pro'], ['perso', 'Perso']];
+  var GRP_TITLE = { pro: 'Parties du midi - DSC tour Saint Gobain', perso: 'Ça joue à Benney' };
+  var GRPKEY = 'jdo-grp';
+  var groupsOf = function (s) { return s.groups && s.groups.length ? s.groups : ['pro']; };
+  var inGroup = function (s, g) { return groupsOf(s).indexOf(g) >= 0; };
+  var grpName = function (g) { return g === 'perso' ? 'Perso' : 'Pro'; };
+  function grpTitle(g) { var c = M.groupCfg && M.groupCfg[g]; return (c && c.title && String(c.title).trim()) || GRP_TITLE[g] || GRP_TITLE.pro; }
+  function pickGrp() {
+    var saved = ''; try { saved = localStorage.getItem(GRPKEY) || ''; } catch (e) {}
+    ui.grp = ST.groups.indexOf(saved) >= 0 ? saved : (ST.groups.indexOf('pro') >= 0 ? 'pro' : (ST.groups[0] || 'pro'));
+  }
+  function grpChips(list) { return '<span class="gchips">' + list.map(function (g) { return '<span class="gchip g-' + g + '">' + grpName(g) + '</span>'; }).join('') + '</span>'; }
+  function groupSwitch() {
+    if (ST.groups.length < 2) return '';
+    return '<div class="gswitch" role="group" aria-label="Groupe">' + GROUPS.filter(function (g) { return ST.groups.indexOf(g[0]) >= 0; }).map(function (g) { return '<button class="g-' + g[0] + '" aria-pressed="' + (ui.grp === g[0]) + '" data-act="setGrp" data-g="' + g[0] + '">' + g[1] + '</button>'; }).join('') + '</div>';
+  }
+  function groupPicker(sel, act) {
+    return '<div class="gpick">' + GROUPS.map(function (g) { return '<button type="button" class="gpick-b g-' + g[0] + '" aria-pressed="' + (sel.indexOf(g[0]) >= 0) + '" data-act="' + act + '" data-g="' + g[0] + '"><span class="tick">' + ic('check', 14) + '</span>' + g[1] + '</button>'; }).join('') + '</div>';
+  }
+  function saveGroupCfg(patch) {
+    var c = clone(M.groupCfg || {}); Object.keys(patch).forEach(function (g) { c[g] = Object.assign({}, c[g] || {}, patch[g]); });
+    M.groupCfg = c; return ST.db.doc('settings/groups').set(c);
+  }
+  function loadGroups() { return Backend.status().then(function (st) { if (!st.error) { ST.groups = st.admin ? ['pro', 'perso'] : st.groups; pickGrp(); } }); }
+
   /* ---------- Badges, profil et célébration ---------- */
+  function saveSettings() { return ST.db.doc('settings/main').set({ balance: M.settings.balance, badgesReset: M.settings.badgesReset || 0 }); }
+  /* dernière remise à zéro qui concerne cette personne : globale ou individuelle (la plus récente) */
+  function resetOf(uid) { var d = M.regs[uid]; return Math.max(M.settings.badgesReset || 0, (d && +d.badgesReset) || 0); }
   function badgeEvents(uid) {
-    var out = [], now = Date.now();
+    var out = [], now = Date.now(), reset = resetOf(uid);
     sorted().forEach(function (s) {
       var ph = phase(s); if (ph !== 'published' && ph !== 'auto') return;
-      if (now < startMs(s)) return;
+      if (now < startMs(s) || startMs(s) < reset) return;   /* avant la dernière remise à zéro : ignorée */
       var r = resultOf(s); if (!r) return;
       var tb = r.tables.filter(function (t) { return t.ids.indexOf(uid) >= 0; })[0], ab = s.absent || {}, g = tb && G(tb.gid);
       out.push({ sid: s.id, start: startMs(s), date: s.date, created: s.created || 0, mine: !!tb, absent: !!ab[uid], gid: tb ? tb.gid : null, gname: g ? g.name : '',
@@ -2038,11 +2141,11 @@ var Badges = (function () {
   function maybeBadges() {
     if (ui.route !== 'home' || ui.modal || ui.badgeDone || ST.auth !== 'in' || !ST.uid || !ST.ready || !ST.loaded.results || !ST.loaded.auto) return;
     var d = M.regs[ST.uid]; if (!d) return;
-    var res = myBadges(), seen = d.badges || [], fresh = res.list.filter(function (b) { return b.got && seen.indexOf(b.id) < 0; });
+    var res = myBadges(), seen = (d.badgesEpoch || 0) === resetOf(ST.uid) ? (d.badges || []) : [], fresh = res.list.filter(function (b) { return b.got && seen.indexOf(b.id) < 0; });
     if (!fresh.length) return;
     ui.badgeDone = true; ui.modal = { type: 'badges', ids: fresh.map(function (b) { return b.id; }), all: res.earned, fx: fresh.some(function (b) { return !b.neg; }) };
   }
-  function saveBadgesSeen(all) { if (!all || !ST.uid) return; saveMine(function (doc) { doc.badges = all.slice(); return doc; }); }
+  function saveBadgesSeen(all) { if (!all || !ST.uid) return; saveMine(function (doc) { doc.badges = all.slice(); doc.badgesEpoch = resetOf(ST.uid); return doc; }); }
   function modalBadges(m) {
     var list = myBadges().list.filter(function (b) { return m.ids.indexOf(b.id) >= 0; }); if (!list.length) return '';
     var many = list.length > 1;
@@ -2077,7 +2180,7 @@ var Badges = (function () {
     if (ST.auth === 'out') h = viewLogin(); else if (ST.auth === 'join') h = viewJoin(); else if (ST.auth === 'config' || ST.auth === 'lib' || ST.auth === 'net') h = viewConfig(); else if (ST.auth === 'boot' || !ST.ready) h = viewLoading();
     else if (ST.error) h = viewError();
     else if (ui.route === 'session') h = viewSession(); else if (ui.route === 'games') h = viewGames(); else if (ui.route === 'admin') h = viewAdmin(); else if (ui.route === 'profile') h = viewProfile(); else h = viewHome();
-    $('#view').innerHTML = h;
+    $('#view').innerHTML = h; filterPicker();
     var items = [['home', 'Sessions', 'cal'], ['games', 'Ludothèque', 'dice']];
     items.push(['profile', 'Profil', 'trophy']);
     if (ST.admin) items.push(['admin', 'Admin', 'gear']);
@@ -2129,7 +2232,7 @@ var Badges = (function () {
   function computeResult(s) {
     var games = gamesOf(s).map(function (g) { return { id: g.id, min: g.min, max: g.max, ideal: g.ideal }; });
     var players = regList(s).map(function (r) { return { name: r.uid, order: r.order, veto: r.veto, weight: malusOf(r.uid, s) }; });
-    var out = E.solve(players, games, { tablePenalty: M.settings.balance });
+    var out = E.solve(players, games, { tablePenalty: M.settings.balance, single: !!s.single });
     return { tables: out.tables.map(function (t) { return { gid: t.gid, ids: t.names }; }), unplaced: out.unplaced, notes: out.notes, adjusted: false };
   }
   function tableProblems(r) {
@@ -2237,6 +2340,18 @@ var Badges = (function () {
     gameInfo: function (el) { ui.modal = { type: 'game', gid: el.dataset.gid }; renderModal(); },
     toggleArch: function () { ui.archOpen = !ui.archOpen; render(); },
     closeModal: function () { var m = ui.modal; ui.modal = null; renderModal(); if (m && m.type === 'badges') saveBadgesSeen(m.all); },
+    resetBadgesAsk: function () { ui.confirm = 'rb'; render(); },
+    resetBadgesNo: function () { ui.confirm = null; render(); },
+    resetBadges: function () {
+      if (!ST.admin) return; M.settings.badgesReset = Date.now(); ui.confirm = null; render();
+      wr(saveSettings(), 'Badges, compteurs et malus remis à zéro pour tout le monde.');
+    },
+    resetUserAsk: function (el) { ui.confirm = 'ru:' + el.dataset.uid; render(); },
+    resetUser: function (el) {
+      var uid = el.dataset.uid, d = M.regs[uid]; if (!ST.admin || !d) return;
+      var c = clone(d); c.badgesReset = Date.now(); ui.confirm = null;
+      wr(ST.db.doc('regs/' + uid).set(c), nameOf(uid) + ' : badges, compteurs et malus remis à zéro.');
+    },
     toggleAbsent: function (el) {
       var s = sessionById(el.dataset.sid), uid = el.dataset.uid; if (!s || !uid || !ST.admin) return;
       var ph = phase(s); if ((ph !== 'published' && ph !== 'auto') || Date.now() < startMs(s)) return;
@@ -2245,13 +2360,34 @@ var Badges = (function () {
     },
     tab: function (el) {
       ui.adminTab = el.dataset.tab; ui.confirm = null; render();
-      if (ui.adminTab === 'notif' && ui.nt.aud === null) Backend.pushAudience().then(function (n) { ui.nt.aud = n; if (ui.adminTab === 'notif') render(); });
-      if (ui.adminTab === 'team' && ST.teamCode === null) Backend.teamCode().then(function (c) { ST.teamCode = c || ''; render(); });
+      if (ui.adminTab === 'notif' && ui.nt.aud === null) Backend.pushAudience(ui.nt.groups).then(function (n) { ui.nt.aud = n; if (ui.adminTab === 'notif') render(); });
+      if (ui.adminTab === 'team') {
+        if (ST.codes === null) Backend.groupCodes().then(function (c) { ST.codes = c || {}; render(); });
+        Backend.adminMembers().then(function (l) { ST.members = l || []; if (ui.adminTab === 'team') render(); });
+      }
     },
-    saveCode: function () {
-      var v = ($('#t-code') || {}).value || ''; v = v.trim();
+    saveCode: function (el) {
+      var g = el.dataset.g, v = (($('#t-code-' + g) || {}).value || '').trim();
       if (v.length < 4) return toast('Le code doit faire 4 caractères au moins.');
-      Backend.setTeamCode(v).then(function (ok) { if (ok) { ST.teamCode = v.toUpperCase(); toast('Code d’équipe modifié.'); render(); } else toast('Modification impossible.'); });
+      Backend.setGroupCode(g, v).then(function (ok) { if (ok) { ST.codes = Object.assign({}, ST.codes || {}); ST.codes[g] = v.toUpperCase(); toast('Code ' + grpName(g) + ' modifié.'); render(); } else toast('Modification impossible : ce code est peut-être déjà utilisé par l’autre groupe.'); });
+    },
+    saveTitle: function (el) {
+      var g = el.dataset.g, v = (($('#t-title-' + g) || {}).value || '').trim(); if (!v) return toast('Le titre ne peut pas être vide.');
+      var patch = {}; patch[g] = { title: v }; wr(saveGroupCfg(patch), 'Titre ' + grpName(g) + ' enregistré.');
+    },
+    memberGroup: function (el) {
+      var uid = el.dataset.uid, g = el.dataset.g, m = (ST.members || []).filter(function (x) { return x.id === uid; })[0]; if (!m) return;
+      var on = m.groups.indexOf(g) < 0;
+      Backend.setMemberGroup(uid, g, on).then(function (ok) {
+        if (!ok) return toast(on ? 'Modification impossible.' : 'Une personne doit rester dans au moins un groupe.');
+        if (on) m.groups.push(g); else m.groups.splice(m.groups.indexOf(g), 1);
+        toast(m.name + (on ? ' ajouté·e au groupe ' : ' retiré·e du groupe ') + grpName(g) + '.'); render();
+      });
+    },
+    ntGroup: function (el) {
+      var a = ui.nt.groups, g = el.dataset.g, i = a.indexOf(g); if (i >= 0) { if (a.length > 1) a.splice(i, 1); } else a.push(g);
+      ui.nt.confirm = false; ui.nt.aud = null; render();
+      Backend.pushAudience(a).then(function (n) { ui.nt.aud = n; if (ui.adminTab === 'notif') render(); });
     },
     copy: function (el) {
       var v = el.dataset.v || '';
@@ -2269,13 +2405,27 @@ var Badges = (function () {
     },
     pushOff: function () { Backend.push.forget(ST.uid, true).then(function () { toast('Notifications désactivées sur cet appareil.'); refreshPush(); }); },
     pushLater: function () { try { localStorage.setItem('jdo-push-hide', String(Date.now())); } catch (e) {} ui.pushHide = true; render(); },
+    pickGroup: function (el) { var a = ui.form.groups, g = el.dataset.g, i = a.indexOf(g); if (i >= 0) { if (a.length > 1) a.splice(i, 1); } else a.push(g); render(); },
+    setGrp: function (el) { ui.grp = el.dataset.g; try { localStorage.setItem(GRPKEY, ui.grp); } catch (e) {} render(true); },
+    sessGroup: function (el) {
+      var s = sessionById(el.dataset.sid); if (!s || !ST.admin) return;
+      var a = groupsOf(s).slice(), g = el.dataset.g, i = a.indexOf(g);
+      if (i >= 0) { if (a.length < 2) return toast('Une session doit être destinée à au moins un groupe.'); a.splice(i, 1); } else a.push(g);
+      wr(ST.db.doc('sessions/' + s.id).update({ groups: a }), 'Groupes de la session modifiés.');
+    },
+    pickSingle: function () { ui.form.single = !ui.form.single; render(); },
+    toggleSingle: function (el) {
+      var s = sessionById(el.dataset.sid); if (!s || !ST.admin) return;
+      if (phase(s) !== 'open') return toast('La session n’est plus ouverte.');
+      wr(ST.db.doc('sessions/' + s.id).update({ single: !s.single }), s.single ? 'Plusieurs jeux possibles.' : 'Un seul jeu sera retenu.');
+    },
     pickGame: function (el) { var a = ui.form.gameIds, id = el.dataset.gid, i = a.indexOf(id); if (i >= 0) a.splice(i, 1); else a.push(id); render(); },
     createSession: function () {
       var f = ui.form; if (!f.date || !f.time || !f.gameIds.length) return toast('Choisissez une date, une heure et au moins un jeu.');
       var id = 'ses_' + Date.now().toString(36);
-      wr(ST.db.doc('sessions/' + id).set({ date: f.date, time: f.time, note: (f.note || '').trim(), gameIds: f.gameIds.slice(), status: 'open', created: Date.now() }), 'Session programmée.').then(function (ok) {
+      wr(ST.db.doc('sessions/' + id).set({ date: f.date, time: f.time, note: (f.note || '').trim(), gameIds: f.gameIds.slice(), groups: f.groups.slice(), single: !!f.single, status: 'open', created: Date.now() }), 'Session programmée.').then(function (ok) {
         if (!ok) return;
-        ui.form.gameIds = []; ui.form.note = ''; ui.adminTab = 'sessions'; render(); window.scrollTo(0, 0);
+        ui.form.gameIds = []; ui.form.note = ''; ui.form.q = ''; ui.form.single = false; ui.adminTab = 'sessions'; render(); window.scrollTo(0, 0);
       });
     },
     delSession: function (el) {
@@ -2316,7 +2466,7 @@ var Badges = (function () {
       if (!s || !g || !ST.admin) return;
       if (phase(s) !== 'open') return toast('La session n’est plus ouverte.');
       if ((s.gameIds || []).indexOf(g.id) >= 0) return;
-      var before = waitList(s).length, gain = Math.min(before, g.max);
+      var before = waitList(s).length, gain = Math.min(before, seatsFor(gamesOf(s).concat([g]), !!s.single) - seatsOf(s));
       wr(ST.db.doc('sessions/' + s.id).update({ gameIds: (s.gameIds || []).concat(g.id) }), g.name + ' ajouté : ' + gain + ' personne' + (gain > 1 ? 's quittent' : ' quitte') + ' la liste d’attente.');
     },
     ntAsk: function () { if (!ui.nt.title.trim() || !ui.nt.text.trim()) return; ui.nt.confirm = true; render(); },
@@ -2327,7 +2477,7 @@ var Badges = (function () {
       var up = n.blob ? Backend.uploadCover(n.blob, 'annonce') : Promise.resolve({ url: null });
       up.then(function (u) {
         if (u.error) return { error: u.error };
-        return Backend.broadcast(n.title.trim(), n.text.trim(), u.url);
+        return Backend.broadcast(n.title.trim(), n.text.trim(), u.url, n.groups);
       }).then(function (r) {
         n.busy = false; n.confirm = false;
         if (r.error) { n.err = r.error; return render(); }
@@ -2471,6 +2621,7 @@ var Badges = (function () {
     else if (t.id === 'f-date') { ui.form.date = t.value; syncCreate(); }
     else if (t.id === 'f-time') { ui.form.time = t.value; syncCreate(); }
     else if (t.id === 'f-note') ui.form.note = t.value;
+    else if (t.id === 'f-q') { ui.form.q = t.value; filterPicker(); }
     else if (t.id === 'imp-q') ui.imp.q = t.value;
     else if (t.id === 'search') { ui.q = t.value; $('#ggrid').innerHTML = gamesGrid(); }
   });
@@ -2487,7 +2638,7 @@ var Badges = (function () {
       cropWide(nf).then(function (b) { if (ui.nt.preview) URL.revokeObjectURL(ui.nt.preview); ui.nt.blob = b; ui.nt.preview = URL.createObjectURL(b); ui.nt.err = ''; render(); }, function () { ui.nt.err = 'Image illisible : essayez une photo JPEG ou PNG.'; render(); });
     } else if (t.id === 'f-date' || t.id === 'f-time') syncCreate();
     else if (t.id === 'm-note') { var s = sessionById(ui.msid); if (s) wr(ST.db.doc('sessions/' + s.id).update({ note: t.value.trim() }), 'Commentaire enregistré.'); }
-    else if (t.id === 'balance') { M.settings.balance = +t.value; wr(ST.db.doc('settings/main').set({ balance: +t.value })); }
+    else if (t.id === 'balance') { M.settings.balance = +t.value; wr(saveSettings()); }
   });
 
   /* ---------- Connexion à la base ---------- */
@@ -2501,7 +2652,8 @@ var Badges = (function () {
     db.collection('regs').onSnapshot(function (snap) { mapDocs(snap, 'regs'); if (ST.uid && M.regs[ST.uid] && M.regs[ST.uid].name && !NAME) NAME = M.regs[ST.uid].name; checkReady('regs'); }, err);
     db.collection('results').onSnapshot(function (snap) { mapDocs(snap, 'results'); ST.loaded.results = true; softRender(); }, err);
     db.collection('auto').onSnapshot(function (snap) { mapDocs(snap, 'auto'); ST.loaded.auto = true; softRender(); }, err);
-    db.doc('settings/main').onSnapshot(function (snap) { if (snap.exists && snap.data() && typeof snap.data().balance === 'number') M.settings.balance = snap.data().balance; checkReady('settings'); }, err);
+    db.doc('settings/groups').onSnapshot(function (snap) { M.groupCfg = (snap.exists && snap.data()) || {}; softRender(); }, function () {});
+    db.doc('settings/main').onSnapshot(function (snap) { var sd = snap.exists && snap.data(); if (sd && typeof sd.balance === 'number') M.settings.balance = sd.balance; M.settings.badgesReset = (sd && +sd.badgesReset) || 0; checkReady('settings'); }, err);
     if (ST.admin) db.collection('drafts').onSnapshot(function (snap) { mapDocs(snap, 'drafts'); softRender(); }, err);
   }
   /* ---------- Démarrage, connexion ---------- */
@@ -2526,8 +2678,9 @@ var Badges = (function () {
     if (st.error) { ui.auth.busy = false; ST.auth = 'net'; ST.cfgErr = st.error; return render(true); }
     ST.admin = st.admin;
     var member = st.member;
-    if (!member && norm(ui.auth.code)) member = await Backend.join(ui.auth.code);
+    if (!member && norm(ui.auth.code)) { member = await Backend.join(ui.auth.code); if (member) st = await Backend.status(); }
     if (!member) { ui.auth.busy = false; ui.auth.msg = ''; ST.auth = 'join'; return render(true); }
+    ST.groups = st.admin ? ['pro', 'perso'] : (st.groups || []); pickGrp();
     ui.auth.busy = false; startApp();
   }
   document.addEventListener('submit', function (e) {
@@ -2551,12 +2704,12 @@ var Badges = (function () {
       });
     } else if (f.id === 'join-form') {
       var code = norm(a.code);
-      if (!code) { a.msg = 'Saisissez le code d’équipe.'; a.ok = false; return render(true); }
+      if (!code) { a.msg = 'Saisissez le code d’inscription.'; a.ok = false; return render(true); }
       a.busy = true; a.msg = ''; render(true);
       Backend.join(code).then(function (ok) {
         a.busy = false;
         if (!ok) { a.msg = 'Ce code n’est pas le bon. Demandez-le à l’organisateur.'; a.ok = false; return render(true); }
-        startApp();
+        loadGroups().then(startApp);
       });
     }
   });
