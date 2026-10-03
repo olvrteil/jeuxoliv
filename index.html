@@ -714,6 +714,9 @@ html{overflow-x:hidden;max-width:100%}
 
 .malus-note{display:flex;gap:12px;align-items:flex-start;margin:-10px 0 24px;padding:14px 16px;border-radius:18px;background:var(--hair);border:1px dashed var(--muted);font-size:.9rem;color:var(--muted)}
 .malus-note b{color:var(--ink)}.malus-note>span{font-size:1.4rem;line-height:1}.malus-note.hot{border-color:var(--tomato)}
+
+.reset-list{display:grid;gap:8px}.reset-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:16px;background:var(--hair);flex-wrap:wrap}
+.reset-who{flex:1;min-width:120px;display:grid}.reset-who small{color:var(--muted);font-size:.78rem}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -1857,6 +1860,11 @@ var Badges = (function () {
       '<p class="hint" style="margin:16px 0 0">Les personnes déjà inscrites restent dans l’équipe quand vous changez le code : il ne sert qu’aux nouveaux arrivants. Mot de passe oublié : réinitialisation depuis Supabase (Authentication, Users).</p></div>' +
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Badges et compteurs</h2><p>Remet à zéro, pour tout le monde, les badges, les compteurs de sessions jouées et manquées, et le malus d’absence. Les sessions et les absences déjà saisies ne sont pas supprimées : seules celles d’avant la remise à zéro sont ignorées. Chacun reverra l’écran de célébration pour ses nouveaux badges.</p></div>' +
       (M.settings.badgesReset ? '<p class="hint" style="margin:0 0 12px">Dernière remise à zéro : ' + esc(new Date(M.settings.badgesReset).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })) + '.</p>' : '') +
+      '<div class="small-h" style="margin-top:22px">Par personne</div><div class="reset-list">' + Object.keys(M.regs).filter(function (u) { return M.regs[u].name && !M.regs[u].fake; }).sort(function (a, b) { return M.regs[a].name.localeCompare(M.regs[b].name, 'fr'); }).map(function (u) {
+        var rs = Badges.compute(badgeEvents(u)), nm = M.regs[u].name, conf = ui.confirm === 'ru:' + u;
+        return '<div class="reset-row">' + avatar(nm, 'sm') + '<div class="reset-who"><b>' + esc(nm) + '</b><small>' + rs.played + ' jouée' + (rs.played > 1 ? 's' : '') + ' · ' + rs.missed + ' manquée' + (rs.missed > 1 ? 's' : '') + ' · ' + rs.earned.length + ' badge' + (rs.earned.length > 1 ? 's' : '') + '</small></div>' +
+          (conf ? '<button class="btn btn-red btn-sm" data-act="resetUser" data-uid="' + esc(u) + '">Confirmer</button><button class="link" data-act="resetBadgesNo">Annuler</button>' : '<button class="btn btn-glass btn-sm" data-act="resetUserAsk" data-uid="' + esc(u) + '">' + ic('undo', 14) + ' Remettre à zéro</button>') + '</div>';
+      }).join('') + '</div>' +
       (ui.confirm === 'rb' ? '<div class="tools"><button class="btn btn-red" data-act="resetBadges">' + ic('trash', 16) + ' Oui, tout remettre à zéro</button><button class="link" data-act="resetBadgesNo">Annuler</button></div>' : '<button class="btn btn-glass" data-act="resetBadgesAsk">' + ic('undo', 16) + ' Réinitialiser les badges</button>') + '</div>';
   }
   function tabSessions() {
@@ -2003,8 +2011,10 @@ var Badges = (function () {
 
   /* ---------- Badges, profil et célébration ---------- */
   function saveSettings() { return ST.db.doc('settings/main').set({ balance: M.settings.balance, badgesReset: M.settings.badgesReset || 0 }); }
+  /* dernière remise à zéro qui concerne cette personne : globale ou individuelle (la plus récente) */
+  function resetOf(uid) { var d = M.regs[uid]; return Math.max(M.settings.badgesReset || 0, (d && +d.badgesReset) || 0); }
   function badgeEvents(uid) {
-    var out = [], now = Date.now(), reset = M.settings.badgesReset || 0;
+    var out = [], now = Date.now(), reset = resetOf(uid);
     sorted().forEach(function (s) {
       var ph = phase(s); if (ph !== 'published' && ph !== 'auto') return;
       if (now < startMs(s) || startMs(s) < reset) return;   /* avant la dernière remise à zéro : ignorée */
@@ -2042,11 +2052,11 @@ var Badges = (function () {
   function maybeBadges() {
     if (ui.route !== 'home' || ui.modal || ui.badgeDone || ST.auth !== 'in' || !ST.uid || !ST.ready || !ST.loaded.results || !ST.loaded.auto) return;
     var d = M.regs[ST.uid]; if (!d) return;
-    var res = myBadges(), seen = (d.badgesEpoch || 0) === (M.settings.badgesReset || 0) ? (d.badges || []) : [], fresh = res.list.filter(function (b) { return b.got && seen.indexOf(b.id) < 0; });
+    var res = myBadges(), seen = (d.badgesEpoch || 0) === resetOf(ST.uid) ? (d.badges || []) : [], fresh = res.list.filter(function (b) { return b.got && seen.indexOf(b.id) < 0; });
     if (!fresh.length) return;
     ui.badgeDone = true; ui.modal = { type: 'badges', ids: fresh.map(function (b) { return b.id; }), all: res.earned, fx: fresh.some(function (b) { return !b.neg; }) };
   }
-  function saveBadgesSeen(all) { if (!all || !ST.uid) return; saveMine(function (doc) { doc.badges = all.slice(); doc.badgesEpoch = M.settings.badgesReset || 0; return doc; }); }
+  function saveBadgesSeen(all) { if (!all || !ST.uid) return; saveMine(function (doc) { doc.badges = all.slice(); doc.badgesEpoch = resetOf(ST.uid); return doc; }); }
   function modalBadges(m) {
     var list = myBadges().list.filter(function (b) { return m.ids.indexOf(b.id) >= 0; }); if (!list.length) return '';
     var many = list.length > 1;
@@ -2246,6 +2256,12 @@ var Badges = (function () {
     resetBadges: function () {
       if (!ST.admin) return; M.settings.badgesReset = Date.now(); ui.confirm = null; render();
       wr(saveSettings(), 'Badges, compteurs et malus remis à zéro pour tout le monde.');
+    },
+    resetUserAsk: function (el) { ui.confirm = 'ru:' + el.dataset.uid; render(); },
+    resetUser: function (el) {
+      var uid = el.dataset.uid, d = M.regs[uid]; if (!ST.admin || !d) return;
+      var c = clone(d); c.badgesReset = Date.now(); ui.confirm = null;
+      wr(ST.db.doc('regs/' + uid).set(c), nameOf(uid) + ' : badges, compteurs et malus remis à zéro.');
     },
     toggleAbsent: function (el) {
       var s = sessionById(el.dataset.sid), uid = el.dataset.uid; if (!s || !uid || !ST.admin) return;
