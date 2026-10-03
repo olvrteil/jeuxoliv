@@ -1854,7 +1854,10 @@ var Badges = (function () {
       '<div class="label">Lien de l’application</div><div class="copyrow"><code>' + esc(link) + '</code><button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(link) + '">' + ic('copy', 16) + ' Copier</button></div>' +
       '<div class="label" style="margin-top:20px">Code d’équipe</div><div class="copyrow"><code class="bigcode">' + (ST.teamCode === null ? '…' : esc(ST.teamCode || 'indisponible')) + '</code>' + (ST.teamCode ? '<button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(ST.teamCode) + '">' + ic('copy', 16) + ' Copier</button>' : '') + '</div>' +
       '<div class="field" style="margin-top:20px;max-width:360px"><label for="t-code">Changer le code</label><div class="import-row"><input class="input" id="t-code" maxlength="30" autocomplete="off" autocapitalize="characters" placeholder="Nouveau code (4 caractères min.)"><button class="btn" data-act="saveCode">Enregistrer</button></div></div>' +
-      '<p class="hint" style="margin:16px 0 0">Les personnes déjà inscrites restent dans l’équipe quand vous changez le code : il ne sert qu’aux nouveaux arrivants. Mot de passe oublié : réinitialisation depuis Supabase (Authentication, Users).</p></div>';
+      '<p class="hint" style="margin:16px 0 0">Les personnes déjà inscrites restent dans l’équipe quand vous changez le code : il ne sert qu’aux nouveaux arrivants. Mot de passe oublié : réinitialisation depuis Supabase (Authentication, Users).</p></div>' +
+      '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Badges et compteurs</h2><p>Remet à zéro, pour tout le monde, les badges, les compteurs de sessions jouées et manquées, et le malus d’absence. Les sessions et les absences déjà saisies ne sont pas supprimées : seules celles d’avant la remise à zéro sont ignorées. Chacun reverra l’écran de célébration pour ses nouveaux badges.</p></div>' +
+      (M.settings.badgesReset ? '<p class="hint" style="margin:0 0 12px">Dernière remise à zéro : ' + esc(new Date(M.settings.badgesReset).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })) + '.</p>' : '') +
+      (ui.confirm === 'rb' ? '<div class="tools"><button class="btn btn-red" data-act="resetBadges">' + ic('trash', 16) + ' Oui, tout remettre à zéro</button><button class="link" data-act="resetBadgesNo">Annuler</button></div>' : '<button class="btn btn-glass" data-act="resetBadgesAsk">' + ic('undo', 16) + ' Réinitialiser les badges</button>') + '</div>';
   }
   function tabSessions() {
     var list = sorted().reverse();   /* du plus récent au plus ancien */
@@ -1999,11 +2002,12 @@ var Badges = (function () {
   }
 
   /* ---------- Badges, profil et célébration ---------- */
+  function saveSettings() { return ST.db.doc('settings/main').set({ balance: M.settings.balance, badgesReset: M.settings.badgesReset || 0 }); }
   function badgeEvents(uid) {
-    var out = [], now = Date.now();
+    var out = [], now = Date.now(), reset = M.settings.badgesReset || 0;
     sorted().forEach(function (s) {
       var ph = phase(s); if (ph !== 'published' && ph !== 'auto') return;
-      if (now < startMs(s)) return;
+      if (now < startMs(s) || startMs(s) < reset) return;   /* avant la dernière remise à zéro : ignorée */
       var r = resultOf(s); if (!r) return;
       var tb = r.tables.filter(function (t) { return t.ids.indexOf(uid) >= 0; })[0], ab = s.absent || {}, g = tb && G(tb.gid);
       out.push({ sid: s.id, start: startMs(s), date: s.date, created: s.created || 0, mine: !!tb, absent: !!ab[uid], gid: tb ? tb.gid : null, gname: g ? g.name : '',
@@ -2038,11 +2042,11 @@ var Badges = (function () {
   function maybeBadges() {
     if (ui.route !== 'home' || ui.modal || ui.badgeDone || ST.auth !== 'in' || !ST.uid || !ST.ready || !ST.loaded.results || !ST.loaded.auto) return;
     var d = M.regs[ST.uid]; if (!d) return;
-    var res = myBadges(), seen = d.badges || [], fresh = res.list.filter(function (b) { return b.got && seen.indexOf(b.id) < 0; });
+    var res = myBadges(), seen = (d.badgesEpoch || 0) === (M.settings.badgesReset || 0) ? (d.badges || []) : [], fresh = res.list.filter(function (b) { return b.got && seen.indexOf(b.id) < 0; });
     if (!fresh.length) return;
     ui.badgeDone = true; ui.modal = { type: 'badges', ids: fresh.map(function (b) { return b.id; }), all: res.earned, fx: fresh.some(function (b) { return !b.neg; }) };
   }
-  function saveBadgesSeen(all) { if (!all || !ST.uid) return; saveMine(function (doc) { doc.badges = all.slice(); return doc; }); }
+  function saveBadgesSeen(all) { if (!all || !ST.uid) return; saveMine(function (doc) { doc.badges = all.slice(); doc.badgesEpoch = M.settings.badgesReset || 0; return doc; }); }
   function modalBadges(m) {
     var list = myBadges().list.filter(function (b) { return m.ids.indexOf(b.id) >= 0; }); if (!list.length) return '';
     var many = list.length > 1;
@@ -2237,6 +2241,12 @@ var Badges = (function () {
     gameInfo: function (el) { ui.modal = { type: 'game', gid: el.dataset.gid }; renderModal(); },
     toggleArch: function () { ui.archOpen = !ui.archOpen; render(); },
     closeModal: function () { var m = ui.modal; ui.modal = null; renderModal(); if (m && m.type === 'badges') saveBadgesSeen(m.all); },
+    resetBadgesAsk: function () { ui.confirm = 'rb'; render(); },
+    resetBadgesNo: function () { ui.confirm = null; render(); },
+    resetBadges: function () {
+      if (!ST.admin) return; M.settings.badgesReset = Date.now(); ui.confirm = null; render();
+      wr(saveSettings(), 'Badges, compteurs et malus remis à zéro pour tout le monde.');
+    },
     toggleAbsent: function (el) {
       var s = sessionById(el.dataset.sid), uid = el.dataset.uid; if (!s || !uid || !ST.admin) return;
       var ph = phase(s); if ((ph !== 'published' && ph !== 'auto') || Date.now() < startMs(s)) return;
@@ -2487,7 +2497,7 @@ var Badges = (function () {
       cropWide(nf).then(function (b) { if (ui.nt.preview) URL.revokeObjectURL(ui.nt.preview); ui.nt.blob = b; ui.nt.preview = URL.createObjectURL(b); ui.nt.err = ''; render(); }, function () { ui.nt.err = 'Image illisible : essayez une photo JPEG ou PNG.'; render(); });
     } else if (t.id === 'f-date' || t.id === 'f-time') syncCreate();
     else if (t.id === 'm-note') { var s = sessionById(ui.msid); if (s) wr(ST.db.doc('sessions/' + s.id).update({ note: t.value.trim() }), 'Commentaire enregistré.'); }
-    else if (t.id === 'balance') { M.settings.balance = +t.value; wr(ST.db.doc('settings/main').set({ balance: +t.value })); }
+    else if (t.id === 'balance') { M.settings.balance = +t.value; wr(saveSettings()); }
   });
 
   /* ---------- Connexion à la base ---------- */
@@ -2501,7 +2511,7 @@ var Badges = (function () {
     db.collection('regs').onSnapshot(function (snap) { mapDocs(snap, 'regs'); if (ST.uid && M.regs[ST.uid] && M.regs[ST.uid].name && !NAME) NAME = M.regs[ST.uid].name; checkReady('regs'); }, err);
     db.collection('results').onSnapshot(function (snap) { mapDocs(snap, 'results'); ST.loaded.results = true; softRender(); }, err);
     db.collection('auto').onSnapshot(function (snap) { mapDocs(snap, 'auto'); ST.loaded.auto = true; softRender(); }, err);
-    db.doc('settings/main').onSnapshot(function (snap) { if (snap.exists && snap.data() && typeof snap.data().balance === 'number') M.settings.balance = snap.data().balance; checkReady('settings'); }, err);
+    db.doc('settings/main').onSnapshot(function (snap) { var sd = snap.exists && snap.data(); if (sd && typeof sd.balance === 'number') M.settings.balance = sd.balance; M.settings.badgesReset = (sd && +sd.badgesReset) || 0; checkReady('settings'); }, err);
     if (ST.admin) db.collection('drafts').onSnapshot(function (snap) { mapDocs(snap, 'drafts'); softRender(); }, err);
   }
   /* ---------- Démarrage, connexion ---------- */
