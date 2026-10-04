@@ -837,6 +837,45 @@ html{overflow-x:hidden;max-width:100%}
 .box-big{background-color:#222;background-image:var(--thumb);background-size:cover;background-position:center}
 .box-big img.cover-img{position:relative;z-index:1}
 @media (max-width:640px){.gs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---- Écrans de chargement (skeleton) ---- */
+:root{--sk-hi:rgba(255,255,255,.62)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sk-hi:rgba(255,255,255,.11)}}
+:root[data-theme="dark"]{--sk-hi:rgba(255,255,255,.11)}
+.sk{display:block;border-radius:12px;background:linear-gradient(100deg,var(--hair) 30%,var(--sk-hi) 50%,var(--hair) 70%);background-size:220% 100%;animation:skshine 1.5s ease-in-out infinite}
+@keyframes skshine{0%{background-position:120% 0}100%{background-position:-120% 0}}
+.sk-wrap{display:flex;flex-direction:column;gap:22px}
+.sk-cap{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--muted)}
+.sk-cap svg{width:30px;height:30px;color:var(--tomato);animation:hop .8s ease-in-out infinite alternate}
+.sk-head{display:flex;flex-direction:column;gap:12px;margin-bottom:6px}
+.sk-eyebrow{height:14px;width:120px}
+.sk-h1{height:38px;width:min(520px,80%)}.sk-h1.s2{width:min(380px,60%)}
+.sk-intro{margin-bottom:10px}
+.sk-line{height:14px;max-width:100%}
+.sk-title{height:22px;width:62%}
+.sk-card{padding:20px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.sk-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sk-chip{height:26px;width:92px;border-radius:999px}.sk-chip.s2{width:64px}
+.sk-boxes{gap:12px}.sk-box{height:84px;width:64px;border-radius:12px}
+.sk-dot{height:30px;width:30px;border-radius:50%}
+.sk-btn{height:46px;width:100%;border-radius:16px;margin-top:4px}
+.sk-poster{height:150px;width:100%;border-radius:16px}
+.sk-gcard{gap:12px}
+.sk-list{display:flex;flex-direction:column;gap:14px}
+.sk-rcard{flex-direction:row;align-items:center;gap:16px;padding:14px}
+.sk-thumb{height:84px;width:84px;flex:none;border-radius:16px}
+.sk-col{display:flex;flex-direction:column;gap:10px;flex:1;min-width:0}
+.sk-back{height:36px;width:110px;border-radius:12px}
+.sk-prof{flex-direction:row;align-items:center;gap:18px}
+.sk-avatar{height:84px;width:84px;flex:none;border-radius:50%}
+.sk-tabs{margin:4px 0 2px}.sk-tabs .sk-chip{height:38px;width:110px;border-radius:14px}
+.sk-panel{padding:24px}
+
+/* ---- Mot de passe oublié, essais du code, équité ---- */
+.forgot-link{align-self:flex-end;margin-top:6px;padding:4px 2px;font-size:13.5px}
+.hint.tries{text-align:center;margin:-4px 0 0;font-weight:700}
+.hint.tries.low{color:var(--bad,var(--tomato))}
+.malus-note.eq{border-style:solid;border-color:var(--cobalt)}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -922,7 +961,7 @@ html{overflow-x:hidden;max-width:100%}
       edges.push([src, 1 + i, 1, 0]);
       edges.push([1 + i, snk, 1, 0]);
       var w = 1 - i / (n * 1000); /* à égalité, les premiers inscrits sont un peu mieux servis */
-      var wt = players[i].weight == null ? 1 : players[i].weight; /* poids de l'insatisfaction (1 = normal ; un malus d'absence le réduit : la personne passe après) */
+      var wt = players[i].weight == null ? 1 : players[i].weight; /* poids de l'insatisfaction (1 = normal ; un malus d'absence le réduit : la personne passe après ; l'équité dans le temps peut l'augmenter jusqu'à 1,6) */
       for (a = 0; a < k; a++) {
         var r = rankIn(players[i], games[S[a]].id);
         if (r > 0) { pg.push([i, a, edges.length]); edges.push([1 + i, n + 1 + a, 1, -PLACE + regret(r) * w * wt]); }
@@ -1190,6 +1229,19 @@ html{overflow-x:hidden;max-width:100%}
     if (!window.supabase || !window.supabase.createClient) return { state: 'lib' };
     try {
       sb = B.sb = window.supabase.createClient(CFG.url, CFG.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
+      /* lien reçu par e-mail (mot de passe oublié) : la session est dans l'adresse, après le # */
+      var hash = String(location.hash || '');
+      if (/[#&]type=recovery/.test(hash) && /access_token=/.test(hash)) {
+        var hp = new URLSearchParams(hash.replace(/^#/, ''));
+        var rs = await sb.auth.setSession({ access_token: hp.get('access_token') || '', refresh_token: hp.get('refresh_token') || '' });
+        try { history.replaceState(null, '', location.pathname + location.search); } catch (x) {}
+        if (rs.error || !rs.data || !rs.data.session) return { state: 'out', linkError: 'Ce lien n’est plus valable (expiré ou déjà utilisé). Refaites une demande de mot de passe oublié.' };
+        return { state: 'recovery', user: userOf(rs.data.session.user) };
+      }
+      if (/[#&]error(_code|_description)?=/.test(hash)) {
+        try { history.replaceState(null, '', location.pathname + location.search); } catch (x) {}
+        return { state: 'out', linkError: 'Ce lien n’est plus valable (expiré ou déjà utilisé). Refaites une demande de mot de passe oublié.' };
+      }
       var r = await sb.auth.getSession();
       var s = r && r.data && r.data.session;
       if (!s) return { state: 'out' };
@@ -1221,8 +1273,29 @@ html{overflow-x:hidden;max-width:100%}
       return { admin: !!d.admin, member: !!d.member, organizer: !!d.organizer, groups: Array.isArray(d.groups) ? d.groups : [] };
     } catch (e) { return { error: friendly(e) }; }
   };
+  /* true = bon code ; false = mauvais code ; 'limit' = 10 essais ratés en 24 h atteints */
   B.join = async function (code) {
-    try { var r = await sb.rpc('join_team', { p_code: code }); return !r.error && r.data === true; } catch (e) { return false; }
+    try {
+      var r = await sb.rpc('join_team', { p_code: code });
+      if (r.error) return /trop_d_essais/i.test(String(r.error.message || '') + String(r.error.hint || '')) ? 'limit' : false;
+      return r.data === true;
+    } catch (e) { return false; }
+  };
+  B.triesLeft = async function () {
+    try { var r = await sb.rpc('join_tries_left'); return r.error || typeof r.data !== 'number' ? null : r.data; } catch (e) { return null; }
+  };
+  B.resetPassword = async function (email) {
+    try {
+      var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+      return r.error ? { error: friendly(r.error) } : { ok: true };
+    } catch (e) { return { error: friendly(e) }; }
+  };
+  B.setPassword = async function (pw) {
+    try {
+      var r = await sb.auth.updateUser({ password: pw });
+      if (r.error) return { error: /same|different from the old/i.test(String(r.error.message || '')) ? 'Choisissez un mot de passe différent de l’ancien.' : friendly(r.error) };
+      return { user: userOf(r.data.user) };
+    } catch (e) { return { error: friendly(e) }; }
   };
   B.groupCodes = async function () {
     try { var r = await sb.rpc('get_group_codes'); return r.error ? null : (r.data || {}); } catch (e) { return null; }
@@ -1527,10 +1600,28 @@ var Badges = (function () {
     var pts = Math.max(0, list.length - 1);
     return { active: list.length, points: pts, weight: WEIGHTS[Math.min(pts, 2)], days: list.slice() };
   }
+  /* Équité dans le temps : on regarde les 4 dernières sessions jouées (ou inscrites sans table) des 56 derniers jours.
+     Déception par session : 1er choix = 0, 2e = 1, 3e = 2, 4e ou plus (ou jeu hors de la liste) = 3, inscrit·e mais sans table = 3.
+     Les absences et les retraits ne comptent pas. Poids de l'insatisfaction : 1 + 0,2 × déception moyenne (au plus 1,6) :
+     plus on a été déçu récemment, plus on est favorisé·e en cas de conflit pour un jeu. Il retombe à 1 dès que les premiers choix reviennent. */
+  var EQ_N = 4, EQ_DAYS = 56, EQ_MAX = 0.6;
+  function equity(ev, refDate) {
+    var ref = dayNum(refDate), list = [];
+    ev.forEach(function (e) {
+      if (e.absent || !e.entry || !e.entry.order || !e.entry.order.length) return;
+      if (ref - dayNum(e.date) > EQ_DAYS) return;
+      if (e.gid) { if (!e.mine) return; var i = e.entry.order.indexOf(e.gid); list.push(i < 0 ? 3 : Math.min(i, 3)); }
+      else list.push(3);
+    });
+    list = list.slice(-EQ_N);
+    if (!list.length) return { n: 0, avg: 0, boost: 0, weight: 1, list: [] };
+    var avg = list.reduce(function (a, b) { return a + b; }, 0) / list.length, boost = Math.min(EQ_MAX, Math.round(0.2 * avg * 100) / 100);
+    return { n: list.length, avg: avg, boost: boost, weight: 1 + boost, list: list };
+  }
   function isoOf(n) { return new Date(n * 864e5).toISOString().slice(0, 10); }
   /* date à laquelle le malus (ou l'avertissement) tombe au plus tard, si la personne ne joue pas d'ici là */
   function malusEnd(info) { var d = info.days; if (!d.length) return null; var target = info.points > 0 ? d[d.length - 2] : d[d.length - 1]; return isoOf(target + WINDOW); }
-  return { DEFS: DEFS, CATS: CATS, compute: compute, malus: malus, malusEnd: malusEnd };
+  return { DEFS: DEFS, CATS: CATS, compute: compute, malus: malus, malusEnd: malusEnd, equity: equity };
 })();
 </script>
 <script>
@@ -1690,8 +1781,25 @@ var Badges = (function () {
   }
 
   /* ---------- États de chargement ---------- */
+  /* Écrans de chargement : des silhouettes qui reprennent la mise en page de la page attendue, avec un reflet qui passe. */
+  function skBars(a) { return a.map(function (w) { return '<i class="sk sk-line" style="width:' + w + '%"></i>'; }).join(''); }
+  function skSession() {
+    return '<div class="sk-card glass-2 sk-scard"><div class="sk-row"><i class="sk sk-chip"></i><i class="sk sk-chip s2"></i></div><i class="sk sk-title"></i>' + skBars([88, 64]) +
+      '<div class="sk-row sk-boxes"><i class="sk sk-box"></i><i class="sk sk-box"></i><i class="sk sk-box"></i></div><div class="sk-row"><i class="sk sk-dot"></i><i class="sk sk-dot"></i><i class="sk sk-dot"></i><i class="sk sk-dot"></i></div><i class="sk sk-btn"></i></div>';
+  }
+  function skGame() { return '<div class="sk-card glass-2 sk-gcard"><i class="sk sk-poster"></i><i class="sk sk-title"></i>' + skBars([70]) + '</div>'; }
+  function skRow() { return '<div class="sk-card glass-2 sk-rcard"><i class="sk sk-thumb"></i><div class="sk-col"><i class="sk sk-title"></i>' + skBars([90, 55]) + '</div></div>'; }
+  function skeleton(route) {
+    var n = function (k, f) { var o = ''; for (var i = 0; i < k; i++) o += f(); return o; }, body;
+    if (route === 'games') body = '<div class="sk-head"><i class="sk sk-eyebrow"></i><i class="sk sk-h1"></i></div><div class="grid-games">' + n(8, skGame) + '</div>';
+    else if (route === 'session') body = '<i class="sk sk-back"></i><div class="sk-head"><i class="sk sk-eyebrow"></i><i class="sk sk-h1"></i>' + skBars([60]) + '</div><div class="sk-list">' + n(5, skRow) + '</div>';
+    else if (route === 'profile') body = '<div class="sk-card glass-2 sk-prof"><i class="sk sk-avatar"></i><div class="sk-col"><i class="sk sk-h1"></i>' + skBars([50, 80]) + '</div></div><div class="sk-list">' + n(4, skRow) + '</div>';
+    else if (route === 'admin') body = '<div class="sk-head"><i class="sk sk-eyebrow"></i><i class="sk sk-h1"></i></div><div class="sk-row sk-tabs"><i class="sk sk-chip"></i><i class="sk sk-chip"></i><i class="sk sk-chip"></i></div><div class="sk-card glass-2 sk-panel">' + skBars([40, 100, 92, 96, 70]) + '</div>';
+    else body = '<div class="sk-head sk-intro"><i class="sk sk-eyebrow"></i><i class="sk sk-h1"></i><i class="sk sk-h1 s2"></i>' + skBars([85, 70]) + '</div><div class="grid-sessions">' + n(3, skSession) + '</div>';
+    return body;
+  }
   function viewLoading() {
-    return '<div class="loading"><svg class="meeple" viewBox="0 0 100 100" aria-hidden="true"><use href="#meeple"/></svg><h2>On prépare la table…</h2><p>Chargement des sessions et des jeux.</p></div>';
+    return '<div class="sk-wrap" role="status" aria-live="polite" aria-busy="true"><div class="sk-cap"><svg class="meeple" viewBox="0 0 100 100" aria-hidden="true"><use href="#meeple"/></svg><span>On prépare la table…</span></div><div aria-hidden="true">' + skeleton(ST.auth === 'boot' ? 'home' : ui.route) + '</div></div>';
   }
   function authBox(icon, title, intro, body) {
     return '<div class="gate auth glass-2">' + (icon === 'lock' || icon === 'users' ? '<img class="auth-me" src="avatar-face.webp" alt="" width="200" height="200">' : '<span class="ok-ico">' + ic(icon, 30) + '</span>') + '<div><h2>' + title + '</h2>' + (intro ? '<p class="hint" style="margin:8px 0 0">' + intro + '</p>' : '') + '</div>' + body + '</div>';
@@ -1703,14 +1811,34 @@ var Badges = (function () {
       : 'L’application n’est pas encore reliée à sa base de données. Renseignez l’adresse du projet dans le fichier config.js.';
     return authBox('x', 'Connexion impossible', t, '');
   }
+  function viewForgot() {
+    var a = ui.auth;
+    return authBox('lock', 'Mot de passe oublié', 'Saisissez l’adresse e-mail de votre compte : nous vous envoyons un lien pour choisir un nouveau mot de passe.',
+      '<form id="forgot-form" class="auth-form" novalidate>' +
+      '<div class="field"><label for="a-email">E-mail</label><input class="input" id="a-email" name="email" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="prenom.nom@entreprise.fr" value="' + esc(a.email) + '"></div>' +
+      authMsg() +
+      '<button class="btn btn-lg btn-block" type="submit"' + (a.busy ? ' disabled' : '') + '>' + ic('check', 20) + ' ' + (a.busy ? 'Un instant…' : 'Envoyer le lien') + '</button></form>' +
+      '<button class="link" type="button" data-act="authMode" data-mode="in">Retour à la connexion</button>');
+  }
+  function viewRecovery() {
+    var a = ui.auth;
+    return authBox('lock', 'Nouveau mot de passe', 'Choisissez un nouveau mot de passe pour ' + esc((ST.recUser && ST.recUser.email) || 'votre compte') + '.',
+      '<form id="reset-form" class="auth-form" novalidate>' +
+      '<div class="field"><label for="a-pw">Nouveau mot de passe</label><input class="input" id="a-pw" name="password" type="password" autocomplete="new-password" placeholder="6 caractères minimum"></div>' +
+      '<div class="field"><label for="a-pw2">Confirmez le mot de passe</label><input class="input" id="a-pw2" name="password2" type="password" autocomplete="new-password" placeholder="Saisissez-le une deuxième fois"></div>' +
+      authMsg() +
+      '<button class="btn btn-lg btn-block" type="submit"' + (a.busy ? ' disabled' : '') + '>' + ic('check', 20) + ' ' + (a.busy ? 'Un instant…' : 'Enregistrer et me connecter') + '</button></form>');
+  }
   function viewLogin() {
     var a = ui.auth, up = a.mode === 'up';
+    if (a.mode === 'forgot') return viewForgot();
     return authBox('lock', up ? 'Créer mon compte' : 'Connexion', up ? 'Une fois le compte créé, vous pourrez vous inscrire aux parties.' : 'Connectez-vous pour réserver votre place à table.',
       '<div class="seg" role="group" aria-label="Mode"><button type="button" aria-pressed="' + !up + '" data-act="authMode" data-mode="in">Se connecter</button><button type="button" aria-pressed="' + up + '" data-act="authMode" data-mode="up">Créer un compte</button></div>' +
       '<form id="auth-form" class="auth-form" novalidate>' +
       (up ? '<div class="field"><label for="a-name">Votre nom à table</label><input class="input" id="a-name" name="name" autocomplete="given-name" maxlength="30" placeholder="Prénom ou surnom" value="' + esc(a.name) + '"></div>' : '') +
       '<div class="field"><label for="a-email">E-mail</label><input class="input" id="a-email" name="email" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="prenom.nom@entreprise.fr" value="' + esc(a.email) + '"></div>' +
-      '<div class="field"><label for="a-pw">Mot de passe</label><input class="input" id="a-pw" name="password" type="password" autocomplete="' + (up ? 'new-password' : 'current-password') + '" placeholder="' + (up ? '6 caractères minimum' : 'Votre mot de passe') + '"></div>' +
+      '<div class="field"><label for="a-pw">Mot de passe</label><input class="input" id="a-pw" name="password" type="password" autocomplete="' + (up ? 'new-password' : 'current-password') + '" placeholder="' + (up ? '6 caractères minimum' : 'Votre mot de passe') + '">' +
+      (up ? '' : '<button class="link forgot-link" type="button" data-act="authMode" data-mode="forgot">Mot de passe oublié ?</button>') + '</div>' +
       (up ? '<div class="field"><label for="a-code">Code d’inscription</label><input class="input" id="a-code" name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Donné par l’organisateur" value="' + esc(a.code) + '"></div>' : '') +
       authMsg() +
       '<button class="btn btn-lg btn-block" type="submit"' + (a.busy ? ' disabled' : '') + '>' + ic('check', 20) + ' ' + (a.busy ? 'Un instant…' : up ? 'Créer mon compte' : 'Me connecter') + '</button></form>');
@@ -1719,6 +1847,7 @@ var Badges = (function () {
     var a = ui.auth;
     return authBox('users', 'Rejoindre l’équipe', 'Saisissez le code d’inscription donné par l’organisateur. Vous ne le ferez qu’une fois.',
       '<form id="join-form" class="auth-form" novalidate><div class="field"><label for="a-code">Code d’équipe</label><input class="input" id="a-code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Ex. 7K2P9XQA" value="' + esc(a.code) + '"></div>' + authMsg() +
+      (ST.triesLeft != null && ST.triesLeft < 10 ? '<p class="hint tries' + (ST.triesLeft <= 3 ? ' low' : '') + '">' + (ST.triesLeft > 0 ? 'Il vous reste ' + ST.triesLeft + ' essai' + (ST.triesLeft > 1 ? 's' : '') + ' sur 24 h.' : 'Plus d’essai disponible pour 24 h.') + '</p>' : '') +
       '<button class="btn btn-lg btn-block" type="submit"' + (a.busy ? ' disabled' : '') + '>' + ic('check', 20) + ' Rejoindre</button></form>' +
       '<button class="link" data-act="logout" type="button">Utiliser un autre compte</button>');
   }
@@ -2005,7 +2134,7 @@ var Badges = (function () {
       '<div class="panel glass"><div class="small-h"><span>Inscrits</span><span>' + n + '</span></div>' +
       (n ? '<div class="who">' + regs.map(function (r) { return '<span class="' + (isMe(r.uid) ? 'me' : '') + '">' + avatar(r.name, 'sm') + esc(r.name) + '</span>'; }).join('') + '</div>' : '<p class="hint" style="margin:0">Personne pour l’instant. Soyez le premier.</p>') + '</div>' +
       (waitList(s).length ? '<div class="panel glass"><div class="small-h"><span>Liste d’attente</span><span>' + waitList(s).length + '</span></div><div class="who">' + waitList(s).map(function (r, i) { return '<span class="' + (isMe(r.uid) ? 'me' : '') + '">' + avatar(r.name, 'sm') + (i + 1) + '. ' + esc(r.name) + '</span>'; }).join('') + '</div></div>' : '') +
-      '<div class="panel glass"><div class="small-h">Comment les tables sont composées</div><ul class="rules"><li>Les inscriptions se ferment à l’heure de la session, et tout se compose alors tout seul.</li><li>Un jeu n’ouvre que s’il réunit assez de joueurs, et on ouvre le moins de tables possible.</li><li>Votre ordre de préférence est respecté, et jamais un jeu refusé.</li><li>Chaque table vise son nombre idéal de joueurs.</li></ul></div>';
+      '<div class="panel glass"><div class="small-h">Comment les tables sont composées</div><ul class="rules"><li>Les inscriptions se ferment à l’heure de la session, et tout se compose alors tout seul.</li><li>Un jeu n’ouvre que s’il réunit assez de joueurs, et on ouvre le moins de tables possible.</li><li>Votre ordre de préférence est respecté, et jamais un jeu refusé.</li><li>Chaque table vise son nombre idéal de joueurs.</li><li>Si les dernières sessions ne vous ont pas donné vos premiers choix, vous passez un peu avant les autres en cas de conflit pour un jeu.</li></ul></div>';
   }
 
   /* ---------- Tables composées ---------- */
@@ -2144,7 +2273,7 @@ var Badges = (function () {
         return '<div class="label" style="margin-top:20px">Code d’inscription · ' + grpChips([g[0]]) + '</div><div class="copyrow"><code class="bigcode">' + (ST.codes === null ? '…' : esc(cd || 'indisponible')) + '</code>' + (cd ? '<button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(cd) + '">' + ic('copy', 16) + ' Copier</button>' : '') + '</div>' +
           '<div class="field" style="margin-top:10px;max-width:360px"><div class="import-row"><input class="input" id="t-code-' + g[0] + '" maxlength="30" autocomplete="off" autocapitalize="characters" placeholder="Nouveau code ' + g[1] + ' (4 caractères min.)" aria-label="Nouveau code ' + g[1] + '"><button class="btn" data-act="saveCode" data-g="' + g[0] + '">Enregistrer</button></div></div>';
       }).join('') +
-      '<p class="hint" style="margin:16px 0 0">Le code utilisé à l’inscription décide du groupe. Les deux codes doivent être différents. Les personnes déjà inscrites restent dans leur groupe quand vous changez un code : il ne sert qu’aux nouveaux arrivants. Mot de passe oublié : réinitialisation depuis Supabase (Authentication, Users).</p></div>' +
+      '<p class="hint" style="margin:16px 0 0">Le code utilisé à l’inscription décide du groupe. Les deux codes doivent être différents. Les personnes déjà inscrites restent dans leur groupe quand vous changez un code : il ne sert qu’aux nouveaux arrivants. Mot de passe oublié : chacun peut le réinitialiser seul depuis l’écran de connexion (lien reçu par e-mail). Le code d’inscription est limité à 10 essais ratés par 24 h et par compte.</p></div>' +
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Titre de l’accueil</h2><p>Le texte affiché en haut de l’accueil, propre à chaque groupe.</p></div>' +
       GROUPS.map(function (g) { return '<div class="field" style="margin-top:12px"><label for="t-title-' + g[0] + '">' + grpChips([g[0]]) + ' Titre</label><div class="import-row"><input class="input" id="t-title-' + g[0] + '" maxlength="80" autocomplete="off" value="' + esc(grpTitle(g[0])) + '"><button class="btn" data-act="saveTitle" data-g="' + g[0] + '">Enregistrer</button></div></div>'; }).join('') + '</div>' +
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Personnes, groupes et organisateurs</h2><p>Ajoutez une personne à l’autre groupe pour qu’elle soit dans les deux. L’admin est toujours dans les deux groupes. Une personne reste dans au moins un groupe. Un <b>organisateur</b> crée et gère ses propres sessions (pour son ou ses groupes) et peut ajouter des jeux ; il ne touche pas à celles des autres. Vous pouvez lui retirer ce droit à tout moment.</p></div>' +
@@ -2483,6 +2612,8 @@ var Badges = (function () {
     if (ml.active) mnote = '<div class="malus-note ' + (ml.points ? 'hot' : '') + '"><span>' + (ml.points ? '⚖️' : '⚠️') + '</span><div>' + (ml.points
       ? '<b>Malus d’absence actif.</b> En cas de conflit pour un jeu, vous passez après les personnes sans malus. Vous gardez votre place à la session. Il diminue à chaque session jouée et s’efface au plus tard le ' + longDate(mend) + '.'
       : '<b>Avertissement.</b> Une absence récente : pas de conséquence pour l’instant. Une deuxième dans les 28 jours déclenche un malus d’affectation (vous passez après les autres en cas de conflit sur un jeu). Il s’efface le ' + longDate(mend) + ', ou dès que vous jouez une session.') + '</div></div>';
+    var eq = Badges.equity(badgeEvents(ST.uid), D.iso(new Date()));
+    if (eq.boost >= 0.1) mnote += '<div class="malus-note eq"><span>🤝</span><div><b>Coup de pouce d’équité.</b> Vos dernières sessions ne vous ont pas toujours donné vos premiers choix : en cas de conflit pour un jeu, vous passez avant les personnes qui ont été bien servies. Il disparaît dès que vos premiers choix reviennent.</div></div>';
     head += mnote;
     return head + Badges.CATS.map(function (c) {
       var l = res.list.filter(function (b) { return b.cat === c[0]; });
@@ -2528,7 +2659,7 @@ var Badges = (function () {
   }
   function render(noKeep) {
     var y = window.scrollY, h;
-    if (ST.auth === 'out') h = viewLogin(); else if (ST.auth === 'join') h = viewJoin(); else if (ST.auth === 'config' || ST.auth === 'lib' || ST.auth === 'net') h = viewConfig(); else if (ST.auth === 'boot' || !ST.ready) h = viewLoading();
+    if (ST.auth === 'out') h = viewLogin(); else if (ST.auth === 'join') h = viewJoin(); else if (ST.auth === 'recovery') h = viewRecovery(); else if (ST.auth === 'config' || ST.auth === 'lib' || ST.auth === 'net') h = viewConfig(); else if (ST.auth === 'boot' || !ST.ready) h = viewLoading();
     else if (ST.error) h = viewError();
     else if (ui.route === 'session') h = viewSession(); else if (ui.route === 'games') h = viewGames(); else if (ui.route === 'admin') h = viewAdmin(); else if (ui.route === 'profile') h = viewProfile(); else h = viewHome();
     var cf = document.activeElement && document.activeElement.id === 'chat-in', cl0 = $('#chat-list'), atEnd = !cl0 || cl0.scrollHeight - cl0.scrollTop - cl0.clientHeight < 60, selS = cf ? document.activeElement.selectionStart : 0;
@@ -2583,7 +2714,7 @@ var Badges = (function () {
   /* poids de l'insatisfaction d'une personne pour l'affectation de la session s (voir Badges.malus) */
   function malusOf(uid, s) {
     var evs = badgeEvents(uid).filter(function (e) { return e.start < startMs(s); });
-    return Badges.malus(evs, s.date).weight;
+    return Badges.malus(evs, s.date).weight * Badges.equity(evs, s.date).weight;   /* malus d'absence × équité dans le temps */
   }
   function computeResult(s) {
     var games = gamesOf(s).map(function (g) { return { id: g.id, min: g.min, max: g.max, ideal: g.ideal }; });
@@ -3219,6 +3350,7 @@ var Badges = (function () {
     setTimeout(function () { if (!ST.ready) { ST.ready = true; render(true); } }, 9000);
     setInterval(tick, 15000);
   }
+  var LIMIT_MSG = 'Trop d’essais : 10 codes erronés en 24 h. Réessayez demain, ou demandez le bon code à l’organisateur.';
   async function afterLogin(user) {
     ST.uid = user.id; ST.profileName = user.name || '';
     if (!NAME && ST.profileName) NAME = ST.profileName;
@@ -3226,8 +3358,13 @@ var Badges = (function () {
     if (st.error) { ui.auth.busy = false; ST.auth = 'net'; ST.cfgErr = st.error; return render(true); }
     ST.admin = st.admin; ST.org = !!st.organizer;
     var member = st.member;
-    if (!member && norm(ui.auth.code)) { member = await Backend.join(ui.auth.code); if (member) st = await Backend.status(); }
-    if (!member) { ui.auth.busy = false; ui.auth.msg = ''; ST.auth = 'join'; return render(true); }
+    var jmsg = '';
+    if (!member && norm(ui.auth.code)) {
+      var jr = await Backend.join(ui.auth.code); member = jr === true;
+      if (member) st = await Backend.status();
+      else jmsg = jr === 'limit' ? LIMIT_MSG : 'Le code saisi n’est pas le bon. Demandez-le à l’organisateur.';
+    }
+    if (!member) { ui.auth.busy = false; ui.auth.msg = jmsg; ui.auth.ok = false; ST.triesLeft = await Backend.triesLeft(); ST.auth = 'join'; return render(true); }
     ST.groups = st.admin ? ['pro', 'perso'] : (st.groups || []); ST.org = !!st.organizer; pickGrp();
     ui.auth.busy = false; startApp();
   }
@@ -3254,10 +3391,38 @@ var Badges = (function () {
       var code = norm(a.code);
       if (!code) { a.msg = 'Saisissez le code d’inscription.'; a.ok = false; return render(true); }
       a.busy = true; a.msg = ''; render(true);
-      Backend.join(code).then(function (ok) {
+      Backend.join(code).then(function (r) {
         a.busy = false;
-        if (!ok) { a.msg = 'Ce code n’est pas le bon. Demandez-le à l’organisateur.'; a.ok = false; return render(true); }
+        if (r === 'limit') { ST.triesLeft = 0; a.msg = LIMIT_MSG; a.ok = false; return render(true); }
+        if (r !== true) {
+          return Backend.triesLeft().then(function (n) {
+            ST.triesLeft = n; a.ok = false;
+            a.msg = 'Ce code n’est pas le bon. Demandez-le à l’organisateur.';
+            render(true);
+          });
+        }
         loadGroups().then(startApp);
+      });
+    } else if (f.id === 'forgot-form') {
+      var fe = norm(a.email);
+      if (!/^\S+@\S+\.\S+$/.test(fe)) { a.msg = 'Saisissez une adresse e-mail valide.'; a.ok = false; return render(true); }
+      a.busy = true; a.msg = ''; render(true);
+      Backend.resetPassword(fe).then(function (r) {
+        a.busy = false;
+        if (r.error) { a.msg = r.error; a.ok = false; return render(true); }
+        a.mode = 'in'; a.ok = true;
+        a.msg = 'Si un compte existe avec cette adresse, un e-mail avec un lien vient d’être envoyé. Pensez à regarder les courriers indésirables.';
+        render(true);
+      });
+    } else if (f.id === 'reset-form') {
+      var p1 = ($('#a-pw') || {}).value || '', p2 = ($('#a-pw2') || {}).value || '';
+      var bad2 = function (m) { a.msg = m; a.ok = false; render(true); };
+      if (p1.length < 6) return bad2('Mot de passe trop court (6 caractères minimum).');
+      if (p1 !== p2) return bad2('Les deux mots de passe ne sont pas identiques.');
+      a.busy = true; a.msg = ''; render(true);
+      Backend.setPassword(p1).then(function (r) {
+        if (r.error) { a.busy = false; return bad2(r.error); }
+        a.code = ''; a.busy = true; afterLogin(r.user || ST.recUser);
       });
     }
   });
@@ -3265,6 +3430,8 @@ var Badges = (function () {
     render(true);
     var r = await Backend.start();
     if (r.state === 'in') return afterLogin(r.user);
+    if (r.state === 'recovery') { ST.recUser = r.user; ST.auth = 'recovery'; ui.auth.msg = ''; return render(true); }
+    if (r.linkError) { ui.auth.msg = r.linkError; ui.auth.ok = false; }
     ST.auth = r.state === 'out' ? 'out' : r.state; ST.cfgErr = r.error || '';
     render(true);
   }
