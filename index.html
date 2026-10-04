@@ -774,7 +774,8 @@ html{overflow-x:hidden;max-width:100%}
 .stepper button:disabled:hover{background:none;color:var(--muted)}
 
 /* tchat de session */
-.chat{margin-top:20px}.chat h2 small{font-weight:600;color:var(--muted);font-size:.6em}.chat h2 svg{vertical-align:-3px;margin-right:6px}
+.chat{margin-top:20px}.chat h2 small{font-weight:600;color:var(--muted);font-size:.6em}.chat .panel-head h2{display:flex;align-items:center;gap:10px}.chat h2 svg{display:block;flex:none;width:26px;height:26px}
+.pv-wrap{margin-top:22px}.pv-list{display:flex;flex-direction:column;gap:8px;margin:0 0 12px;padding:0;list-style:none}.pv-list li{display:flex;align-items:center;gap:12px;padding:8px 12px 8px 8px;border-radius:16px;background:var(--hair);font-size:13.5px;color:var(--muted)}.pv-list b{color:var(--ink);font-weight:700}.pv-list .mini{width:34px;flex:none}.pv-off .mini{opacity:.5}.pv-on{border:2px solid var(--teal)}.pv-warn{color:var(--muted)}
 .chat-list{display:flex;flex-direction:column;gap:12px;max-height:380px;overflow-y:auto;padding:4px 2px 8px;margin:0 0 14px}
 .msg{display:flex;gap:10px;align-items:flex-end;max-width:88%}
 .msg.me{align-self:flex-end;flex-direction:row-reverse}
@@ -1641,7 +1642,7 @@ var Badges = (function () {
     return '<div class="note">' + ic('info', 22) + '<div><div class="small-h" style="margin:0 0 6px">Le mot de l’organisateur</div><p>' + esc(s.note.trim()).replace(/\n/g, '<br>') + '</p></div></div>';
   }
   function noteEditor(s) {
-    return '<div class="panel glass-2 note-edit"><div class="field"><label for="m-note">Commentaire pour les joueurs</label><textarea class="input" id="m-note" rows="2" maxlength="280" placeholder="Ex. Salle Cèdre, on commence à 12h20. Apportez votre déjeuner !">' + esc(s.note || '') + '</textarea></div><p class="hint" style="margin:8px 0 0">Affiché sur la carte de la session et sur sa page. Enregistré dès que vous quittez le champ.</p></div>';
+    return '<div class="panel glass-2 note-edit"><div class="field"><label for="m-note">Commentaire pour les joueurs</label><textarea class="input" id="m-note" rows="2" maxlength="280" placeholder="Ex. Lieu, on commence à 20h30...">' + esc(s.note || '') + '</textarea></div><p class="hint" style="margin:8px 0 0">Affiché sur la carte de la session et sur sa page. Enregistré dès que vous quittez le champ.</p></div>';
   }
   function roBanner() {
     return '';
@@ -1815,7 +1816,7 @@ var Badges = (function () {
   function chatPanel(s) {
     if (!ST.uid) return '';
     var list = msgsOf(s), txt = (ui.chatText && ui.chatText[s.id]) || '';
-    return '<section class="panel glass-2 chat" id="chat"><div class="panel-head"><h2>' + ic('chat', 20) + ' Messages' + (list.length ? ' <small>(' + list.length + ')</small>' : '') + '</h2><p>Un mot pour les autres joueurs de cette session : horaire, salle, retard, apport de jeu…</p></div>' +
+    return '<section class="panel glass-2 chat" id="chat"><div class="panel-head"><h2>' + ic('chat', 26) + '<span>Messages</span>' + (list.length ? ' <small>(' + list.length + ')</small>' : '') + '</h2><p>Un mot pour les autres joueurs…</p></div>' +
       '<div class="chat-list" id="chat-list">' + (list.length ? list.map(function (m) {
         var me = m.uid === ST.uid, nm = m.name || nameOf(m.uid) || 'Joueur';
         return '<div class="msg' + (me ? ' me' : '') + '">' + (me ? '' : avatar(nm, 'sm')) + '<div class="msg-b"><div class="msg-h"><b>' + esc(me ? 'Moi' : nm) + '</b><time>' + msgTime(m.ts) + '</time>' + (me || canManage(s) ? '<button class="msg-x" title="Supprimer ce message" aria-label="Supprimer ce message" data-act="chatDel" data-id="' + esc(m.id) + '">' + ic('x', 12) + '</button>' : '') + '</div><p>' + esc(m.text).replace(/\n/g, '<br>') + '</p></div></div>';
@@ -2142,7 +2143,7 @@ var Badges = (function () {
     return '<div class="form"><div class="panel glass-2"><div class="panel-head"><h2>Nouvelle session</h2><p>' + (ui.dupFrom && sessionById(ui.dupFrom) ? ic('copy', 15) + ' Copie de la session du ' + longDate(sessionById(ui.dupFrom).date) + ' : changez la date, puis ajustez les jeux ou le texte si besoin.' : 'Choisissez le jour, l’heure, puis les jeux proposés.') + '</p></div>' +
       '<div class="form-row"><div class="field"><label for="f-date">Date</label><input class="input" id="f-date" type="date" value="' + esc(f.date) + '"></div><div class="field"><label for="f-time">Heure</label><input class="input" id="f-time" type="time" value="' + esc(f.time) + '"></div></div>' +
       '<p class="hint" style="margin:10px 0 0">À cette heure, les inscriptions se ferment et les tables se composent toutes seules si vous n’avez pas clôturé avant.</p>' +
-      '<div class="field" style="margin-top:18px"><label for="f-note">Commentaire pour les joueurs (facultatif)</label><textarea class="input" id="f-note" rows="3" maxlength="280" placeholder="Ex. Salle Cèdre, on commence à 12h20. Apportez votre déjeuner !">' + esc(f.note) + '</textarea></div>' +
+      '<div class="field" style="margin-top:18px"><label for="f-note">Commentaire pour les joueurs (facultatif)</label><textarea class="input" id="f-note" rows="3" maxlength="280" placeholder="Ex. Lieu, on commence à 20h30...">' + esc(f.note) + '</textarea></div>' +
       '<div class="label" style="margin-top:24px">Pour quel groupe ?</div>' + groupPicker(f.groups, 'pickGroup') + '<p class="hint" style="margin:8px 0 0">Seules les personnes du ou des groupes choisis voient la session.</p>' +
       '<div class="label" style="margin-top:24px">Type de session</div><button class="opt-single" type="button" role="switch" aria-checked="' + (!!f.single) + '" data-act="pickSingle"><span class="sw"></span><span><strong>Un seul jeu retenu</strong><small>Tout le monde joue au même jeu, choisi à la clôture selon le nombre de joueurs et les préférences. Les places sont celles du jeu qui en accepte le plus.</small></span></button>' +
       '<div class="label" style="margin-top:24px">Jeux proposés</div>' +
@@ -2172,7 +2173,7 @@ var Badges = (function () {
       '<div class="gf-fields">' + gfField('gf-name', 'Nom du jeu', gfInput('gf-name', 'text', 'Ex. Les Aventuriers du Rail', ' maxlength="60"')) +
       '<div class="form-row3">' + gfField('gf-min', 'Joueurs min.', gfInput('gf-min', 'number', '2', ' min="2" max="30"')) + gfField('gf-ideal', 'Idéal', gfInput('gf-ideal', 'number', '4', ' min="2" max="30"')) + gfField('gf-max', 'Joueurs max.', gfInput('gf-max', 'number', '5', ' min="2" max="30"')) + '</div>' +
       '<div class="form-row3">' + gfField('gf-time', 'Durée (min)', gfInput('gf-time', 'number', '45', ' min="1" max="600"')) + gfField('gf-age', 'Âge dès', gfInput('gf-age', 'number', '8', ' min="1" max="99"')) + gfField('gf-year', 'Année', gfInput('gf-year', 'number', '2004', ' min="1800" max="2100"')) + '</div>' +
-      gfField('gf-weight', 'Complexité, de 1 (facile) à 5 (expert)', gfInput('gf-weight', 'number', '2.2', ' min="1" max="5" step="0.1"'), 'gf-narrow') +
+      gfField('gf-weight', 'Complexité BGG, de 1 (facile) à 5 (expert)', gfInput('gf-weight', 'number', '2.2', ' min="1" max="5" step="0.1"'), 'gf-narrow') +
       gfField('gf-tags', 'Catégories, séparées par des virgules', gfInput('gf-tags', 'text', 'Ex. Familial, Stratégie', ' maxlength="80"')) +
       gfField('gf-summary', 'Résumé', '<textarea class="input" id="gf-summary" rows="8" placeholder="Décrivez le jeu : règles, déroulement, ambiance… (sans limite de longueur)">' + esc(f.summary) + '</textarea>') +
       (f.err ? '<p class="auth-msg bad" role="alert">' + esc(f.err) + '</p>' : '') +
@@ -2239,6 +2240,16 @@ var Badges = (function () {
   function singlePanel(s) {
     return '<div class="panel glass-2"><div class="small-h">Type de session</div><button class="opt-single" type="button" role="switch" aria-checked="' + (!!s.single) + '" data-act="toggleSingle" data-sid="' + s.id + '"><span class="sw"></span><span><strong>Un seul jeu retenu</strong><small>' + (s.single ? 'À la clôture, un seul jeu est choisi pour tout le monde.' : 'Plusieurs jeux peuvent être joués en parallèle.') + '</small></span></button></div>';
   }
+  function closePreview(s) {
+    var n = regList(s).length, games = gamesOf(s), r;
+    if (!n) return '';
+    try { r = computeResult(s); } catch (e) { return ''; }
+    var on = r.tables.map(function (t) { var g = G(t.gid); return g ? '<li class="pv-on"><div class="mini">' + box(g) + '</div><span><b>' + esc(g.name) + '</b> · ' + t.ids.length + ' joueur' + (t.ids.length > 1 ? 's' : '') + '</span></li>' : ''; }).join('');
+    var off = games.filter(function (g) { return !r.tables.some(function (t) { return t.gid === g.id; }); }).map(function (g) { return '<li class="pv-off"><div class="mini">' + box(g) + '</div><span><b>' + esc(g.name) + '</b> · ' + esc(r.notes[g.id] || 'Pas de table') + '</span></li>'; }).join('');
+    return '<div class="small-h">Jeux retenus si on clôturait maintenant</div><ul class="pv-list">' + on + off + '</ul>' +
+      (r.unplaced.length ? '<p class="hint pv-warn" style="margin:0 0 6px">' + r.unplaced.length + ' joueur' + (r.unplaced.length > 1 ? 's' : '') + ' sans table.</p>' : '') +
+      '<p class="hint" style="margin:0">Aperçu indicatif : il évolue avec les inscriptions et le curseur d’équilibre.</p>';
+  }
   function viewManage() {
     var s = sessionById(ui.msid);
     if (!s || !canManage(s)) { ui.msid = null; return viewAdmin(); }
@@ -2251,7 +2262,7 @@ var Badges = (function () {
           : '<div class="empty"><svg class="meeple" viewBox="0 0 100 100"><use href="#meeple"/></svg><p>Aucun inscrit pour l’instant.</p></div>') + '</div>' +
         '<aside class="aside"><div class="panel glass-2"><div class="small-h">Clôture et affectation</div><div class="gauge"><div class="ring ' + (n >= seats ? 'full' : '') + '" style="--p:' + p + '"><div><b>' + n + '</b><span>sur ' + seats + '</span></div></div><p>' + (ph === 'pending' ? 'L’heure est passée : la clôture automatique se déclenche dès qu’une personne a la page ouverte.' : 'Clôture automatique à <b>' + hm(s.time) + '</b> si vous ne l’avez pas faite avant. Les tables sont alors publiées tout de suite.') + '</p></div>' +
         '<div class="field" style="margin-top:22px"><label for="balance">Équilibre de l’affectation</label><input class="range" id="balance" type="range" min="0" max="100" step="5" value="' + M.settings.balance + '"><div class="range-l"><span>Une table par envie</span><span>Moins de tables</span></div></div>' +
-        '<button class="btn btn-red btn-lg btn-block" style="margin-top:22px" data-act="closeSession" data-sid="' + s.id + '"' + (n ? '' : ' disabled') + '>' + ic('lock', 19) + ' Clôturer et affecter maintenant</button></div>' +
+        '<div class="pv-wrap" id="pv">' + closePreview(s) + '</div><button class="btn btn-red btn-lg btn-block" style="margin-top:22px" data-act="closeSession" data-sid="' + s.id + '"' + (n ? '' : ' disabled') + '>' + ic('lock', 19) + ' Clôturer et affecter maintenant</button></div>' +
         singlePanel(s) + addGamePanel(s) +
         (!ST.admin ? '' : '<div class="panel glass"><div class="small-h">Outils de test</div><div class="tools"><button class="btn btn-glass btn-sm" data-act="fake" data-sid="' + s.id + '" data-n="6"' + (n >= seats ? ' disabled' : '') + '>' + ic('plus', 15) + ' 6 inscrits fictifs</button><button class="btn btn-glass btn-sm" data-act="fake" data-sid="' + s.id + '" data-n="14"' + (n >= seats ? ' disabled' : '') + '>' + ic('plus', 15) + ' 14</button>' + (fakes ? '<button class="link" data-act="clearFakes" data-sid="' + s.id + '">Retirer les fictifs</button>' : '') + '</div></div>') + '</aside></div>';
     }
@@ -2972,7 +2983,7 @@ var Badges = (function () {
       cropWide(nf).then(function (b) { if (ui.nt.preview) URL.revokeObjectURL(ui.nt.preview); ui.nt.blob = b; ui.nt.preview = URL.createObjectURL(b); ui.nt.err = ''; render(); }, function () { ui.nt.err = 'Image illisible : essayez une photo JPEG ou PNG.'; render(); });
     } else if (t.id === 'f-date' || t.id === 'f-time') syncCreate();
     else if (t.id === 'm-note') { var s = sessionById(ui.msid); if (s) wr(ST.db.doc('sessions/' + s.id).update({ note: t.value.trim() }), 'Commentaire enregistré.'); }
-    else if (t.id === 'balance') { M.settings.balance = +t.value; wr(saveSettings()); }
+    else if (t.id === 'balance') { M.settings.balance = +t.value; var pvEl = $('#pv'), pvS = sessionById(ui.msid); if (pvEl && pvS) pvEl.innerHTML = closePreview(pvS); wr(saveSettings()); }
   });
 
   /* ---------- Connexion à la base ---------- */
