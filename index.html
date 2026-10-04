@@ -748,6 +748,60 @@ html{overflow-x:hidden;max-width:100%}
 .single-note{display:flex;gap:12px;align-items:flex-start;margin:0 0 16px;padding:12px 16px;border-radius:16px;background:var(--glass-2);border:2px solid var(--hair);font-weight:600;font-size:14px}
 .single-note svg{flex:none;margin-top:2px}
 .full{white-space:pre-line}
+
+/* retrait d'une table + agenda */
+.mt-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:18px;padding-top:16px;border-top:1px solid var(--hair)}
+.wd-state{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:.86rem;padding:7px 12px;border-radius:99px;background:rgba(255,194,46,.18);color:var(--ink)}
+.mt-note{display:flex;gap:6px;align-items:flex-start;font-size:.85rem}
+.pchip.left{opacity:.6;text-decoration:line-through}.abs-tag.lf-tag{text-decoration:none;display:inline-block;background:var(--hair);color:var(--muted)}
+.wd-panel{margin-bottom:18px;border:2px solid rgba(255,194,46,.55)}.wd-panel .panel-head h2{display:flex;align-items:center;gap:8px}.wd-game{font-weight:600;color:var(--muted)}
+.wd-chip{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;font-weight:800;padding:4px 10px;border-radius:99px;background:var(--tomato);color:var(--on-tomato)}
+#nav button{position:relative}
+.nav-dot{position:absolute;top:2px;right:calc(50% - 26px);min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:var(--tomato);color:var(--on-tomato);font-weight:800;font-size:11px;line-height:20px;font-style:normal;text-align:center;box-shadow:0 0 0 2px var(--bg,#0d1020)}
+
+/* dupliquer, promotion, sauvegarde */
+.dup-row{margin:0 0 16px}
+.wd-promo{display:flex;align-items:center;gap:5px;margin-top:3px;font-weight:600;font-size:.8rem;color:var(--muted)}
+.ops-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:0 0 16px}
+.ops-it{padding:12px 14px;border-radius:16px;background:var(--hair);display:flex;flex-direction:column;gap:3px;border-left:5px solid var(--sun)}
+.ops-it.ok{border-left-color:var(--mint,#2fd9c0)}.ops-it.warn{border-left-color:var(--tomato)}.ops-it b{font-size:.9rem}.ops-it span{font-size:.84rem;color:var(--muted)}
+
+/* organisateurs */
+.gpick-b.g-org[aria-pressed="true"]{background:#FFE08A}
+.pill-host{display:inline-flex;align-items:center;gap:5px;background:#E8DEFF;color:#2A1C5A;border:1px solid #B9A3F5}
+.stepper-wrap.ro{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.stepper button:disabled{opacity:.35;cursor:not-allowed}
+.stepper button:disabled:hover{background:none;color:var(--muted)}
+
+/* tchat de session */
+.chat{margin-top:20px}.chat h2 small{font-weight:600;color:var(--muted);font-size:.6em}.chat h2 svg{vertical-align:-3px;margin-right:6px}
+.chat-list{display:flex;flex-direction:column;gap:12px;max-height:380px;overflow-y:auto;padding:4px 2px 8px;margin:0 0 14px}
+.msg{display:flex;gap:10px;align-items:flex-end;max-width:88%}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg-b{background:var(--glass-2,#fff);border:1px solid var(--hair,#ddd);border-radius:18px 18px 18px 6px;padding:8px 14px;min-width:0}
+.msg.me .msg-b{background:#CFE0FF;border-color:#9DB8F0;border-radius:18px 18px 6px 18px}
+.msg-h{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--muted)}.msg-h b{color:var(--ink);font-size:13px}
+.msg-b p{margin:2px 0 0;font-size:15px;line-height:1.4;overflow-wrap:anywhere}
+.msg-x{margin-left:auto;opacity:.45;padding:2px;border-radius:6px}.msg-x:hover{opacity:1;background:var(--glass-2)}
+.chat-form{display:flex;gap:10px;align-items:flex-end}.chat-form textarea{resize:none;flex:1;min-height:46px;max-height:140px}
+.chat-form .btn{flex:none;height:46px;padding:0 18px}
+.chat-empty{text-align:center;margin:10px 0}
+/* tchat : lisibilité maximale, couleurs de la charte (jaune soleil + encre, bords marqués) */
+.msg-b{background:var(--glass-2);color:var(--ink);border:2px solid var(--stroke);box-shadow:0 2px 0 var(--stroke)}
+.msg.me .msg-b{background:var(--sun);color:var(--on-sun);border-color:var(--sun-edge);box-shadow:0 2px 0 var(--sun-edge)}
+.msg-h{color:var(--muted);font-weight:600}.msg-h b{color:inherit;font-weight:800}
+.msg.me .msg-h{color:var(--on-sun)}.msg.me .msg-h time{opacity:.78}
+.msg-b p{color:inherit;font-size:16px;font-weight:500;line-height:1.45}
+.msg-x{color:inherit;opacity:.6}.msg-x:hover{opacity:1;background:rgba(0,0,0,.1)}
+.chat-form textarea{border:2px solid var(--stroke)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .msg:not(.me) .msg-b,:root:not([data-theme="light"]) .chat-form textarea{border-color:var(--hair);box-shadow:none}}
+:root[data-theme="dark"] .msg:not(.me) .msg-b,:root[data-theme="dark"] .chat-form textarea{border-color:var(--hair);box-shadow:none}
+
+/* carte de session : « places - bulle nombre » sur une ligne */
+.seats-row .seat-num{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px 8px}
+.sn-main,.sn-msg{white-space:nowrap}
+.sn-msg{display:inline-flex;align-items:center;gap:5px;color:var(--ink);font:800 14px/1 var(--font-b)}
+.sn-msg svg{flex:none}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -1129,7 +1183,7 @@ html{overflow-x:hidden;max-width:100%}
       var r = await sb.rpc('my_status');
       if (r.error) throw r.error;
       var d = r.data || {};
-      return { admin: !!d.admin, member: !!d.member, groups: Array.isArray(d.groups) ? d.groups : [] };
+      return { admin: !!d.admin, member: !!d.member, organizer: !!d.organizer, groups: Array.isArray(d.groups) ? d.groups : [] };
     } catch (e) { return { error: friendly(e) }; }
   };
   B.join = async function (code) {
@@ -1147,6 +1201,42 @@ html{overflow-x:hidden;max-width:100%}
   B.setMemberGroup = async function (uid, grp, on) {
     try { var r = await sb.rpc('jdo_set_member_group', { p_uid: uid, p_grp: grp, p_on: !!on }); return !r.error && r.data === true; } catch (e) { return false; }
   };
+  B.setOrganizer = async function (uid, on) {
+    try { var r = await sb.rpc('jdo_set_organizer', { p_uid: uid, p_on: !!on }); return !r.error && r.data === true; } catch (e) { return false; }
+  };
+  B.hostUnreg = async function (sid, uid) {
+    try { var r = await sb.rpc('jdo_host_unreg', { p_sid: sid, p_uid: uid }); return !r.error && r.data === true; } catch (e) { return false; }
+  };
+  /* ---- sauvegarde et maintien en activité (administrateur) ---- */
+  B.opsStatus = async function () { try { var r = await sb.rpc('jdo_ops_status'); return r.error ? null : r.data; } catch (e) { return null; } };
+  B.backupList = async function () { try { var r = await sb.rpc('jdo_backup_list'); return r.error ? [] : (r.data || []); } catch (e) { return []; } };
+  B.backupNow = async function () { try { var r = await sb.rpc('jdo_backup_now'); return !r.error; } catch (e) { return false; } };
+  B.backupRestore = async function (id) { try { var r = await sb.rpc('jdo_backup_restore', { p_id: id }); return r.error ? null : r.data; } catch (e) { return null; } };
+  B.exportAll = async function () {
+    try {
+      var out = [], from = 0, page = 500;
+      for (;;) {
+        var r = await sb.from('kv').select('coll,id,data').order('coll').order('id').range(from, from + page - 1);
+        if (r.error) return null;
+        out = out.concat(r.data || []);
+        if (!r.data || r.data.length < page) break;
+        from += page;
+      }
+      return out;
+    } catch (e) { return null; }
+  };
+  B.importAll = async function (rows) {
+    try {
+      var n = 0;
+      for (var i = 0; i < rows.length; i += 100) {
+        var chunk = rows.slice(i, i + 100).map(function (x) { return { coll: x.coll, id: x.id, data: x.data, updated_at: new Date().toISOString() }; });
+        var r = await sb.from('kv').upsert(chunk, { onConflict: 'coll,id' });
+        if (r.error) return null;
+        n += chunk.length;
+      }
+      return n;
+    } catch (e) { return null; }
+  };
   B.pushAudience = async function (groups) {
     try { var r = await sb.rpc('jdo_push_audience', { p_groups: groups && groups.length ? groups : null }); return r.error ? null : r.data; } catch (e) { return null; }
   };
@@ -1157,19 +1247,19 @@ html{overflow-x:hidden;max-width:100%}
       return { n: r.data };
     } catch (e) { return { error: friendly(e) }; }
   };
-  B.uploadCover = async function (blob, id) {
+  B.uploadCover = async function (blob, id, folder) {
     try {
-      var path = id + '-' + Date.now().toString(36) + '.jpg';
+      var path = (folder || '') + id + '-' + Date.now().toString(36) + '.jpg';
       var r = await sb.storage.from('covers').upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false });
       if (r.error) {
         var m = String(r.error.message || '');
-        return { error: /row-level|polic|unauthorized|not allowed/i.test(m) ? 'Envoi refusé : réservé à l’administrateur.' : /bucket not found/i.test(m) ? 'Le stockage des photos n’est pas encore activé : relancez le script SQL dans Supabase.' : friendly(r.error) };
+        return { error: /row-level|polic|unauthorized|not allowed/i.test(m) ? 'Envoi refusé : réservé à l’administrateur et aux organisateurs.' : /bucket not found/i.test(m) ? 'Le stockage des photos n’est pas encore activé : relancez le script SQL dans Supabase.' : friendly(r.error) };
       }
       return { url: sb.storage.from('covers').getPublicUrl(path).data.publicUrl };
     } catch (e) { return { error: friendly(e) }; }
   };
   B.removeCover = async function (url) {
-    try { var m = /\/covers\/([\w.-]+)$/.exec(url || ''); if (m) await sb.storage.from('covers').remove([m[1]]); } catch (e) {}
+    try { var m = /\/covers\/([\w.\/-]+)$/.exec(url || ''); if (m) await sb.storage.from('covers').remove([m[1]]); } catch (e) {}
   };
   /* ---------- Notifications push ---------- */
   var iosDev = function () { var ua = navigator.userAgent || ''; return /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1); };
@@ -1272,6 +1362,11 @@ html{overflow-x:hidden;max-width:100%}
           var cur = await ref.get();
           return ref.set(Object.assign({}, cur.exists ? cur.data() : {}, patch));
         },
+        setForce: async function (data) {
+          var r = await sb.from('kv').upsert({ coll: c, id: id, data: data, updated_at: new Date().toISOString() }, { onConflict: 'coll,id' });
+          if (r.error) throw wrapErr(r.error);
+          setLocal(c, id, data); refresh(c);
+        },
         delete: async function () {
           var r = await sb.from('kv').delete().eq('coll', c).eq('id', id);
           if (r.error) throw wrapErr(r.error);
@@ -1286,6 +1381,7 @@ html{overflow-x:hidden;max-width:100%}
       collection: function (c) { return { onSnapshot: function (cb, err) { return sub(c, undefined, cb, err); } }; }
     };
     function refreshAll() { Object.keys(C).forEach(function (c) { if (C[c].subs.length) refresh(c); }); }
+    db.reload = refreshAll;
     db.watch = function () {
       try {
         sb.channel('jdo-kv').on('postgres_changes', { event: '*', schema: 'public', table: 'kv' }, function (p) {
@@ -1429,10 +1525,14 @@ var Badges = (function () {
     camera: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"/><circle cx="12" cy="13" r="4"/>',
     image: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
     logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/>',
+    chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/>',
     copy: '<rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
     lock: '<rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
     trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
     spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',
+    copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+    download: '<path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
+    upload: '<path d="M12 15V3m0 0L8 7m4-4l4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
     cal: '<rect x="3" y="5" width="18" height="16" rx="3.5"/><path d="M3 10h18M8 3v4M16 3v4"/>',
     dice: '<rect x="3" y="3" width="18" height="18" rx="4.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
@@ -1445,8 +1545,8 @@ var Badges = (function () {
   var ic = function (n, s) { return '<svg class="ic" width="' + (s || 18) + '" height="' + (s || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[n] + '</svg>'; };
 
   /* ---------- État ---------- */
-  var M = { groupCfg: {}, games: [], sessions: [], regs: {}, results: {}, drafts: {}, auto: {}, settings: { balance: 30 } };
-  var ST = { db: null, auth: 'boot', cfgErr: '', ready: false, loaded: {}, error: '', uid: null, profileName: '', admin: false, canWrite: true, teamCode: null, groups: [], codes: null, members: null, started: false };
+  var M = { groupCfg: {}, games: [], sessions: [], regs: {}, results: {}, drafts: {}, auto: {}, wd: {}, msg: {}, settings: { balance: 30 } };
+  var ST = { db: null, auth: 'boot', cfgErr: '', ready: false, loaded: {}, error: '', uid: null, profileName: '', admin: false, org: false, canWrite: true, teamCode: null, groups: [], codes: null, members: null, started: false };
   var NAMEKEY = 'jdo-name', NAME = '';
   try { NAME = localStorage.getItem(NAMEKEY) || ''; } catch (e) {}
   var tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
@@ -1658,7 +1758,7 @@ var Badges = (function () {
     list.forEach(function (x) { (x.date === today ? tod : x.date > today ? up : arch).push(x); });
     arch.reverse();
     var grid = function (l) { return '<div class="grid-sessions">' + l.map(sessionCard).join('') + '</div>'; };
-    var empty = '<div class="panel glass-2 empty"><svg class="meeple" viewBox="0 0 100 100"><use href="#meeple"/></svg><h2>Aucune session programmée</h2><p>' + (ST.admin ? 'Programmez la première pour ouvrir les inscriptions.' : 'L’organisateur n’a pas encore ouvert de session. Revenez bientôt.') + '</p>' + (ST.admin ? '<button class="btn" data-act="toNew">' + ic('plus', 18) + ' Programmer une session</button>' : '') + '</div>';
+    var empty = '<div class="panel glass-2 empty"><svg class="meeple" viewBox="0 0 100 100"><use href="#meeple"/></svg><h2>Aucune session programmée</h2><p>' + (canHost() ? 'Programmez la première pour ouvrir les inscriptions.' : 'L’organisateur n’a pas encore ouvert de session. Revenez bientôt.') + '</p>' + (canHost() ? '<button class="btn" data-act="toNew">' + ic('plus', 18) + ' Programmer une session</button>' : '') + '</div>';
     var secToday = tod.length ? '<section><div class="sec-head"><h2>Sessions du jour</h2><p>' + plural(tod.length, 'session aujourd’hui', 'sessions aujourd’hui') + '</p></div>' + grid(tod) + '</section>' : '';
     var secUp = '<section><div class="sec-head"><h2>Sessions à venir</h2><p>' + plural(up.length, 'session programmée', 'sessions programmées') + '</p></div>' + (up.length ? grid(up) : (tod.length || arch.length ? '<p class="hint">Aucune autre session programmée pour le moment.</p>' : empty)) + '</section>';
     var secArch = arch.length ? '<section class="archives"><button class="arch-toggle" data-act="toggleArch" aria-expanded="' + (ui.archOpen ? 'true' : 'false') + '">' + ic('cal', 18) + '<span>Sessions archivées</span><small>' + arch.length + '</small><i class="chev">' + (ui.archOpen ? '–' : '+') + '</i></button>' + (ui.archOpen ? grid(arch) : '') + '</section>' : '';
@@ -1678,10 +1778,10 @@ var Badges = (function () {
     else if (ph === 'published' || ph === 'auto') { label = 'Voir les tables'; cls += ' btn-teal'; }
     else { label = 'Voir la session'; cls += ' btn-glass'; }
     return '<article class="scard glass" style="--bgimg:url(' + bgOf(games[0]) + ')"><span class="scard-bg"></span>' +
-      '<div class="scard-top">' + ticket(s) + '<div class="scard-meta">' + statusPill(s) + (s.single ? '<span class="pill pill-single">Un seul jeu</span>' : '') + (mine ? (waitPos(s, ST.uid) ? '<span class="pill pill-wait">' + ic('clock', 13) + ' En attente · n°' + waitPos(s, ST.uid) + '</span>' : '<span class="pill pill-me">' + ic('check', 13) + ' Inscrit·e</span>') : '') + '</div></div>' +
+      '<div class="scard-top">' + ticket(s) + '<div class="scard-meta">' + statusPill(s) + (s.single ? '<span class="pill pill-single">Un seul jeu</span>' : '') + (s.ownerName ? '<span class="pill pill-host">' + ic('users', 13) + ' Organisé par ' + esc(s.ownerName) + '</span>' : '') + (mine ? (waitPos(s, ST.uid) ? '<span class="pill pill-wait">' + ic('clock', 13) + ' En attente · n°' + waitPos(s, ST.uid) + '</span>' : '<span class="pill pill-me">' + ic('check', 13) + ' Inscrit·e</span>') : '') + '</div></div>' +
       '<div class="fan">' + games.map(function (g, j) { return '<div class="fan-i" style="--j:' + j + ';--n:' + games.length + '">' + box(g) + '</div>'; }).join('') + '</div>' +
       '<p class="scard-games">' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</p>' + (s.note && s.note.trim() ? '<p class="scard-note">' + esc(s.note.trim()) + '</p>' : '') +
-      '<div class="seats-row">' + seatStrip(n, seats) + '<span class="seat-num"><b>' + n + '</b> / ' + seats + ' places' + (waitList(s).length ? ' · ' + waitList(s).length + ' en attente' : '') + '</span></div>' +
+      '<div class="seats-row">' + seatStrip(n, seats) + '<span class="seat-num"><span class="sn-main"><b>' + n + '</b> / ' + seats + ' places</span>' + (msgsOf(s).length ? '<span class="sn-sep">-</span><span class="sn-msg" title="Messages" aria-label="' + msgsOf(s).length + ' message' + (msgsOf(s).length > 1 ? 's' : '') + '">' + ic('chat', 15) + msgsOf(s).length + '</span>' : '') + (waitList(s).length ? '<span class="sn-sep">·</span><span class="sn-main">' + waitList(s).length + ' en attente</span>' : '') + '</span></div>' +
       '<button class="' + cls + '" data-act="open" data-sid="' + s.id + '">' + label + ' ' + ic('arrow', 17) + '</button></article>';
   }
 
@@ -1704,7 +1804,23 @@ var Badges = (function () {
     else main = closedPanel(s, mine, games, ph === 'pending');
     return '<button class="back" data-act="home">' + ic('back', 18) + ' Toutes les sessions</button>' +
       '<div class="sess-head">' + ticket(s, 'big') + '<div><h1>' + longDate(s.date) + '</h1><div class="sub">' + statusPill(s) + '<span>' + (ph === 'open' ? 'Inscriptions jusqu’à ' + hm(s.time) : hm(s.time)) + '</span><span>' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</span></div></div></div>' +
-      noteBox(s) + (s.single && ph === 'open' ? '<p class="single-note">' + ic('dice', 18) + '<span>Un seul jeu sera joué par tout le monde. Il est choisi à la clôture selon le nombre de joueurs et vos préférences : classez donc tous les jeux honnêtement.</span></p>' : '') + (ph === 'open' ? roBanner() : '') + '<div class="cols"><div>' + main + '</div><aside class="aside">' + asidePanels(s) + '</aside></div>';
+      noteBox(s) + (s.single && ph === 'open' ? '<p class="single-note">' + ic('dice', 18) + '<span>Un seul jeu sera joué par tout le monde. Il est choisi à la clôture selon le nombre de joueurs et vos préférences : classez donc tous les jeux honnêtement.</span></p>' : '') + (ph === 'open' ? roBanner() : '') + '<div class="cols"><div>' + main + '</div><aside class="aside">' + asidePanels(s) + '</aside></div>' + chatPanel(s);
+  }
+  /* ---------- Messages de la session (tchat) ---------- */
+  function msgsOf(s) { return Object.keys(M.msg).map(function (k) { var m = M.msg[k]; m.id = k; return m; }).filter(function (m) { return m.sid === s.id; }).sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); }); }
+  function msgTime(ts) {
+    var d = new Date(ts), t = ('0' + d.getHours()).slice(-2) + 'h' + ('0' + d.getMinutes()).slice(-2);
+    return D.iso(d) === D.iso(new Date()) ? t : d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' · ' + t;
+  }
+  function chatPanel(s) {
+    if (!ST.uid) return '';
+    var list = msgsOf(s), txt = (ui.chatText && ui.chatText[s.id]) || '';
+    return '<section class="panel glass-2 chat" id="chat"><div class="panel-head"><h2>' + ic('chat', 20) + ' Messages' + (list.length ? ' <small>(' + list.length + ')</small>' : '') + '</h2><p>Un mot pour les autres joueurs de cette session : horaire, salle, retard, apport de jeu…</p></div>' +
+      '<div class="chat-list" id="chat-list">' + (list.length ? list.map(function (m) {
+        var me = m.uid === ST.uid, nm = m.name || nameOf(m.uid) || 'Joueur';
+        return '<div class="msg' + (me ? ' me' : '') + '">' + (me ? '' : avatar(nm, 'sm')) + '<div class="msg-b"><div class="msg-h"><b>' + esc(me ? 'Moi' : nm) + '</b><time>' + msgTime(m.ts) + '</time>' + (me || canManage(s) ? '<button class="msg-x" title="Supprimer ce message" aria-label="Supprimer ce message" data-act="chatDel" data-id="' + esc(m.id) + '">' + ic('x', 12) + '</button>' : '') + '</div><p>' + esc(m.text).replace(/\n/g, '<br>') + '</p></div></div>';
+      }).join('') : '<p class="hint chat-empty">Aucun message pour l’instant. Écrivez le premier !</p>') + '</div>' +
+      '<div class="chat-form"><textarea class="input" id="chat-in" rows="1" maxlength="500" placeholder="Écrire un message…" aria-label="Votre message">' + esc(txt) + '</textarea><button class="btn" data-act="chatSend" data-sid="' + s.id + '" aria-label="Envoyer">' + ic('arrow', 18) + '</button></div></section>';
   }
   function rankingPanel(s, games, mine) {
     var d = ui.draft, k = games.length, handled = d.order.length + d.veto.length;
@@ -1758,6 +1874,69 @@ var Badges = (function () {
     return '<div class="panel glass-2"><div class="ok-head"><span class="ok-ico" style="background:var(--ink);color:var(--bg);box-shadow:none">' + ic('lock', 22) + '</span><div><h2>' + (pending ? 'Clôture en cours' : 'Inscriptions clôturées') + '</h2><p class="hint" style="margin:4px 0 0">' + (pending ? 'L’heure est passée : les tables se composent à l’instant. Cela prend quelques secondes.' : 'Les tables seront annoncées dès que l’organisateur les aura publiées.') + '</p></div></div>' +
       (mine ? '<div class="small-h">Vos choix</div>' + choicesList(mine) : '') + '</div>';
   }
+
+  /* ---------- Retrait d’une table publiée + agenda ---------- */
+  var wdId = function (sid, uid) { return sid + '_' + uid; };
+  var wdOf = function (s, uid) { return M.wd[wdId(s.id, uid)] || null; };
+  var isLeft = function (s, uid) { return !!(s.left && s.left[uid]); };
+  function wdOpenList(s) { return Object.keys(M.wd).map(function (k) { return M.wd[k]; }).filter(function (w) { return w.sid === s.id && w.status === 'open'; }).sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); }); }
+  function wdPendingCount() { return Object.keys(M.wd).filter(function (k) { var w = M.wd[k], s = sessionById(w.sid); return w.status === 'open' && s && !isLeft(s, w.uid) && Date.now() < startMs(s) + 36e5 * 12; }).length; }
+  function canWithdraw(s) { var ph = phase(s); return (ph === 'published' || ph === 'auto') && Date.now() < startMs(s) + 36e5 * 8; }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function icsLocal(d) { return d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + 'T' + pad2(d.getHours()) + pad2(d.getMinutes()) + '00'; }
+  function icsTxt(t) { return String(t).replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+  function icsFold(line) { var out = [], b = line; while (b.length > 70) { out.push(b.slice(0, 70)); b = ' ' + b.slice(70); } out.push(b); return out.join('\r\n'); }
+  /* contenu du fichier agenda : heure locale « flottante » (suit le fuseau du téléphone), durée = 2 parties, lieu vide */
+  function icsOf(s, mt) {
+    var g = G(mt.gid), ph = s.date.split('-'), tm = (s.time || '12:00').split(':'), dur = 2 * (+g.time || 30);
+    var a = new Date(+ph[0], +ph[1] - 1, +ph[2], +tm[0], +tm[1] || 0), b = new Date(a.getTime() + dur * 60000);
+    var others = mt.ids.filter(function (x) { return !isMe(x) && !isLeft(s, x); }).map(nameOf);
+    var desc = others.length ? 'Avec ' + others.join(', ') : 'Seul·e à cette table pour l’instant';
+    var now = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
+    return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Jeux d\'Oliv//FR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
+      'UID:' + s.id + '-' + ST.uid + '@jeuxdoliv', 'DTSTAMP:' + now, 'DTSTART:' + icsLocal(a), 'DTEND:' + icsLocal(b),
+      'SUMMARY:' + icsTxt('Jeux d\'Oliv - ' + g.name), 'LOCATION:', 'DESCRIPTION:' + icsTxt(desc), 'END:VEVENT', 'END:VCALENDAR'].map(icsFold).join('\r\n') + '\r\n';
+  }
+  function tableActions(s, mt) {
+    if (!ST.uid || !mt) return '';
+    if (isLeft(s, ST.uid)) return '<p class="hint mt-note" style="margin:16px 0 0">' + ic('check', 15) + ' Votre retrait a été accepté par l’organisateur.</p>';
+    var w = wdOf(s, ST.uid), btns = '<button class="btn btn-glass btn-sm" data-act="addCal" data-sid="' + s.id + '">' + ic('cal', 16) + ' Ajouter à mon agenda</button>';
+    if (canWithdraw(s)) {
+      if (w && w.status === 'open') btns += '<span class="wd-state">' + ic('clock', 15) + ' Demande de retrait envoyée</span><button class="link" data-act="wdCancel" data-sid="' + s.id + '">Annuler la demande</button>';
+      else if (ui.confirm === 'wd:' + s.id) btns += '<button class="btn btn-red btn-sm" data-act="wdAsk" data-sid="' + s.id + '">' + ic('send', 16) + ' Confirmer la demande</button><button class="link" data-act="wdNo">Non, je viens</button>';
+      else btns += '<button class="btn btn-glass btn-sm" data-act="wdAsk" data-sid="' + s.id + '">' + ic('x', 16) + ' Demander à me retirer</button>';
+    }
+    return '<div class="mt-actions">' + btns + '</div>' + (w && w.status === 'no' && canWithdraw(s) ? '<p class="hint mt-note" style="margin:10px 0 0">Votre précédente demande n’a pas été retenue : l’organisateur compte sur vous.</p>' : '') +
+      (ui.confirm === 'wd:' + s.id ? '<p class="hint mt-note" style="margin:10px 0 0">L’organisateur sera prévenu par notification. Tant qu’il n’a pas répondu, votre place reste réservée.</p>' : '');
+  }
+  /* place libérée par un retrait : la 1re personne éligible (liste d’attente, puis « sans table ») prend la place */
+  function pickPromo(s, r, tb, left) {
+    var g = G(tb.gid); if (!g) return null;
+    var active = tb.ids.filter(function (u) { return !left[u]; }).length;
+    if (active >= g.max) return null;
+    var inTable = {}; r.tables.forEach(function (t) { t.ids.forEach(function (u) { inTable[u] = 1; }); });
+    var ab = s.absent || {}, cands = waitList(s).map(function (x) { return x.uid; }).concat(r.unplaced), i, u, reg;
+    for (i = 0; i < cands.length; i++) {
+      u = cands[i]; reg = regOf(s, u);
+      if (inTable[u] || left[u] || ab[u] || !reg || reg.veto.indexOf(g.id) >= 0) continue;
+      return u;
+    }
+    return null;
+  }
+  function promoFor(s, uid) {
+    var r = resultOf(s), tb = r && r.tables.filter(function (t) { return t.ids.indexOf(uid) >= 0; })[0]; if (!tb) return null;
+    var left = clone(s.left || {}); left[uid] = 1; var p = pickPromo(s, r, tb, left); return p ? { uid: p, gid: tb.gid } : null;
+  }
+  function wdPanel(s) {
+    var list = wdOpenList(s).filter(function (w) { return !isLeft(s, w.uid); });
+    if (!list.length) return '';
+    var r = resultOf(s);
+    return '<div class="panel glass-2 wd-panel"><div class="panel-head"><h2>' + ic('bell', 18) + ' Demandes de retrait (' + list.length + ')</h2><p>Ces personnes ne sont plus disponibles. Accepter les retire de leur table, sans malus.</p></div>' +
+      list.map(function (w) {
+        var tb = r && r.tables.filter(function (t) { return t.ids.indexOf(w.uid) >= 0; })[0], g = tb && G(tb.gid), nm = nameOf(w.uid) || w.name || 'Joueur';
+        return '<div class="reg"><div class="who-n">' + avatar(nm) + '<span>' + esc(nm) + (g ? '<small class="wd-game"> · ' + esc(g.name) + '</small>' : '') + (promoFor(s, w.uid) ? '<small class="wd-promo">' + ic('users', 13) + ' ' + esc(nameOf(promoFor(s, w.uid).uid)) + ' (liste d’attente) prendra la place</small>' : '') + '</span></div><div class="row"><button class="btn btn-sm" data-act="wdOk" data-sid="' + s.id + '" data-uid="' + esc(w.uid) + '">' + ic('check', 15) + ' Accepter</button><button class="link danger" data-act="wdKo" data-sid="' + s.id + '" data-uid="' + esc(w.uid) + '">Refuser</button></div></div>';
+      }).join('') + '</div>';
+  }
   function publishedPanel(s, auto) {
     var r = resultOf(s), banner = '', mt, un;
     if (!r) return closedPanel(s, myReg(s), gamesOf(s), true);
@@ -1765,11 +1944,11 @@ var Badges = (function () {
       mt = r.tables.filter(function (t) { return t.ids.indexOf(ST.uid) >= 0; })[0];
       un = r.unplaced.indexOf(ST.uid) >= 0;
     }
-    var wt = ST.uid && waitPos(s, ST.uid) > 0;
+    var wt = ST.uid && !mt && waitPos(s, ST.uid) > 0;
     if (wt) banner = '<div class="panel glass-2"><div class="ok-head" style="margin:0"><span class="ok-ico" style="background:var(--sun);color:var(--on-sun)">' + ic('clock', 22) + '</span><div><h2>Pas de place cette fois</h2><p class="hint" style="margin:4px 0 0">Vous étiez sur la liste d’attente : toutes les places étaient prises à la clôture.</p></div></div></div>';
     else if (mt) {
       var g = G(mt.gid), others = mt.ids.filter(function (x) { return !isMe(x); });
-      banner = '<div class="panel glass-2"><div class="ok-head" style="margin:0"><span class="ok-ico">' + ic('check', 24) + '</span><div><h2>Vous jouez à ' + esc(g ? g.name : 'ce jeu') + '</h2><p class="hint" style="margin:4px 0 0">' + (others.length ? 'Avec ' + others.map(function (x) { return esc(nameOf(x)); }).join(', ') + '.' : 'Vous êtes seul·e à cette table pour l’instant.') + '</p></div></div></div>';
+      banner = '<div class="panel glass-2"><div class="ok-head" style="margin:0"><span class="ok-ico">' + ic('check', 24) + '</span><div><h2>Vous jouez à ' + esc(g ? g.name : 'ce jeu') + '</h2><p class="hint" style="margin:4px 0 0">' + (others.length ? 'Avec ' + others.map(function (x) { return esc(nameOf(x)); }).join(', ') + '.' : 'Vous êtes seul·e à cette table pour l’instant.') + '</p></div></div>' + tableActions(s, mt) + '</div>';
     } else if (un) {
       banner = '<div class="panel glass-2"><div class="ok-head" style="margin:0"><span class="ok-ico" style="background:var(--tomato);color:var(--on-tomato);box-shadow:0 3px 0 var(--tomato-edge)">' + ic('x', 22) + '</span><div><h2>Pas de table cette fois</h2><p class="hint" style="margin:4px 0 0">Aucune table ouverte ne correspondait à vos choix. Parlez-en à l’organisateur.</p></div></div></div>';
     }
@@ -1802,7 +1981,8 @@ var Badges = (function () {
       '<div class="facts" style="margin-top:4px"><span>' + ic('users', 14) + ' ' + g.min + '–' + g.max + ' joueurs</span></div></div></div>' +
       '<div class="players">' + t.ids.map(function (uid) {
         var n = nameOf(uid), reg = regOf(s, uid), r = reg ? rankOf(reg, g.id) : 0;
-        var isAbs = !!(s.absent && s.absent[uid]);
+        var isAbs = !!(s.absent && s.absent[uid]), lf = isLeft(s, uid);
+        if (lf) return '<span class="pchip left">' + avatar(n, 'sm') + esc(n) + '<span class="abs-tag lf-tag">retiré·e</span></span>';
         if (o.abs) return '<button class="pchip abs' + (isAbs ? ' off' : '') + '" data-act="toggleAbsent" data-sid="' + s.id + '" data-uid="' + esc(uid) + '" aria-pressed="' + isAbs + '" title="' + (isAbs ? 'Retirer l’absence de ' : 'Marquer absent·e : ') + esc(n) + '">' + avatar(n, 'sm') + esc(n) + (isAbs ? '<span class="abs-tag">absent·e</span>' : '') + '</button>';
         return o.edit ? '<button class="pchip" data-act="moveOpen" data-uid="' + esc(uid) + '" title="Déplacer ' + esc(n) + '">' + avatar(n, 'sm') + esc(n) + rk(r) + '</button>'
           : '<span class="pchip ' + (isMe(uid) ? 'me' : '') + '">' + avatar(n, 'sm') + esc(n) + '</span>';
@@ -1851,11 +2031,13 @@ var Badges = (function () {
 
   /* ---------- Admin ---------- */
   function viewAdmin() {
-    if (!ST.admin) return '<div class="gate glass-2"><span class="ok-ico">' + ic('lock', 30) + '</span><div><h2>Espace réservé</h2><p class="hint" style="margin:8px 0 0">Seul l’organisateur peut programmer les sessions.</p></div></div>';
+    if (!canHost()) return '<div class="gate glass-2"><span class="ok-ico">' + ic('lock', 30) + '</span><div><h2>Espace réservé</h2><p class="hint" style="margin:8px 0 0">Seul l’organisateur peut programmer les sessions.</p></div></div>';
     if (ui.msid) return viewManage();
-    var tabs = [['sessions', 'Sessions', 'cal'], ['new', 'Programmer', 'plus'], ['games', 'Jeux', 'dice'], ['notif', 'Annonces', 'bell'], ['team', 'Équipe', 'users']], body;
+    var tabs = [['sessions', ST.admin ? 'Sessions' : 'Mes sessions', 'cal'], ['new', 'Programmer', 'plus'], ['games', 'Jeux', 'dice']], body;
+    if (ST.admin) tabs.push(['notif', 'Annonces', 'bell'], ['team', 'Équipe', 'users']);
+    else if (ui.adminTab === 'notif' || ui.adminTab === 'team') ui.adminTab = 'sessions';
     if (ui.adminTab === 'new') body = tabNew(); else if (ui.adminTab === 'games') body = tabGames(); else if (ui.adminTab === 'notif') body = tabNotif(); else if (ui.adminTab === 'team') body = tabTeam(); else body = tabSessions();
-    return '<div class="admin-top"><div><p class="eyebrow">Espace admin</p><h1 style="font-size:clamp(2rem,4vw,3rem)">Organiser les parties</h1></div>' +
+    return '<div class="admin-top"><div><p class="eyebrow">' + (ST.admin ? 'Espace admin' : 'Espace organisateur') + '</p><h1 style="font-size:clamp(2rem,4vw,3rem)">' + (ST.admin ? 'Organiser les parties' : 'Mes parties') + '</h1></div>' +
       '<div class="seg" role="group" aria-label="Sections">' + tabs.map(function (t) { return '<button aria-pressed="' + (ui.adminTab === t[0]) + '" data-act="tab" data-tab="' + t[0] + '">' + ic(t[2], 17) + ' ' + t[1] + '</button>'; }).join('') + '</div></div>' + body;
   }
   function tabNotif() {
@@ -1890,7 +2072,28 @@ var Badges = (function () {
       im.src = url;
     });
   }
-  function tabTeam() {
+  function fdate(t) { try { return new Date(t).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { return ''; } }
+  function loadOps() { Backend.opsStatus().then(function (o) { ST.ops = o; Backend.backupList().then(function (l) { ST.backups = l || []; if (ui.adminTab === 'team') render(); }); }); }
+  function backupPanel() {
+    var o = ST.ops, bl = ST.backups, busy = ui.bk && ui.bk.busy, st = '';
+    if (o === undefined || o === null) st = '<p class="hint" style="margin:0 0 14px">' + (o === null ? 'Pour activer la sauvegarde automatique et le maintien en activité, exécutez le nouveau script SQL dans Supabase.' : 'Chargement…') + '</p>';
+    else {
+      var pingOk = o.ping_status >= 200 && o.ping_status < 300;
+      st = '<div class="ops-grid"><div class="ops-it ' + (o.cron && o.last_backup ? 'ok' : 'warn') + '"><b>Copie automatique</b><span>' + (o.last_backup ? 'Dernière : ' + esc(fdate(o.last_backup)) + ' · ' + o.backups + ' copie' + (o.backups > 1 ? 's' : '') + ' conservée' + (o.backups > 1 ? 's' : '') : 'Aucune copie') + (o.cron ? '' : ' · planification absente') + '</span></div>' +
+        '<div class="ops-it ' + (o.cron && pingOk ? 'ok' : 'warn') + '"><b>Maintien en activité (plan gratuit)</b><span>' + (!o.cron ? 'Planification absente (pg_cron indisponible)' : o.ping_status_at ? 'Dernier contrôle : ' + esc(fdate(o.ping_status_at)) + ' · réponse ' + o.ping_status : o.ping_at ? 'Appel envoyé le ' + esc(fdate(o.ping_at)) + ', réponse attendue' : 'Premier appel prévu à 8h') + '</span></div></div>';
+    }
+    return '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Sauvegarde</h2><p>Une copie de tout (jeux, sessions, inscriptions, badges) est faite chaque nuit, et vous pouvez en garder une sur votre ordinateur. Les images des jeux ne sont pas dans le fichier.</p></div>' + st +
+      (ui.bkFile ? '<div class="abs-hint" style="margin-top:0">' + ic('upload', 16) + ' <span><b>' + ui.bkFile.rows.length + ' éléments</b> dans « ' + esc(ui.bkFile.name) + '»' + (ui.bkFile.at ? ' (du ' + esc(fdate(ui.bkFile.at)) + ')' : '') + '. Ils remplacent les éléments du même nom ; rien n’est supprimé.</span></div><div class="tools" style="margin-bottom:14px"><button class="btn btn-sm btn-red" data-act="bkImportGo">Importer</button><button class="link" data-act="bkImportNo">Annuler</button></div>' : '') + '<div class="tools"><button class="btn btn-sm btn-glass" data-act="bkExport"' + (busy ? ' disabled' : '') + '>' + ic('download', 16) + ' Exporter un fichier</button>' +
+      '<label class="btn btn-sm btn-glass" style="cursor:pointer">' + ic('upload', 16) + ' Importer un fichier<input type="file" id="bk-file" accept="application/json,.json" hidden></label>' +
+      '<button class="btn btn-sm btn-glass" data-act="bkNow"' + (busy || o === null ? ' disabled' : '') + '>' + ic('check', 16) + ' Sauvegarder maintenant</button></div>' +
+      (bl && bl.length ? '<div class="small-h" style="margin-top:20px">Copies automatiques</div><div class="reset-list">' + bl.map(function (b) {
+        var cf = ui.confirm === 'bk:' + b.id;
+        return '<div class="reset-row"><div class="reset-who"><b>' + esc(fdate(b.taken_at)) + '</b><small>' + b.n + ' éléments · ' + esc(b.reason) + '</small></div>' +
+          (cf ? '<button class="btn btn-sm btn-red" data-act="bkRestore" data-id="' + b.id + '">Confirmer : tout remplacer</button><button class="link" data-act="bkNo">Annuler</button>' : '<button class="btn btn-sm btn-glass" data-act="bkRestore" data-id="' + b.id + '">Restaurer</button>') + '</div>';
+      }).join('') + '</div>' : '') + '</div>';
+  }
+  function tabTeam() { return tabTeam0() + backupPanel(); }
+  function tabTeam0() {
     var link = location.href.split('#')[0].split('?')[0];
     return '<div class="panel glass-2 team"><div class="panel-head"><h2>Inviter vos collègues</h2><p>Chacun crée son compte sur le lien ci-dessous, puis saisit le code d’inscription de son groupe (Pro ou Perso). Sans code, personne ne voit ni ne modifie rien.</p></div>' +
       '<div class="label">Lien de l’application</div><div class="copyrow"><code>' + esc(link) + '</code><button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(link) + '">' + ic('copy', 16) + ' Copier</button></div>' +
@@ -1902,10 +2105,10 @@ var Badges = (function () {
       '<p class="hint" style="margin:16px 0 0">Le code utilisé à l’inscription décide du groupe. Les deux codes doivent être différents. Les personnes déjà inscrites restent dans leur groupe quand vous changez un code : il ne sert qu’aux nouveaux arrivants. Mot de passe oublié : réinitialisation depuis Supabase (Authentication, Users).</p></div>' +
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Titre de l’accueil</h2><p>Le texte affiché en haut de l’accueil, propre à chaque groupe.</p></div>' +
       GROUPS.map(function (g) { return '<div class="field" style="margin-top:12px"><label for="t-title-' + g[0] + '">' + grpChips([g[0]]) + ' Titre</label><div class="import-row"><input class="input" id="t-title-' + g[0] + '" maxlength="80" autocomplete="off" value="' + esc(grpTitle(g[0])) + '"><button class="btn" data-act="saveTitle" data-g="' + g[0] + '">Enregistrer</button></div></div>'; }).join('') + '</div>' +
-      '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Personnes et groupes</h2><p>Ajoutez une personne à l’autre groupe pour qu’elle soit dans les deux. L’admin est toujours dans les deux groupes. Une personne reste dans au moins un groupe.</p></div>' +
+      '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Personnes, groupes et organisateurs</h2><p>Ajoutez une personne à l’autre groupe pour qu’elle soit dans les deux. L’admin est toujours dans les deux groupes. Une personne reste dans au moins un groupe. Un <b>organisateur</b> crée et gère ses propres sessions (pour son ou ses groupes) et peut ajouter des jeux ; il ne touche pas à celles des autres. Vous pouvez lui retirer ce droit à tout moment.</p></div>' +
       (ST.members === null ? '<p class="hint">Chargement…</p>' : !ST.members.length ? '<p class="hint">Aucune personne pour l’instant.</p>' : '<div class="reset-list">' + ST.members.map(function (m) {
-        return '<div class="reset-row">' + avatar(m.name || '?', 'sm') + '<div class="reset-who"><b>' + esc(m.name || 'Sans nom') + '</b><small>' + (m.admin ? 'Admin · les deux groupes' : '') + '</small></div>' +
-          (m.admin ? '' : '<div class="gpick">' + GROUPS.map(function (g) { return '<button type="button" class="gpick-b g-' + g[0] + '" aria-pressed="' + (m.groups.indexOf(g[0]) >= 0) + '" data-act="memberGroup" data-uid="' + esc(m.id) + '" data-g="' + g[0] + '"><span class="tick">' + ic('check', 14) + '</span>' + g[1] + '</button>'; }).join('') + '</div>') + '</div>';
+        return '<div class="reset-row">' + avatar(m.name || '?', 'sm') + '<div class="reset-who"><b>' + esc(m.name || 'Sans nom') + '</b><small>' + (m.admin ? 'Admin · les deux groupes' : m.organizer ? 'Organisateur · crée ses propres sessions' : '') + '</small></div>' +
+          (m.admin ? '' : '<div class="gpick">' + GROUPS.map(function (g) { return '<button type="button" class="gpick-b g-' + g[0] + '" aria-pressed="' + (m.groups.indexOf(g[0]) >= 0) + '" data-act="memberGroup" data-uid="' + esc(m.id) + '" data-g="' + g[0] + '"><span class="tick">' + ic('check', 14) + '</span>' + g[1] + '</button>'; }).join('') + '</div><button type="button" class="gpick-b g-org" title="Peut créer et gérer ses propres sessions" aria-pressed="' + !!m.organizer + '" data-act="memberOrg" data-uid="' + esc(m.id) + '"><span class="tick">' + ic('check', 14) + '</span>Organisateur</button>') + '</div>';
       }).join('') + '</div>') + '</div>' +
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Badges et compteurs</h2><p>Remet à zéro, pour tout le monde, les badges, les compteurs de sessions jouées et manquées, et le malus d’absence. Les sessions et les absences déjà saisies ne sont pas supprimées : seules celles d’avant la remise à zéro sont ignorées. Chacun reverra l’écran de célébration pour ses nouveaux badges.</p></div>' +
       (M.settings.badgesReset ? '<p class="hint" style="margin:0 0 12px">Dernière remise à zéro : ' + esc(new Date(M.settings.badgesReset).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })) + '.</p>' : '') +
@@ -1917,13 +2120,13 @@ var Badges = (function () {
       (ui.confirm === 'rb' ? '<div class="tools"><button class="btn btn-red" data-act="resetBadges">' + ic('trash', 16) + ' Oui, tout remettre à zéro</button><button class="link" data-act="resetBadgesNo">Annuler</button></div>' : '<button class="btn btn-glass" data-act="resetBadgesAsk">' + ic('undo', 16) + ' Réinitialiser les badges</button>') + '</div>';
   }
   function tabSessions() {
-    var list = sorted().reverse();   /* du plus récent au plus ancien */
+    var list = sorted().filter(canManage).reverse();   /* du plus récent au plus ancien ; un organisateur ne gère que les siennes */
     if (!list.length) return '<div class="panel glass empty"><svg class="meeple" viewBox="0 0 100 100"><use href="#meeple"/></svg><h2>Aucune session</h2><p>Programmez la première dans l’onglet « Programmer ».</p></div>';
     return '<div class="arows">' + list.map(function (s) {
       var games = gamesOf(s), seats = seatsOf(s), confirming = ui.confirm === 'del:' + s.id;
       return '<article class="arow glass">' + ticket(s, 'mini') + '<div><h3>' + longDate(s.date) + ' · ' + hm(s.time) + ' ' + grpChips(groupsOf(s)) + '</h3><div class="minis">' + games.map(function (g) { return '<div title="' + esc(g.name) + '">' + box(g) + '</div>'; }).join('') + '</div></div>' +
-        '<div class="arow-side">' + statusPill(s) + '<span class="seat-num"><b>' + regList(s).length + '</b> / ' + seats + ' places</span><div class="row"><button class="link danger" data-act="delSession" data-sid="' + s.id + '">' + ic('trash', 15) + ' ' + (confirming ? 'Confirmer' : 'Supprimer') + '</button>' +
-        '<button class="btn btn-sm" data-act="manage" data-sid="' + s.id + '">Gérer ' + ic('arrow', 16) + '</button></div></div></article>';
+        '<div class="arow-side">' + statusPill(s) + (wdOpenList(s).filter(function (w) { return !isLeft(s, w.uid); }).length ? '<span class="wd-chip">' + ic('bell', 13) + ' ' + wdOpenList(s).filter(function (w) { return !isLeft(s, w.uid); }).length + ' demande de retrait</span>' : '') + '<span class="seat-num"><b>' + regList(s).length + '</b> / ' + seats + ' places</span><div class="row"><button class="link danger" data-act="delSession" data-sid="' + s.id + '">' + ic('trash', 15) + ' ' + (confirming ? 'Confirmer' : 'Supprimer') + '</button>' +
+        '<button class="link" data-act="dupSession" data-sid="' + s.id + '">' + ic('copy', 15) + ' Dupliquer</button><button class="btn btn-sm" data-act="manage" data-sid="' + s.id + '">Gérer ' + ic('arrow', 16) + '</button></div></div></article>';
     }).join('') + '</div>';
   }
   function normQ(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
@@ -1935,7 +2138,8 @@ var Badges = (function () {
   }
   function tabNew() {
     var f = ui.form, sel = f.gameIds.map(G).filter(Boolean), total = seatsFor(sel, !!f.single);
-    return '<div class="form"><div class="panel glass-2"><div class="panel-head"><h2>Nouvelle session</h2><p>Choisissez le jour, l’heure, puis les jeux proposés.</p></div>' +
+    if (!ST.admin) { f.groups = f.groups.filter(function (g) { return ST.groups.indexOf(g) >= 0; }); if (!f.groups.length) f.groups = [ST.groups[0] || 'pro']; }
+    return '<div class="form"><div class="panel glass-2"><div class="panel-head"><h2>Nouvelle session</h2><p>' + (ui.dupFrom && sessionById(ui.dupFrom) ? ic('copy', 15) + ' Copie de la session du ' + longDate(sessionById(ui.dupFrom).date) + ' : changez la date, puis ajustez les jeux ou le texte si besoin.' : 'Choisissez le jour, l’heure, puis les jeux proposés.') + '</p></div>' +
       '<div class="form-row"><div class="field"><label for="f-date">Date</label><input class="input" id="f-date" type="date" value="' + esc(f.date) + '"></div><div class="field"><label for="f-time">Heure</label><input class="input" id="f-time" type="time" value="' + esc(f.time) + '"></div></div>' +
       '<p class="hint" style="margin:10px 0 0">À cette heure, les inscriptions se ferment et les tables se composent toutes seules si vous n’avez pas clôturé avant.</p>' +
       '<div class="field" style="margin-top:18px"><label for="f-note">Commentaire pour les joueurs (facultatif)</label><textarea class="input" id="f-note" rows="3" maxlength="280" placeholder="Ex. Salle Cèdre, on commence à 12h20. Apportez votre déjeuner !">' + esc(f.note) + '</textarea></div>' +
@@ -1952,7 +2156,7 @@ var Badges = (function () {
       '<button class="btn btn-lg btn-block" data-act="createSession"' + (sel.length && f.date && f.time ? '' : ' disabled') + '>' + ic('plus', 20) + ' Programmer la session</button></aside></div>';
   }
   function stepper(g, f, l) {
-    return '<div class="stepper"><span class="label">' + l + '</span><div><button aria-label="Moins" data-act="adj" data-gid="' + g.id + '" data-f="' + f + '" data-d="-1">' + ic('minus', 14) + '</button><output>' + g[f] + '</output><button aria-label="Plus" data-act="adj" data-gid="' + g.id + '" data-f="' + f + '" data-d="1">' + ic('plus', 14) + '</button></div></div>';
+    return '<div class="stepper"><span class="label">' + l + '</span><div><button aria-label="Moins"' + (g[f] <= 2 ? ' disabled' : '') + ' data-act="adj" data-gid="' + g.id + '" data-f="' + f + '" data-d="-1">' + ic('minus', 14) + '</button><output>' + g[f] + '</output><button aria-label="Plus" data-act="adj" data-gid="' + g.id + '" data-f="' + f + '" data-d="1">' + ic('plus', 14) + '</button></div></div>';
   }
   var newGf = function () { return { id: '', name: '', year: '', min: 2, ideal: 4, max: 4, time: '', age: '', weight: '', tags: '', summary: '', img: '', blob: null, preview: '', busy: false, err: '' }; };
   var GFKEYS = { 'gf-name': 'name', 'gf-year': 'year', 'gf-min': 'min', 'gf-ideal': 'ideal', 'gf-max': 'max', 'gf-time': 'time', 'gf-age': 'age', 'gf-weight': 'weight', 'gf-tags': 'tags', 'gf-summary': 'summary' };
@@ -1966,7 +2170,7 @@ var Badges = (function () {
       (prev ? '<button class="link danger" type="button" data-act="gfClearPhoto">Retirer la photo</button>' : '') +
       '<p class="hint" style="margin:0">Le dessus de la boîte, bien cadré. Elle est recadrée automatiquement.</p></div></div>' +
       '<div class="gf-fields">' + gfField('gf-name', 'Nom du jeu', gfInput('gf-name', 'text', 'Ex. Les Aventuriers du Rail', ' maxlength="60"')) +
-      '<div class="form-row3">' + gfField('gf-min', 'Joueurs min.', gfInput('gf-min', 'number', '2', ' min="1" max="30"')) + gfField('gf-ideal', 'Idéal', gfInput('gf-ideal', 'number', '4', ' min="1" max="30"')) + gfField('gf-max', 'Joueurs max.', gfInput('gf-max', 'number', '5', ' min="1" max="30"')) + '</div>' +
+      '<div class="form-row3">' + gfField('gf-min', 'Joueurs min.', gfInput('gf-min', 'number', '2', ' min="2" max="30"')) + gfField('gf-ideal', 'Idéal', gfInput('gf-ideal', 'number', '4', ' min="2" max="30"')) + gfField('gf-max', 'Joueurs max.', gfInput('gf-max', 'number', '5', ' min="2" max="30"')) + '</div>' +
       '<div class="form-row3">' + gfField('gf-time', 'Durée (min)', gfInput('gf-time', 'number', '45', ' min="1" max="600"')) + gfField('gf-age', 'Âge dès', gfInput('gf-age', 'number', '8', ' min="1" max="99"')) + gfField('gf-year', 'Année', gfInput('gf-year', 'number', '2004', ' min="1800" max="2100"')) + '</div>' +
       gfField('gf-weight', 'Complexité, de 1 (facile) à 5 (expert)', gfInput('gf-weight', 'number', '2.2', ' min="1" max="5" step="0.1"'), 'gf-narrow') +
       gfField('gf-tags', 'Catégories, séparées par des virgules', gfInput('gf-tags', 'text', 'Ex. Familial, Stratégie', ' maxlength="80"')) +
@@ -1990,10 +2194,10 @@ var Badges = (function () {
     var head = edit ? '<h2>Modifier « ' + esc(ui.gf.name) + ' »</h2>' : '<h2>Ajouter un jeu</h2>';
     var seg = edit ? '' : '<div class="seg" role="group" aria-label="Mode d’ajout"><button type="button" aria-pressed="' + !manual + '" data-act="addMode" data-m="bgg">' + ic('search', 17) + ' BoardGameGeek</button><button type="button" aria-pressed="' + manual + '" data-act="addMode" data-m="manual">' + ic('edit', 17) + ' À la main</button></div>';
     var imp = '<section class="import glass-2" id="gf-top"><div class="import-head"><div class="panel-head" style="margin:0">' + head + '</div>' + seg + '</div>' + (manual ? gameForm() : bggBody()) + '</section>';
-    return imp + '<div class="sec-head"><h2>Ludothèque (' + M.games.length + ')</h2><p>Ajustez les nombres de joueurs ici, ou ouvrez la fiche complète avec le crayon.</p></div><div class="glist">' + M.games.map(function (g) {
-      return '<div class="grow">' + box(g) + '<div><h3>' + esc(g.name) + '</h3>' + facts(g) + '</div><div class="stepper-wrap" style="display:flex;gap:14px">' + stepper(g, 'min', 'Mini') + stepper(g, 'ideal', 'Idéal') + stepper(g, 'max', 'Maxi') + '</div>' +
-        '<div class="grow-btns"><button class="icon-btn edit" title="Modifier la fiche" aria-label="Modifier ' + esc(g.name) + '" data-act="editGame" data-gid="' + g.id + '">' + ic('edit', 16) + '</button>' +
-        '<button class="icon-btn" title="Retirer de la ludothèque" aria-label="Retirer ' + esc(g.name) + '" data-act="removeGame" data-gid="' + g.id + '">' + ic('trash', 16) + '</button></div></div>';
+    return imp + '<div class="sec-head"><h2>Ludothèque (' + M.games.length + ')</h2><p>' + (ST.admin ? 'Ajustez les nombres de joueurs ici, ou ouvrez la fiche complète avec le crayon.' : 'Vous pouvez ajouter des jeux et modifier ou retirer uniquement ceux que vous avez ajoutés.') + '</p></div><div class="glist">' + M.games.map(function (g) {
+      return '<div class="grow">' + box(g) + '<div><h3>' + esc(g.name) + '</h3>' + facts(g) + '</div>' + (canEditGame(g) ? '<div class="stepper-wrap" style="display:flex;gap:14px">' + stepper(g, 'min', 'Mini') + stepper(g, 'ideal', 'Idéal') + stepper(g, 'max', 'Maxi') + '</div>' : '<div class="stepper-wrap ro"><small class="hint">' + (g.owner && g.ownerName ? 'Ajouté par ' + esc(g.ownerName) : 'Ajouté par l’admin') + '</small></div>') +
+        (!canEditGame(g) ? '' : '<div class="grow-btns"><button class="icon-btn edit" title="Modifier la fiche" aria-label="Modifier ' + esc(g.name) + '" data-act="editGame" data-gid="' + g.id + '">' + ic('edit', 16) + '</button>' +
+        '<button class="icon-btn" title="Retirer de la ludothèque" aria-label="Retirer ' + esc(g.name) + '" data-act="removeGame" data-gid="' + g.id + '">' + ic('trash', 16) + '</button></div>') + '</div>';
     }).join('') + '</div>';
   }
 
@@ -2037,9 +2241,9 @@ var Badges = (function () {
   }
   function viewManage() {
     var s = sessionById(ui.msid);
-    if (!s) { ui.msid = null; return viewAdmin(); }
+    if (!s || !canManage(s)) { ui.msid = null; return viewAdmin(); }
     var games = gamesOf(s), seats = seatsOf(s), regs = regList(s), n = regs.length, ph = phase(s);
-    var head = '<button class="back" data-act="mBack">' + ic('back', 18) + ' Toutes les sessions</button><div class="sess-head">' + ticket(s, 'big') + '<div><h1>' + longDate(s.date) + '</h1><div class="sub">' + statusPill(s) + '<span>' + hm(s.time) + '</span><span>' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</span></div></div></div>' + '<div class="panel glass-2 sess-groups"><div class="small-h">Groupes destinataires</div>' + groupPicker(groupsOf(s), 'sessGroup').replace(/data-act="sessGroup"/g, 'data-act="sessGroup" data-sid="' + s.id + '"') + '</div>' + noteEditor(s);
+    var head = '<button class="back" data-act="mBack">' + ic('back', 18) + ' Toutes les sessions</button><div class="sess-head">' + ticket(s, 'big') + '<div><h1>' + longDate(s.date) + '</h1><div class="sub">' + statusPill(s) + '<span>' + hm(s.time) + '</span><span>' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</span></div></div></div>' + '<div class="panel glass-2 sess-groups"><div class="small-h">Groupes destinataires</div>' + groupPicker(groupsOf(s), 'sessGroup').replace(/data-act="sessGroup"/g, 'data-act="sessGroup" data-sid="' + s.id + '"') + '</div>' + noteEditor(s) + '<div class="dup-row"><button class="btn btn-glass btn-sm" data-act="dupSession" data-sid="' + s.id + '">' + ic('copy', 16) + ' Dupliquer sur une autre date</button></div>';
     if (ph === 'open' || ph === 'pending') {
       var p = seats ? Math.min(100, Math.round(n / seats * 100)) : 0, fakes = Object.keys(M.regs).some(function (u) { return M.regs[u].fake && M.regs[u].s && M.regs[u].s[s.id]; });
       return head + '<div class="cols"><div class="panel glass-2"><div class="panel-head"><h2>Inscrits (' + n + ')</h2><p>Pour chaque inscrit : l’ordre de ses jeux, du préféré au moins préféré. La croix indique un jeu refusé.</p></div>' +
@@ -2049,7 +2253,7 @@ var Badges = (function () {
         '<div class="field" style="margin-top:22px"><label for="balance">Équilibre de l’affectation</label><input class="range" id="balance" type="range" min="0" max="100" step="5" value="' + M.settings.balance + '"><div class="range-l"><span>Une table par envie</span><span>Moins de tables</span></div></div>' +
         '<button class="btn btn-red btn-lg btn-block" style="margin-top:22px" data-act="closeSession" data-sid="' + s.id + '"' + (n ? '' : ' disabled') + '>' + ic('lock', 19) + ' Clôturer et affecter maintenant</button></div>' +
         singlePanel(s) + addGamePanel(s) +
-        '<div class="panel glass"><div class="small-h">Outils de test</div><div class="tools"><button class="btn btn-glass btn-sm" data-act="fake" data-sid="' + s.id + '" data-n="6"' + (n >= seats ? ' disabled' : '') + '>' + ic('plus', 15) + ' 6 inscrits fictifs</button><button class="btn btn-glass btn-sm" data-act="fake" data-sid="' + s.id + '" data-n="14"' + (n >= seats ? ' disabled' : '') + '>' + ic('plus', 15) + ' 14</button>' + (fakes ? '<button class="link" data-act="clearFakes" data-sid="' + s.id + '">Retirer les fictifs</button>' : '') + '</div></div></aside></div>';
+        (!ST.admin ? '' : '<div class="panel glass"><div class="small-h">Outils de test</div><div class="tools"><button class="btn btn-glass btn-sm" data-act="fake" data-sid="' + s.id + '" data-n="6"' + (n >= seats ? ' disabled' : '') + '>' + ic('plus', 15) + ' 6 inscrits fictifs</button><button class="btn btn-glass btn-sm" data-act="fake" data-sid="' + s.id + '" data-n="14"' + (n >= seats ? ' disabled' : '') + '>' + ic('plus', 15) + ' 14</button>' + (fakes ? '<button class="link" data-act="clearFakes" data-sid="' + s.id + '">Retirer les fictifs</button>' : '') + '</div></div>') + '</aside></div>';
     }
     return head + resultsView(s, games, ph);
   }
@@ -2067,15 +2271,18 @@ var Badges = (function () {
     if (ph === 'closed') bar = '<div class="actionbar glass-2"><div class="progress"><strong>Vérifiez, ajustez, puis publiez</strong>' + (probs.length ? '<span class="hint pub-warn" style="margin:0">À corriger avant de publier : ' + esc(probs.join(' ; ')) + '.</span>' : '<span class="hint" style="margin:0">Touchez un joueur pour le déplacer (même vers une table pleine tant que ce n’est pas publié). Les joueurs ne voient rien avant la publication.</span>') + '</div><div class="row"><button class="link" data-act="reopen" data-sid="' + s.id + '">' + ic('undo', 16) + ' Rouvrir</button><button class="btn btn-glass" data-act="rerun" data-sid="' + s.id + '">' + ic('spark', 17) + ' ' + (ui.confirm === 'rerun:' + s.id ? 'Écraser mes ajustements ?' : 'Relancer') + '</button><button class="btn btn-teal btn-lg" data-act="publish" data-sid="' + s.id + '"' + (probs.length ? ' disabled' : '') + '>' + ic('send', 19) + ' Publier les tables</button></div></div>';
     else if (ph === 'auto') bar = '<div class="actionbar glass-2"><div class="progress"><strong>Clôturée automatiquement à ' + hm(s.time) + '</strong><span class="hint" style="margin:0">Les tables sont déjà visibles des joueurs. Reprenez la main pour les ajuster.</span></div><button class="btn btn-glass" data-act="takeOver" data-sid="' + s.id + '">' + ic('swap', 17) + ' Reprendre la main</button></div>';
     else bar = '<div class="actionbar glass-2"><div class="progress"><strong>Tables publiées</strong><span class="hint" style="margin:0">Les joueurs voient leur table.</span></div><button class="btn btn-glass" data-act="unpublish" data-sid="' + s.id + '">' + ic('undo', 17) + ' Annuler la publication</button></div>';
-    var canAbs = !edit && ST.admin && (ph === 'published' || ph === 'auto') && Date.now() >= startMs(s);
+    var canAbs = !edit && canManage(s) && (ph === 'published' || ph === 'auto') && Date.now() >= startMs(s);
     var absHint = canAbs ? '<p class="abs-hint">' + ic('ghost', 16) + ' Un·e inscrit·e n’est pas venu·e ? Touchez son nom pour le marquer absent·e (touchez à nouveau pour annuler). Cela alimente son profil et ses badges.</p>' : '';
-    return stats + absHint + '<div class="tables">' + r.tables.map(function (t, i) { return tableCard(s, t, { edit: edit, i: i, abs: canAbs }); }).join('') + '</div>' + un + nr + bar;
+    return stats + (edit ? '' : wdPanel(s)) + absHint + '<div class="tables">' + r.tables.map(function (t, i) { return tableCard(s, t, { edit: edit, i: i, abs: canAbs }); }).join('') + '</div>' + un + nr + bar;
   }
 
   /* ---------- Groupes Pro / Perso ---------- */
   var GROUPS = [['pro', 'Pro'], ['perso', 'Perso']];
   var GRP_TITLE = { pro: 'Parties du midi - DSC tour Saint Gobain', perso: 'Ça joue à Benney' };
   var GRPKEY = 'jdo-grp';
+  function canHost() { return !!(ST.admin || ST.org); }
+  function canManage(s) { return !!(s && (ST.admin || (ST.org && s.owner && s.owner === ST.uid))); }
+  function canEditGame(g) { return !!(g && (ST.admin || (ST.org && g.owner && g.owner === ST.uid))); }
   var groupsOf = function (s) { return s.groups && s.groups.length ? s.groups : ['pro']; };
   var inGroup = function (s, g) { return groupsOf(s).indexOf(g) >= 0; };
   var grpName = function (g) { return g === 'perso' ? 'Perso' : 'Pro'; };
@@ -2090,13 +2297,13 @@ var Badges = (function () {
     return '<div class="gswitch" role="group" aria-label="Groupe">' + GROUPS.filter(function (g) { return ST.groups.indexOf(g[0]) >= 0; }).map(function (g) { return '<button class="g-' + g[0] + '" aria-pressed="' + (ui.grp === g[0]) + '" data-act="setGrp" data-g="' + g[0] + '">' + g[1] + '</button>'; }).join('') + '</div>';
   }
   function groupPicker(sel, act) {
-    return '<div class="gpick">' + GROUPS.map(function (g) { return '<button type="button" class="gpick-b g-' + g[0] + '" aria-pressed="' + (sel.indexOf(g[0]) >= 0) + '" data-act="' + act + '" data-g="' + g[0] + '"><span class="tick">' + ic('check', 14) + '</span>' + g[1] + '</button>'; }).join('') + '</div>';
+    return '<div class="gpick">' + GROUPS.filter(function (g) { return ST.admin || ST.groups.indexOf(g[0]) >= 0; }).map(function (g) { return '<button type="button" class="gpick-b g-' + g[0] + '" aria-pressed="' + (sel.indexOf(g[0]) >= 0) + '" data-act="' + act + '" data-g="' + g[0] + '"><span class="tick">' + ic('check', 14) + '</span>' + g[1] + '</button>'; }).join('') + '</div>';
   }
   function saveGroupCfg(patch) {
     var c = clone(M.groupCfg || {}); Object.keys(patch).forEach(function (g) { c[g] = Object.assign({}, c[g] || {}, patch[g]); });
     M.groupCfg = c; return ST.db.doc('settings/groups').set(c);
   }
-  function loadGroups() { return Backend.status().then(function (st) { if (!st.error) { ST.groups = st.admin ? ['pro', 'perso'] : st.groups; pickGrp(); } }); }
+  function loadGroups() { return Backend.status().then(function (st) { if (!st.error) { ST.groups = st.admin ? ['pro', 'perso'] : st.groups; ST.org = !!st.organizer; pickGrp(); } }); }
 
   /* ---------- Badges, profil et célébration ---------- */
   function saveSettings() { return ST.db.doc('settings/main').set({ balance: M.settings.balance, badgesReset: M.settings.badgesReset || 0 }); }
@@ -2109,8 +2316,8 @@ var Badges = (function () {
       if (now < startMs(s) || startMs(s) < reset) return;   /* avant la dernière remise à zéro : ignorée */
       var r = resultOf(s); if (!r) return;
       var tb = r.tables.filter(function (t) { return t.ids.indexOf(uid) >= 0; })[0], ab = s.absent || {}, g = tb && G(tb.gid);
-      out.push({ sid: s.id, start: startMs(s), date: s.date, created: s.created || 0, mine: !!tb, absent: !!ab[uid], gid: tb ? tb.gid : null, gname: g ? g.name : '',
-        mates: tb ? tb.ids.filter(function (u) { return u !== uid && !ab[u]; }) : [], entry: entryOf(uid, s.id) });
+      out.push({ sid: s.id, start: startMs(s), date: s.date, created: s.created || 0, mine: !!tb && !isLeft(s, uid), absent: !!ab[uid], gid: tb ? tb.gid : null, gname: g ? g.name : '',
+        mates: tb ? tb.ids.filter(function (u) { return u !== uid && !ab[u] && !isLeft(s, u); }) : [], entry: entryOf(uid, s.id) });
     });
     return out;
   }
@@ -2180,13 +2387,18 @@ var Badges = (function () {
     if (ST.auth === 'out') h = viewLogin(); else if (ST.auth === 'join') h = viewJoin(); else if (ST.auth === 'config' || ST.auth === 'lib' || ST.auth === 'net') h = viewConfig(); else if (ST.auth === 'boot' || !ST.ready) h = viewLoading();
     else if (ST.error) h = viewError();
     else if (ui.route === 'session') h = viewSession(); else if (ui.route === 'games') h = viewGames(); else if (ui.route === 'admin') h = viewAdmin(); else if (ui.route === 'profile') h = viewProfile(); else h = viewHome();
+    var cf = document.activeElement && document.activeElement.id === 'chat-in', cl0 = $('#chat-list'), atEnd = !cl0 || cl0.scrollHeight - cl0.scrollTop - cl0.clientHeight < 60, selS = cf ? document.activeElement.selectionStart : 0;
     $('#view').innerHTML = h; filterPicker();
+    var cl = $('#chat-list'), ci = $('#chat-in');
+    if (cl && (atEnd || ui.chatKeep)) cl.scrollTop = cl.scrollHeight;
+    if (ci && (cf || ui.chatKeep)) { ci.focus(); try { ci.setSelectionRange(cf ? selS : 0, cf ? selS : 0); } catch (e) {} }
+    ui.chatKeep = false;
     var items = [['home', 'Sessions', 'cal'], ['games', 'Ludothèque', 'dice']];
     items.push(['profile', 'Profil', 'trophy']);
-    if (ST.admin) items.push(['admin', 'Admin', 'gear']);
+    if (canHost()) items.push(['admin', ST.admin ? 'Admin' : 'Organiser', 'gear']);
     if (ST.auth !== 'in') items = [];
     $('#nav').style.gridTemplateColumns = 'repeat(' + (items.length || 1) + ',1fr)';
-    $('#nav').innerHTML = items.map(function (t) { return '<button data-go="' + t[0] + '" aria-current="' + (t[0] === navKey() ? 'page' : 'false') + '">' + ic(t[2], 18) + '<span>' + t[1] + '</span></button>'; }).join('');
+    $('#nav').innerHTML = items.map(function (t) { return '<button data-go="' + t[0] + '" aria-current="' + (t[0] === navKey() ? 'page' : 'false') + '">' + ic(t[2], 18) + (t[0] === 'admin' && wdPendingCount() ? '<i class="nav-dot">' + wdPendingCount() + '</i>' : '') + '<span>' + t[1] + '</span></button>'; }).join('');
     maybeReveal(); maybeBadges(); renderModal(); updateHeader(); updatePushLink(); ui.anim = false;
     if (!noKeep) window.scrollTo(0, y);
   }
@@ -2196,7 +2408,7 @@ var Badges = (function () {
     raf = requestAnimationFrame(function () {
       raf = 0;
       var a = document.activeElement;
-      if (a && /^(INPUT|TEXTAREA)$/.test(a.tagName)) { pendingRender = true; return; }
+      if (a && a.id !== 'chat-in' && /^(INPUT|TEXTAREA)$/.test(a.tagName)) { pendingRender = true; return; }
       render();
     });
   }
@@ -2352,8 +2564,55 @@ var Badges = (function () {
       var c = clone(d); c.badgesReset = Date.now(); ui.confirm = null;
       wr(ST.db.doc('regs/' + uid).set(c), nameOf(uid) + ' : badges, compteurs et malus remis à zéro.');
     },
+    addCal: function (el) {
+      var s = sessionById(el.dataset.sid), mt = s && myTableOf(s); if (!mt || !G(mt.gid)) return;
+      try {
+        var blob = new Blob([icsOf(s, mt)], { type: 'text/calendar;charset=utf-8' }), a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'jeux-doliv-' + s.date + '.ics'; document.body.appendChild(a); a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+        toast('Fichier agenda prêt : ouvrez-le pour ajouter le rendez-vous.');
+      } catch (e) { toast('Impossible de créer le fichier agenda.'); }
+    },
+    wdAsk: function (el) {
+      var s = sessionById(el.dataset.sid), k = 'wd:' + (s && s.id); if (!s || !ST.uid || !myTableOf(s)) return;
+      if (!canWithdraw(s)) return toast('Il est trop tard pour demander un retrait.');
+      if (ui.confirm !== k) { ui.confirm = k; return render(); }
+      ui.confirm = null;
+      wr(ST.db.doc('wd/' + wdId(s.id, ST.uid)).set({ sid: s.id, uid: ST.uid, name: nameOf(ST.uid) || norm(NAME) || 'Joueur', ts: Date.now(), status: 'open' }), 'Demande envoyée : l’organisateur est prévenu.');
+      render();
+    },
+    chatSend: function (el) {
+      var s = sessionById(el.dataset.sid), inp = $('#chat-in'), t = ((inp && inp.value) || '').trim().slice(0, 500); if (!s || !ST.uid || !t) return;
+      var id = s.id + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+      ui.chatText = ui.chatText || {}; ui.chatText[s.id] = ''; ui.chatKeep = true;
+      wr(ST.db.doc('msg/' + id).set({ sid: s.id, uid: ST.uid, name: nameOf(ST.uid) || norm(NAME) || ST.profileName || 'Joueur', text: t, ts: Date.now() })).then(function (ok) { if (!ok) { ui.chatText[s.id] = t; render(true); } });
+      render(true);
+    },
+    chatDel: function (el) { var id = el.dataset.id; if (id) wr(ST.db.doc('msg/' + id).delete()); },
+    wdNo: function () { ui.confirm = null; render(); },
+    wdCancel: function (el) { var s = sessionById(el.dataset.sid); if (!s || !ST.uid) return; wr(ST.db.doc('wd/' + wdId(s.id, ST.uid)).delete(), 'Demande annulée.'); },
+    wdOk: function (el) {
+      var s = sessionById(el.dataset.sid), uid = el.dataset.uid; if (!s || !uid || !canManage(s)) return;
+      var left = clone(s.left || {}); left[uid] = 1; var w = clone(M.wd[wdId(s.id, uid)] || { sid: s.id, uid: uid, ts: Date.now() }); w.status = 'ok';
+      var ph = phase(s), r = resultOf(s), tb = r && r.tables.filter(function (t) { return t.ids.indexOf(uid) >= 0; })[0], p = tb ? pickPromo(s, r, tb, left) : null, patch = { left: left }, chain;
+      if (p) { var joined = clone(s.joined || {}); joined[p] = tb.gid; patch.joined = joined; }
+      chain = ST.db.doc('sessions/' + s.id).update(patch);
+      if (p) chain = chain.then(function () {
+        var raw = clone(ph === 'auto' ? M.auto[s.id] : M.results[s.id]);
+        raw.tables.forEach(function (t) { if (t.gid === tb.gid && t.ids.indexOf(p) < 0) t.ids.push(p); });
+        raw.unplaced = (raw.unplaced || []).filter(function (u) { return u !== p; });
+        return ph === 'auto' ? ST.db.doc('auto/' + s.id).setForce(raw) : ST.db.doc('results/' + s.id).set(raw);
+      });
+      chain = chain.then(function () { return ST.db.doc('wd/' + wdId(s.id, uid)).set(w); });
+      wr(chain, nameOf(uid) + ' est retiré·e de sa table.' + (p ? ' ' + nameOf(p) + ' prend sa place.' : ' Aucune personne de la liste d’attente ne peut la prendre.'));
+    },
+    wdKo: function (el) {
+      var s = sessionById(el.dataset.sid), uid = el.dataset.uid, w = M.wd[wdId(el.dataset.sid, uid)]; if (!s || !w || !canManage(s)) return;
+      w = clone(w); w.status = 'no';
+      wr(ST.db.doc('wd/' + wdId(s.id, uid)).set(w), 'Demande refusée.');
+    },
     toggleAbsent: function (el) {
-      var s = sessionById(el.dataset.sid), uid = el.dataset.uid; if (!s || !uid || !ST.admin) return;
+      var s = sessionById(el.dataset.sid), uid = el.dataset.uid; if (!s || !uid || !canManage(s)) return;
       var ph = phase(s); if ((ph !== 'published' && ph !== 'auto') || Date.now() < startMs(s)) return;
       var m = clone(s.absent || {}), was = !!m[uid]; if (was) delete m[uid]; else m[uid] = 1;
       wr(ST.db.doc('sessions/' + s.id).update({ absent: m }), was ? nameOf(uid) + ' n’est plus marqué·e absent·e.' : nameOf(uid) + ' est marqué·e absent·e.');
@@ -2364,6 +2623,7 @@ var Badges = (function () {
       if (ui.adminTab === 'team') {
         if (ST.codes === null) Backend.groupCodes().then(function (c) { ST.codes = c || {}; render(); });
         Backend.adminMembers().then(function (l) { ST.members = l || []; if (ui.adminTab === 'team') render(); });
+        loadOps();
       }
     },
     saveCode: function (el) {
@@ -2382,6 +2642,14 @@ var Badges = (function () {
         if (!ok) return toast(on ? 'Modification impossible.' : 'Une personne doit rester dans au moins un groupe.');
         if (on) m.groups.push(g); else m.groups.splice(m.groups.indexOf(g), 1);
         toast(m.name + (on ? ' ajouté·e au groupe ' : ' retiré·e du groupe ') + grpName(g) + '.'); render();
+      });
+    },
+    memberOrg: function (el) {
+      var uid = el.dataset.uid, m = (ST.members || []).filter(function (x) { return x.id === uid; })[0]; if (!m) return;
+      var on = !m.organizer;
+      Backend.setOrganizer(uid, on).then(function (ok) {
+        if (!ok) return toast('Modification impossible.');
+        m.organizer = on; toast(m.name + (on ? ' est maintenant organisateur·trice.' : ' n’est plus organisateur·trice.')); render();
       });
     },
     ntGroup: function (el) {
@@ -2408,34 +2676,72 @@ var Badges = (function () {
     pickGroup: function (el) { var a = ui.form.groups, g = el.dataset.g, i = a.indexOf(g); if (i >= 0) { if (a.length > 1) a.splice(i, 1); } else a.push(g); render(); },
     setGrp: function (el) { ui.grp = el.dataset.g; try { localStorage.setItem(GRPKEY, ui.grp); } catch (e) {} render(true); },
     sessGroup: function (el) {
-      var s = sessionById(el.dataset.sid); if (!s || !ST.admin) return;
+      var s = sessionById(el.dataset.sid); if (!s || !canManage(s)) return;
       var a = groupsOf(s).slice(), g = el.dataset.g, i = a.indexOf(g);
       if (i >= 0) { if (a.length < 2) return toast('Une session doit être destinée à au moins un groupe.'); a.splice(i, 1); } else a.push(g);
       wr(ST.db.doc('sessions/' + s.id).update({ groups: a }), 'Groupes de la session modifiés.');
     },
     pickSingle: function () { ui.form.single = !ui.form.single; render(); },
     toggleSingle: function (el) {
-      var s = sessionById(el.dataset.sid); if (!s || !ST.admin) return;
+      var s = sessionById(el.dataset.sid); if (!s || !canManage(s)) return;
       if (phase(s) !== 'open') return toast('La session n’est plus ouverte.');
       wr(ST.db.doc('sessions/' + s.id).update({ single: !s.single }), s.single ? 'Plusieurs jeux possibles.' : 'Un seul jeu sera retenu.');
     },
     pickGame: function (el) { var a = ui.form.gameIds, id = el.dataset.gid, i = a.indexOf(id); if (i >= 0) a.splice(i, 1); else a.push(id); render(); },
     createSession: function () {
       var f = ui.form; if (!f.date || !f.time || !f.gameIds.length) return toast('Choisissez une date, une heure et au moins un jeu.');
-      var id = 'ses_' + Date.now().toString(36);
-      wr(ST.db.doc('sessions/' + id).set({ date: f.date, time: f.time, note: (f.note || '').trim(), gameIds: f.gameIds.slice(), groups: f.groups.slice(), single: !!f.single, status: 'open', created: Date.now() }), 'Session programmée.').then(function (ok) {
+      var id = 'ses_' + Date.now().toString(36), grp = f.groups.filter(function (g) { return ST.admin || ST.groups.indexOf(g) >= 0; });
+      if (!grp.length) grp = [ST.groups[0] || 'pro'];
+      var doc = { date: f.date, time: f.time, note: (f.note || '').trim(), gameIds: f.gameIds.slice(), groups: grp, single: !!f.single, status: 'open', created: Date.now(), owner: ST.uid };
+      if (!ST.admin) doc.ownerName = nameOf(ST.uid) || norm(NAME) || ST.profileName || 'Organisateur';
+      wr(ST.db.doc('sessions/' + id).set(doc), 'Session programmée.').then(function (ok) {
         if (!ok) return;
-        ui.form.gameIds = []; ui.form.note = ''; ui.form.q = ''; ui.form.single = false; ui.adminTab = 'sessions'; render(); window.scrollTo(0, 0);
+        ui.form.gameIds = []; ui.form.note = ''; ui.form.q = ''; ui.form.single = false; ui.dupFrom = null; ui.adminTab = 'sessions'; render(); window.scrollTo(0, 0);
       });
     },
     delSession: function (el) {
-      var id = el.dataset.sid, k = 'del:' + id;
+      var id = el.dataset.sid, k = 'del:' + id; if (!canManage(sessionById(id))) return;
       if (ui.confirm !== k) { ui.confirm = k; return render(); }
       ui.confirm = null;
       var jobs = [ST.db.doc('sessions/' + id).delete(), ST.db.doc('drafts/' + id).delete(), ST.db.doc('results/' + id).delete(), ST.db.doc('auto/' + id).delete()];
-      Object.keys(M.regs).forEach(function (uid) { var d = M.regs[uid]; if (d && d.s && d.s[id]) { var c = clone(d); delete c.s[id]; jobs.push(ST.db.doc('regs/' + uid).set(c)); } });
+      Object.keys(M.regs).forEach(function (uid) { var d = M.regs[uid]; if (d && d.s && d.s[id]) { if (ST.admin) { var c = clone(d); delete c.s[id]; jobs.push(ST.db.doc('regs/' + uid).set(c)); } else jobs.push(Backend.hostUnreg(id, uid)); } });
       wr(Promise.all(jobs), 'Session supprimée.');
     },
+    dupSession: function (el) {
+      var src = sessionById(el.dataset.sid); if (!src || !canManage(src)) return;
+      var p = src.date.split('-'), d = new Date(+p[0], +p[1] - 1, +p[2] + 7), today = D.iso(new Date());
+      while (D.iso(d) <= today) d.setDate(d.getDate() + 7);
+      ui.form = { date: D.iso(d), time: src.time || '12:15', note: src.note || '', gameIds: (src.gameIds || []).filter(function (id) { return !!G(id); }), groups: groupsOf(src).slice(), q: '', single: !!src.single };
+      ui.dupFrom = src.id; ui.msid = null; ui.adminTab = 'new'; ui.confirm = null; render(true); window.scrollTo(0, 0);
+      toast('Session dupliquée : choisissez la nouvelle date et ajustez ce qui change.');
+    },
+    bkExport: function () {
+      ui.bk = { busy: true }; render();
+      Backend.exportAll().then(function (rows) {
+        ui.bk = null;
+        if (!rows) { render(); return toast('Export impossible.'); }
+        var blob = new Blob([JSON.stringify({ app: 'jeux-doliv', version: 1, exported: new Date().toISOString(), rows: rows })], { type: 'application/json' }), a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'jeux-doliv-sauvegarde-' + D.iso(new Date()) + '.json'; document.body.appendChild(a); a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+        render(); toast('Sauvegarde exportée (' + rows.length + ' éléments).');
+      });
+    },
+    bkNow: function () {
+      ui.bk = { busy: true }; render();
+      Backend.backupNow().then(function (ok) { ui.bk = null; toast(ok ? 'Copie enregistrée.' : 'Copie impossible : exécutez le nouveau script SQL.'); loadOps(); });
+    },
+    bkNo: function () { ui.confirm = null; render(); },
+    bkRestore: function (el) {
+      var id = +el.dataset.id, k = 'bk:' + id;
+      if (ui.confirm !== k) { ui.confirm = k; return render(); }
+      ui.confirm = null; ui.bk = { busy: true }; render();
+      Backend.backupRestore(id).then(function (n) { ui.bk = null; toast(n == null ? 'Restauration impossible.' : 'Données restaurées (' + n + ' éléments). Une copie « avant restauration » a été gardée.'); ST.db.reload && ST.db.reload(); loadOps(); });
+    },
+    bkImportGo: function () {
+      var f = ui.bkFile; if (!f) return; ui.bkFile = null; ui.bk = { busy: true }; render();
+      Backend.importAll(f.rows).then(function (n) { ui.bk = null; toast(n == null ? 'Import impossible.' : n + ' éléments importés.'); ST.db.reload && ST.db.reload(); render(); });
+    },
+    bkImportNo: function () { ui.bkFile = null; render(); },
     manage: function (el) { ui.msid = el.dataset.sid; ui.confirm = null; render(true); window.scrollTo(0, 0); },
     mBack: function () { ui.msid = null; ui.confirm = null; render(true); window.scrollTo(0, 0); },
     fake: function (el) {
@@ -2463,7 +2769,7 @@ var Badges = (function () {
     },
     addGame: function (el) {
       var s = sessionById(el.dataset.sid), g = G(el.dataset.gid);
-      if (!s || !g || !ST.admin) return;
+      if (!s || !g || !canManage(s)) return;
       if (phase(s) !== 'open') return toast('La session n’est plus ouverte.');
       if ((s.gameIds || []).indexOf(g.id) >= 0) return;
       var before = waitList(s).length, gain = Math.min(before, seatsFor(gamesOf(s).concat([g]), !!s.single) - seatsOf(s));
@@ -2487,7 +2793,8 @@ var Badges = (function () {
       });
     },
     removeReg: function (el) {
-      var uid = el.dataset.uid, d = M.regs[uid]; if (!d) return;
+      var uid = el.dataset.uid, d = M.regs[uid], s0 = sessionById(el.dataset.sid); if (!d || !canManage(s0)) return;
+      if (!ST.admin) return wr(Backend.hostUnreg(el.dataset.sid, uid).then(function (ok) { if (!ok) throw new Error('refus'); }));
       var c = clone(d); if (c.s) delete c.s[el.dataset.sid];
       wr(ST.db.doc('regs/' + uid).set(c));
     },
@@ -2533,15 +2840,16 @@ var Badges = (function () {
       saveDraft(s, function (d) { var t = d.tables.filter(function (x) { return x.gid === el.dataset.gid; })[0]; if (!t) return; t.ids.forEach(function (u) { d.unplaced.push(u); }); d.tables = d.tables.filter(function (x) { return x !== t; }); });
     },
     adj: function (el) {
+      if (!canEditGame(G(el.dataset.gid))) return;
       var g = clone(G(el.dataset.gid)), f = el.dataset.f, d = +el.dataset.d;
-      g[f] = Math.max(1, Math.min(30, g[f] + d));
+      g[f] = Math.max(2, Math.min(30, g[f] + d));
       if (f === 'min') { if (g.max < g.min) g.max = g.min; if (g.ideal < g.min) g.ideal = g.min; }
       if (f === 'max') { if (g.min > g.max) g.min = g.max; if (g.ideal > g.max) g.ideal = g.max; }
       if (f === 'ideal') { if (g.ideal < g.min) g.ideal = g.min; if (g.ideal > g.max) g.ideal = g.max; }
       wr(ST.db.doc('games/' + g.id).update({ min: g.min, max: g.max, ideal: g.ideal }));
     },
     removeGame: function (el) {
-      var id = el.dataset.gid;
+      var id = el.dataset.gid; if (!canEditGame(G(id))) return;
       if (M.sessions.some(function (s) { return (s.gameIds || []).indexOf(id) >= 0; })) return toast('Ce jeu est utilisé par une session. Supprimez d’abord la session.');
       ui.form.gameIds = ui.form.gameIds.filter(function (x) { return x !== id; });
       var old = G(id) && G(id).img; if (ui.gf && ui.gf.id === id) ui.gf = null;
@@ -2549,7 +2857,7 @@ var Badges = (function () {
     },
     addMode: function (el) { ui.addMode = el.dataset.m; if (ui.addMode === 'manual' && !ui.gf) ui.gf = newGf(); render(); },
     editGame: function (el) {
-      var g = G(el.dataset.gid); if (!g) return;
+      var g = G(el.dataset.gid); if (!g || !canEditGame(g)) return;
       ui.gf = { id: g.id, name: g.name, year: g.year || '', min: g.min, ideal: g.ideal, max: g.max, time: g.time || '', age: g.age || '', weight: g.weight || '', tags: (g.tags || []).join(', '), summary: g.summary || '', img: g.img || '', blob: null, preview: '', busy: false, err: '' };
       ui.addMode = 'manual'; render(true);
       var t = document.getElementById('gf-top'); if (t && t.scrollIntoView) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2562,17 +2870,20 @@ var Badges = (function () {
       var num = function (v) { return v === '' || v == null ? null : +v; };
       if (!name) return bad('Indiquez le nom du jeu.');
       if (!(min >= 1 && max >= 1 && ideal >= 1) || min % 1 || max % 1 || ideal % 1) return bad('Indiquez le nombre de joueurs (minimum, idéal et maximum).');
+      if (min < 2 || ideal < 2 || max < 2) return bad('Un jeu se joue à 2 joueurs minimum (un jeu solo n’a pas besoin de l’application).');
       if (max < min) return bad('Le maximum de joueurs doit être au moins égal au minimum.');
       if (ideal < min || ideal > max) return bad('Le nombre idéal doit se situer entre le minimum et le maximum.');
       var wt = num(f.weight); if (wt !== null && (wt < 1 || wt > 5)) return bad('La complexité va de 1 à 5.');
       f.busy = true; f.err = ''; render();
       var id = f.id || slug(name), url = f.img, oldImg = f.id && G(f.id) ? G(f.id).img : '';
       if (f.blob) {
-        var up = await Backend.uploadCover(f.blob, id);
+        var up = await Backend.uploadCover(f.blob, id, ST.admin ? '' : ST.uid + '/');
         if (up.error) { f.busy = false; f.err = up.error; return render(); }
         url = up.url;
       }
       var g = f.id ? clone(G(f.id)) : Object.assign({ id: id, n: Date.now(), manual: true }, D.autoStyle(name));
+      if (!f.id && !ST.admin) { g.owner = ST.uid; g.ownerName = nameOf(ST.uid) || norm(NAME) || ST.profileName || 'Organisateur'; }
+      if (f.id && !canEditGame(G(f.id))) { f.busy = false; return bad('Ce jeu a été ajouté par quelqu’un d’autre.'); }
       g.name = name; g.min = min; g.max = max; g.ideal = ideal; g.summary = f.summary.trim();
       g.tags = String(f.tags).split(',').map(norm).filter(Boolean).slice(0, 5);
       [['time', f.time, 1], ['age', f.age, 1], ['year', f.year, 1], ['weight', f.weight, 0.1]].forEach(function (x) { var v = num(x[1]); if (v !== null && v > 0) g[x[0]] = x[2] === 1 ? Math.round(v) : Math.round(v * 10) / 10; else delete g[x[0]]; });
@@ -2590,7 +2901,8 @@ var Badges = (function () {
     },
     impPick: function (el) { var c = D.CATALOG.filter(function (x) { return x.id === el.dataset.id; })[0]; ui.imp.q = c.name; ui.imp.hit = c; ui.imp.miss = false; render(); },
     impAdd: function (el) {
-      var c = clone(D.CATALOG.filter(function (x) { return x.id === el.dataset.id; })[0]); c.n = Date.now();
+      var c = clone(D.CATALOG.filter(function (x) { return x.id === el.dataset.id; })[0]); c.n = Date.now(); c.min = Math.max(2, c.min || 2); c.max = Math.max(c.min, c.max || c.min); c.ideal = Math.max(c.min, Math.min(c.max, c.ideal || c.min));
+      if (!ST.admin) { c.owner = ST.uid; c.ownerName = nameOf(ST.uid) || norm(NAME) || ST.profileName || 'Organisateur'; }
       wr(ST.db.doc('games/' + c.id).set(c), c.name + ' ajouté à la ludothèque.').then(function (ok) { if (ok) { ui.imp = { q: '', hit: null, miss: false }; render(); } });
     }
   };
@@ -2613,8 +2925,12 @@ var Badges = (function () {
   document.addEventListener('input', function (e) {
     var t = e.target;
     if (t.id === 'reg-name') { NAME = t.value; try { localStorage.setItem(NAMEKEY, NAME); } catch (x) {} updateHeader(); }
-    else if (GFKEYS[t.id] && ui.gf) ui.gf[GFKEYS[t.id]] = t.value;
+    else if (GFKEYS[t.id] && ui.gf) {
+      if ((t.id === 'gf-min' || t.id === 'gf-ideal' || t.id === 'gf-max') && +t.value > 30) t.value = '30';
+      ui.gf[GFKEYS[t.id]] = t.value;
+    }
     else if (t.id === 'nt-title' || t.id === 'nt-text') { ui.nt[t.id === 'nt-title' ? 'title' : 'text'] = t.value; ui.nt.confirm = false; syncNotif(); }
+    else if (t.id === 'chat-in') { ui.chatText = ui.chatText || {}; ui.chatText[ui.sid] = t.value; t.style.height = 'auto'; t.style.height = Math.min(140, t.scrollHeight) + 'px'; }
     else if (t.id === 'a-email') ui.auth.email = t.value;
     else if (t.id === 'a-name') ui.auth.name = t.value;
     else if (t.id === 'a-code') ui.auth.code = t.value;
@@ -2625,8 +2941,26 @@ var Badges = (function () {
     else if (t.id === 'imp-q') ui.imp.q = t.value;
     else if (t.id === 'search') { ui.q = t.value; $('#ggrid').innerHTML = gamesGrid(); }
   });
+  document.addEventListener('keydown', function (e) {
+    if (e.target && e.target.id === 'chat-in' && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); var b = $('[data-act="chatSend"]'); if (b) ACT.chatSend(b); }
+  });
   document.addEventListener('change', function (e) {
     var t = e.target;
+    if ((t.id === 'gf-min' || t.id === 'gf-ideal' || t.id === 'gf-max') && ui.gf) {   /* jamais moins de 1 joueur */
+      var nv = Math.round(+t.value); if (t.value !== '' && !(nv >= 2)) { t.value = '2'; ui.gf[GFKEYS[t.id]] = '2'; toast('Un jeu se joue à 2 joueurs minimum.'); }
+      return;
+    }
+    if (t.id === 'bk-file') {
+      var bf = t.files && t.files[0]; t.value = ''; if (!bf) return;
+      bf.text().then(function (txt) {
+        var j = JSON.parse(txt), ok = { games: 1, sessions: 1, regs: 1, results: 1, drafts: 1, auto: 1, settings: 1, wd: 1, msg: 1 };
+        if (!j || j.app !== 'jeux-doliv' || !Array.isArray(j.rows)) throw new Error('format');
+        var rows = j.rows.filter(function (r) { return r && ok[r.coll] && typeof r.id === 'string' && r.data && typeof r.data === 'object'; });
+        if (!rows.length) throw new Error('vide');
+        ui.bkFile = { rows: rows, name: bf.name, at: j.exported }; render();
+      }).catch(function () { ui.bkFile = null; toast('Ce fichier n’est pas une sauvegarde Jeux d’Oliv.'); });
+      return;
+    }
     if (t.id === 'gf-file') {
       var file = t.files && t.files[0]; if (!file || !ui.gf) return;
       if (!/^image\//.test(file.type)) { ui.gf.err = 'Ce fichier n’est pas une image.'; return render(); }
@@ -2651,10 +2985,12 @@ var Badges = (function () {
     db.collection('sessions').onSnapshot(function (snap) { M.sessions = docsOf(snap, true); checkReady('sessions'); }, err);
     db.collection('regs').onSnapshot(function (snap) { mapDocs(snap, 'regs'); if (ST.uid && M.regs[ST.uid] && M.regs[ST.uid].name && !NAME) NAME = M.regs[ST.uid].name; checkReady('regs'); }, err);
     db.collection('results').onSnapshot(function (snap) { mapDocs(snap, 'results'); ST.loaded.results = true; softRender(); }, err);
+    db.collection('wd').onSnapshot(function (snap) { mapDocs(snap, 'wd'); softRender(); }, function () {});
+    db.collection('msg').onSnapshot(function (snap) { mapDocs(snap, 'msg'); softRender(); }, function () {});
     db.collection('auto').onSnapshot(function (snap) { mapDocs(snap, 'auto'); ST.loaded.auto = true; softRender(); }, err);
     db.doc('settings/groups').onSnapshot(function (snap) { M.groupCfg = (snap.exists && snap.data()) || {}; softRender(); }, function () {});
     db.doc('settings/main').onSnapshot(function (snap) { var sd = snap.exists && snap.data(); if (sd && typeof sd.balance === 'number') M.settings.balance = sd.balance; M.settings.badgesReset = (sd && +sd.badgesReset) || 0; checkReady('settings'); }, err);
-    if (ST.admin) db.collection('drafts').onSnapshot(function (snap) { mapDocs(snap, 'drafts'); softRender(); }, err);
+    if (canHost()) db.collection('drafts').onSnapshot(function (snap) { mapDocs(snap, 'drafts'); softRender(); }, err);
   }
   /* ---------- Démarrage, connexion ---------- */
   function startApp() {
@@ -2676,11 +3012,11 @@ var Badges = (function () {
     if (!NAME && ST.profileName) NAME = ST.profileName;
     var st = await Backend.status();
     if (st.error) { ui.auth.busy = false; ST.auth = 'net'; ST.cfgErr = st.error; return render(true); }
-    ST.admin = st.admin;
+    ST.admin = st.admin; ST.org = !!st.organizer;
     var member = st.member;
     if (!member && norm(ui.auth.code)) { member = await Backend.join(ui.auth.code); if (member) st = await Backend.status(); }
     if (!member) { ui.auth.busy = false; ui.auth.msg = ''; ST.auth = 'join'; return render(true); }
-    ST.groups = st.admin ? ['pro', 'perso'] : (st.groups || []); pickGrp();
+    ST.groups = st.admin ? ['pro', 'perso'] : (st.groups || []); ST.org = !!st.organizer; pickGrp();
     ui.auth.busy = false; startApp();
   }
   document.addEventListener('submit', function (e) {
