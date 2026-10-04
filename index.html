@@ -803,6 +803,40 @@ html{overflow-x:hidden;max-width:100%}
 .sn-main,.sn-msg{white-space:nowrap}
 .sn-msg{display:inline-flex;align-items:center;gap:5px;color:var(--ink);font:800 14px/1 var(--font-b)}
 .sn-msg svg{flex:none}
+/* Import BoardGameGeek (GameShelf) */
+.gs-busy{display:flex;align-items:center;gap:10px;margin:0}
+.gs-sum{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;font-size:14px}
+.gs-sum b{font:800 18px/1 var(--font-d);letter-spacing:-.01em}
+.gs-sum span{color:var(--muted);font-weight:600}
+.gs-tools{display:flex;flex-direction:column;gap:12px}
+.gs-tools .gsearch{margin-top:0}
+.gs-btns{display:flex;flex-wrap:wrap;gap:8px}
+.gs-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;border:2px solid var(--hair);background:var(--glass-2);font-weight:700;font-size:13px;color:var(--ink);transition:background .15s,border-color .15s}
+.gs-chip:hover{border-color:var(--ink)}
+.gs-chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.gs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(142px,100%),1fr));gap:20px 14px;margin-top:6px}
+.gs-t{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 10px 12px;border-radius:20px;border:2px solid var(--hair);background:var(--glass-2);text-align:center;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+.gs-t[hidden]{display:none}
+.gs-t:hover{transform:translateY(-3px)}
+.gs-t .box{width:72%}
+.gs-t strong{font:700 13px/1.25 var(--font-d);overflow-wrap:anywhere}
+.gs-t small{color:var(--muted);font-size:12px;font-weight:600}
+.gs-t .tick{position:absolute;top:-10px;right:-10px;z-index:6;width:30px;height:30px;border-radius:50%;background:var(--teal);color:var(--on-teal);border:2px solid var(--stroke);display:grid;place-items:center;transform:scale(0);transition:transform .18s cubic-bezier(.3,1.6,.5,1)}
+.gs-t[aria-pressed="true"]{border-color:var(--teal);box-shadow:0 0 0 4px rgba(10,154,137,.2)}
+.gs-t[aria-pressed="true"] .tick{transform:scale(1)}
+.gs-t.is-off{opacity:.55;cursor:default}
+.gs-t.is-off:hover{transform:none}
+.gs-flag{font-style:normal;font-size:11.5px;font-weight:700;color:var(--muted)}
+.gs-ideal{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;margin-top:2px;font-size:12px;font-weight:700;color:var(--muted)}
+.gs-ideal b{color:var(--ink)}
+.gs-n{min-width:28px;height:28px;padding:0 7px;border-radius:999px;border:2px solid var(--hair);background:transparent;font:800 12.5px/1 var(--font-d);color:var(--ink);transition:background .12s,border-color .12s}
+.gs-n:hover{border-color:var(--ink)}
+.gs-n[aria-pressed="true"]{background:var(--sun);color:var(--on-sun);border-color:var(--stroke)}
+.gs-bar{margin-top:6px}
+.gs-todo{display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-size:11.5px;font-weight:700;color:var(--warn)}
+.box-big{background-color:#222;background-image:var(--thumb);background-size:cover;background-position:center}
+.box-big img.cover-img{position:relative;z-index:1}
+@media (max-width:640px){.gs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -1552,7 +1586,7 @@ var Badges = (function () {
   try { NAME = localStorage.getItem(NAMEKEY) || ''; } catch (e) {}
   var tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
   var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'] }, route: 'home', grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
-    form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false },
+    form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false }, gs: gsNew(),
     auth: { mode: 'in', email: '', name: '', code: '', msg: '', ok: false, busy: false }, addMode: 'manual', gf: null };
 
   var G = function (id) { return M.games.filter(function (g) { return g.id === id; })[0]; };
@@ -1608,9 +1642,16 @@ var Badges = (function () {
 
   /* ---------- Briques ---------- */
   var IMGRE = /^https:\/\/[\w.-]+\/storage\/v1\/object\/public\/covers\/[\w.-]+$/;
-  var hasImg = function (g) { return !!(g && g.img && IMGRE.test(g.img)); };
-  var art = function (g) { return hasImg(g) ? '<img class="cover-img" src="' + g.img + '" alt="Boîte du jeu ' + esc(g.name) + '" loading="lazy" decoding="async">' : coverSVG(g); };
-  var bgOf = function (g) { return hasImg(g) ? g.img : coverURI(g); };
+  /* miniatures BoardGameGeek (import GameShelf) : adresse signée, les parenthèses doivent rester telles quelles */
+  var GEEKRE = /^https:\/\/cf\.geekdo-images\.com\/[\w\-.\/=:()~%,+!]+$/;
+  var hasImg = function (g) { return !!(g && g.img && (IMGRE.test(g.img) || GEEKRE.test(g.img))); };
+  var art = function (g) { return hasImg(g) ? '<img class="cover-img" src="' + g.img + '" alt="Boîte du jeu ' + esc(g.name) + '" loading="lazy" decoding="async"' + (GEEKRE.test(g.img) ? ' referrerpolicy="no-referrer"' : '') + '>' : coverSVG(g); };
+  var bgOf = function (g) { return hasImg(g) ? (GEEKRE.test(g.img) ? "'" + g.img + "'" : g.img) : coverURI(g); };
+  /* fiche d'un jeu : la grande image BGG se charge par-dessus la miniature (une seule fois, à l'ouverture de la fiche) */
+  var bigBox = function (g) {
+    if (hasImg(g) && g.imgBig && GEEKRE.test(g.imgBig) && GEEKRE.test(g.img)) return '<div class="box box-big" style="--thumb:url(\'' + g.img + '\')"><img class="cover-img" src="' + g.imgBig + '" alt="Boîte du jeu ' + esc(g.name) + '" decoding="async" fetchpriority="low" referrerpolicy="no-referrer"></div>';
+    return box(g);
+  };
   var box = function (g) { return '<div class="box">' + art(g) + '</div>'; };
   var hue = function (n) { var h = 0, i; for (i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % 5; return h; };
   var avatar = function (n, c) { return '<span class="av ' + (c || '') + '" style="--c:var(--p' + hue(n) + ')">' + esc(n.charAt(0).toUpperCase()) + '</span>'; };
@@ -2006,8 +2047,8 @@ var Badges = (function () {
   }
   function modalGame(g) {
     return '<div class="modal" data-act="closeModal"><div class="sheet glass-2" data-act="noop" role="dialog" aria-modal="true" aria-label="' + esc(g.name) + '"><button class="icon-btn sheet-x" data-act="closeModal" aria-label="Fermer">' + ic('x', 18) + '</button>' +
-      '<div class="sheet-grid">' + box(g) + '<div><p class="eyebrow">Fiche du jeu</p><h2>' + esc(g.name) + '</h2>' + facts(g, true) + '<p class="full">' + esc(g.summary) + '</p><div class="tags">' + (g.tags || []).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</div>' +
-      '<p class="credit">' + (g.manual ? 'Fiche saisie par l’organisateur.' : 'Données : BoardGameGeek, résumé traduit. Affiche d’exemple dans cette version.') + '</p></div></div></div></div>';
+      '<div class="sheet-grid">' + bigBox(g) + '<div><p class="eyebrow">Fiche du jeu</p><h2>' + esc(g.name) + '</h2>' + facts(g, true) + '<p class="full">' + (g.summary ? esc(g.summary) : '<span class="hint">Pas encore de résumé pour ce jeu.</span>') + '</p><div class="tags">' + (g.tags || []).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</div>' +
+      '<p class="credit">' + (g.bgg ? 'Données et image : BoardGameGeek.' : g.manual ? 'Fiche saisie par l’organisateur.' : 'Données : BoardGameGeek, résumé traduit. Affiche d’exemple dans cette version.') + '</p></div></div></div></div>';
   }
   function modalMove(m) {
     var s = sessionById(m.sid), r = s && M.drafts[s.id];
@@ -2180,15 +2221,107 @@ var Badges = (function () {
       '<div class="gf-actions"><button class="btn btn-teal" type="button" data-act="gfSave"' + (f.busy ? ' disabled' : '') + '>' + ic(edit ? 'check' : 'plus', 18) + ' ' + (f.busy ? 'Enregistrement…' : edit ? 'Enregistrer les modifications' : 'Ajouter à la ludothèque') + '</button>' +
       (edit ? '<button class="btn btn-glass" type="button" data-act="gfCancel">Annuler</button>' : '') + '</div></div></div>';
   }
-  function bggBody() {
-    var avail = D.CATALOG.filter(function (c) { return !G(c.id); }), hit = ui.imp.hit;
-    return '<p class="hint" style="margin:0">Tapez le nom du jeu : l’affiche, le résumé traduit en français et le nombre de joueurs sont récupérés automatiquement.</p>' +
-      '<div class="import-row"><input class="input" id="imp-q" placeholder="Ex. Azul, Wingspan…" value="' + esc(ui.imp.q) + '" autocomplete="off"><button class="btn" data-act="impSearch">' + ic('search', 18) + ' Chercher</button></div>' +
-      (avail.length ? '<div class="suggest">Essayez : ' + avail.map(function (c) { return '<button class="chip-btn" data-act="impPick" data-id="' + c.id + '">' + esc(c.name) + '</button>'; }).join('') + '</div>' : '') +
-      (hit ? '<div class="hit">' + box(hit) + '<div><span class="tr">' + ic('spark', 14) + ' Résumé traduit automatiquement</span><h3>' + esc(hit.name) + '</h3>' + facts(hit, true) + '<p class="sum" style="-webkit-line-clamp:unset;margin-top:8px">' + esc(hit.summary) + '</p><div class="row" style="margin-top:16px"><button class="btn btn-teal" data-act="impAdd" data-id="' + hit.id + '">' + ic('plus', 18) + ' Ajouter à la ludothèque</button></div></div></div>' : '') +
-      (ui.imp.miss ? '<p class="hint" style="margin:0">Aucun résultat dans cette version. Le branchement réel sur BoardGameGeek reste à faire.</p>' : '') +
-      '<p class="hint" style="margin:0">Pour l’instant, la recherche porte sur quelques jeux d’exemple : utilisez « À la main » pour les autres.</p>';
+  /* ---------- Import BoardGameGeek via GameShelf (solution provisoire, sans clé BGG) ---------- */
+  var GS_URL = 'https://us-central1-bgg-collection.cloudfunctions.net/getUserCollection8', GS_KEY = 'jdo-gs-user';
+  var GS_FR = { 'Card Game': 'Jeu de cartes', 'Fantasy': 'Fantasy', 'Deduction': 'Déduction', 'Science Fiction': 'Science-fiction', 'Exploration': 'Exploration', 'Adventure': 'Aventure', 'Puzzle': 'Casse-tête', 'Fighting': 'Combat', 'Novel-based': 'Inspiré d’un roman', 'Animals': 'Animaux', 'Real-time': 'Temps réel', 'Dice': 'Dés', 'Murder / Mystery': 'Enquête', 'Economic': 'Économie', 'Medieval': 'Médiéval', 'Territory Building': 'Construction de territoire', 'Horror': 'Horreur', 'Space Exploration': 'Conquête spatiale', 'Mythology': 'Mythologie', 'Print & Play': 'Print & Play', 'Bluffing': 'Bluff', 'Nautical': 'Maritime', 'Pirates': 'Pirates', 'Party Game': 'Jeu d’ambiance', 'City Building': 'Construction de ville', 'Abstract Strategy': 'Abstrait', 'Civilization': 'Civilisation', 'Environmental': 'Écologie', 'Spies / Secret Agents': 'Espionnage', 'Wargame': 'Jeu de guerre', 'Number': 'Chiffres', 'American West': 'Far West', 'Action / Dexterity': 'Adresse', 'Post-Napoleonic': 'XIXe siècle', 'Humor': 'Humour', 'Travel': 'Voyage', 'Ancient': 'Antiquité', 'Movies / TV / Radio theme': 'Cinéma et télé', 'Political': 'Politique', 'Trains': 'Trains', 'Miniatures': 'Figurines', 'Industry / Manufacturing': 'Industrie', 'Medical': 'Médical', 'Comic Book / Strip': 'Bande dessinée', 'Transportation': 'Transports', 'Renaissance': 'Renaissance', 'World War II': 'Seconde Guerre mondiale', 'World War I': 'Première Guerre mondiale', 'Sports': 'Sport', 'Children\u2019s Game': 'Jeu pour enfants', 'Word Game': 'Jeu de mots', 'Racing': 'Course', 'Religious': 'Religion', 'Mature / Adult': 'Adulte', 'Farming': 'Agriculture', 'Math': 'Maths', 'Video Game Theme': 'Univers du jeu vidéo', 'Prehistoric': 'Préhistoire', 'Arabian': 'Orient', 'Modern Warfare': 'Guerre moderne', 'Civil War': 'Guerre civile', 'American Civil War': 'Guerre de Sécession', 'Zombies': 'Zombies', 'Aviation / Flight': 'Aviation', 'Trivia': 'Culture générale', 'Negotiation': 'Négociation', 'Age of Reason': 'Siècle des Lumières', 'Napoleonic': 'Époque napoléonienne', 'Collectible Components': 'Éléments à collectionner', 'Mafia': 'Mafia', 'Memory': 'Mémoire', 'Music': 'Musique', 'Educational': 'Éducatif', 'Maze': 'Labyrinthe', 'Game System': 'Système de jeu' };
+  function gsNew() {
+    var u = ''; try { u = localStorage.getItem(GS_KEY) || ''; } catch (e) {}
+    return { user: u, busy: false, err: '', list: null, who: '', total: 0, solo: 0, sel: {}, q: '', hideAdded: true, adding: null };
   }
+  /* Règles d'adaptation d'un jeu GameShelf aux tables de l'appli :
+     - minimum toujours ≥ 2 (un jeu à 1 joueur au minimum passe à 2) ; un jeu solo (max < 2) est écarté ;
+     - un seul nombre « idéal » : si BGG en donne plusieurs (« meilleur à 2 ou 4 »), on propose les choix et on garde le plus grand par défaut ;
+     - sans « meilleur » connu : valeur estimée au milieu des nombres recommandés (ou de la fourchette). */
+  function gsPrep(r) {
+    var num = function (v) { var n = parseInt(v, 10); return isFinite(n) ? n : 0; };
+    var minR = num(r.minPlayers), maxR = num(r.maxPlayers), p = { id: 'bgg' + r.id, bgg: String(r.id), name: norm(r.name), solo: false };
+    if (maxR < 2) { p.solo = true; return p; }
+    var min = Math.max(2, minR || 2), max = Math.min(30, Math.max(min, maxR));
+    var inRange = function (l) { var seen = {}; return (l || []).map(num).filter(function (n) { if (n < min || n > max || seen[n]) return false; seen[n] = 1; return true; }).sort(function (a, b) { return a - b; }); };
+    var best = inRange(r.playersBest), rec = inRange(r.playersRecommended);
+    p.min = min; p.max = max;
+    if (best.length) { p.cands = best; p.ideal = best[best.length - 1]; }
+    else { p.ideal = rec.length ? rec[Math.floor(rec.length / 2)] : Math.round((min + max) / 2); p.cands = [p.ideal]; p.est = true; }
+    var t = num(r.playingTime) || num(r.maxPlayTime), a = num(r.minAge) || num(r.recommendedMinAge), y = num(r.yearPublished), w = parseFloat(r.weight);
+    if (t > 0) p.time = Math.min(600, t); if (a > 0) p.age = Math.min(99, a); if (y > 0) p.year = y; if (w >= 1 && w <= 5) p.weight = Math.round(w * 10) / 10;
+    p.tags = (r.categories || []).map(function (c) { return GS_FR[c] || c; }).filter(Boolean).slice(0, 5);
+    if (r.thumbnail && GEEKRE.test(r.thumbnail)) { p.img = r.thumbnail; if (r.image && GEEKRE.test(r.image)) p.imgBig = r.image; }
+    return p;
+  }
+  function gsGame(p, i) {
+    var g = Object.assign({ id: p.id, n: Date.now() + i, bgg: p.bgg, name: p.name, min: p.min, max: p.max, ideal: p.ideal, summary: '', tags: p.tags || [] }, D.autoStyle(p.name));
+    ['time', 'age', 'year', 'weight', 'img', 'imgBig'].forEach(function (k) { if (p[k]) g[k] = p[k]; });
+    if (!ST.admin) { g.owner = ST.uid; g.ownerName = nameOf(ST.uid) || norm(NAME) || ST.profileName || 'Organisateur'; }
+    return g;
+  }
+  /* Résumé : second point d'accès de GameShelf (getAdditionalInfo), texte anglais de l'éditeur ; échec = résumé laissé vide */
+  var GS_INFO = GS_URL.replace('getUserCollection8', 'getAdditionalInfo');
+  function gsClean(t) {
+    var d = new DOMParser().parseFromString(String(t || '').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ' '), 'text/html');
+    t = (d.documentElement.textContent || '').replace(/[ \t\u00a0]+/g, ' ').replace(/ ?\n ?/g, '\n').replace(/\n{3,}/g, '\n\n').replace(/\s*[—–-]+\s*description from the publisher\.?\s*$/i, '').trim();
+    if (t.length > 1400) { var cut = t.slice(0, 1400), k = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('.\n')); t = (k > 600 ? cut.slice(0, k + 1) : cut.replace(/\s+\S*$/, '') + '…'); }
+    return t;
+  }
+  function gsDesc(g) {
+    var ctl = typeof AbortController === 'function' ? new AbortController() : null, to = ctl && setTimeout(function () { ctl.abort(); }, 12000);
+    return fetch(GS_INFO + '?id=' + encodeURIComponent(String(g.bgg || g.id).replace(/^bgg/, '')), ctl ? { signal: ctl.signal } : {})
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && typeof j.description === 'string') g.summary = gsClean(j.description); }, function () {})
+      .then(function () { if (to) clearTimeout(to); });
+  }
+  var gsFind = function (id) { return ((ui.gs.list || []).filter(function (p) { return p.id === id; }))[0]; };
+  /* new : ajoutable | added : déjà importé | dup : un jeu du même nom existe déjà */
+  function gsState(p) {
+    if (G(p.id)) return 'added';
+    return M.games.some(function (g) { return key(g.name) === key(p.name); }) ? 'dup' : 'new';
+  }
+  var gsPicked = function () { return (ui.gs.list || []).filter(function (p) { return ui.gs.sel[p.id] && gsState(p) === 'new'; }); };
+  function gsBox(p) { return '<div class="box">' + (p.img ? '<img class="cover-img" src="' + p.img + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">' : coverSVG(Object.assign({ id: p.id, name: p.name, age: p.age || 8 }, D.autoStyle(p.name)))) + '</div>'; }
+  function gsIdealRow(p) {
+    if (p.cands.length > 1) return '<div class="gs-ideal" role="group" aria-label="Nombre idéal de joueurs"><span>Idéal</span>' + p.cands.map(function (n) { return '<button type="button" class="gs-n" aria-pressed="' + (p.ideal === n) + '" data-act="gsIdeal" data-id="' + esc(p.id) + '" data-n="' + n + '">' + n + '</button>'; }).join('') + '</div>';
+    return '<div class="gs-ideal"><span>Idéal <b>' + p.ideal + '</b>' + (p.est ? ' (estimé)' : '') + '</span></div>';
+  }
+  function gsTile(p, st) {
+    var on = !!ui.gs.sel[p.id] && st === 'new', off = st !== 'new', lab = p.min === p.max ? p.min : p.min + '–' + p.max;
+    return '<article class="gs-t' + (off ? ' is-off' : '') + '" role="button" tabindex="' + (off ? -1 : 0) + '" aria-pressed="' + on + '" aria-disabled="' + off + '" data-act="gsToggle" data-id="' + esc(p.id) + '" data-q="' + esc(normQ(p.name)) + '"><span class="tick">' + ic('check', 16) + '</span>' + gsBox(p) +
+      '<strong>' + esc(p.name) + '</strong><small>' + lab + ' joueurs' + (p.time ? ' · ' + p.time + ' min' : '') + '</small>' +
+      (st === 'added' ? '<em class="gs-flag">Déjà dans la ludothèque</em>' : st === 'dup' ? '<em class="gs-flag">Un jeu du même nom existe déjà</em>' : gsIdealRow(p)) + '</article>';
+  }
+  function gsCountText(n) { return n ? n + ' jeu' + (n > 1 ? 'x' : '') + ' coché' + (n > 1 ? 's' : '') : 'Aucun jeu coché'; }
+  function gsList() {
+    var s = ui.gs, rows = s.list.map(function (p) { return { p: p, st: gsState(p) }; }), nNew = rows.filter(function (x) { return x.st === 'new'; }).length, nOld = rows.length - nNew;
+    var shown = rows.filter(function (x) { return !(s.hideAdded && x.st !== 'new'); }), picked = gsPicked().length;
+    return '<div class="gs-sum"><b>' + esc(s.who) + '</b><span>' + plural(s.total, 'jeu possédé', 'jeux possédés') + ' (extensions exclues)</span><span>' + nNew + ' à ajouter</span>' + (nOld ? '<span>' + nOld + ' déjà dans la ludothèque</span>' : '') + (s.solo ? '<span>' + plural(s.solo, 'jeu solo ignoré', 'jeux solo ignorés') + '</span>' : '') + '</div>' +
+      '<div class="gs-tools"><div class="gsearch">' + ic('search', 18) + '<input class="input" id="gs-q" type="search" placeholder="Filtrer la liste (nom du jeu)" autocomplete="off" value="' + esc(s.q) + '"><small id="gs-qn"></small></div>' +
+      '<div class="gs-btns"><button type="button" class="gs-chip" data-act="gsAll">' + ic('check', 14) + ' Tout cocher</button><button type="button" class="gs-chip" data-act="gsNone">' + ic('x', 14) + ' Tout décocher</button>' +
+      (nOld ? '<button type="button" class="gs-chip" role="switch" aria-checked="' + !!s.hideAdded + '" aria-pressed="' + !!s.hideAdded + '" data-act="gsHide">Masquer les jeux déjà présents</button>' : '') + '</div></div>' +
+      '<p class="hint gsearch-none" id="gs-none" hidden>Aucun jeu ne correspond à ce filtre.</p>' +
+      (shown.length ? '<div class="gs-grid" id="gs-grid">' + shown.map(function (x) { return gsTile(x.p, x.st); }).join('') + '</div>' : '<p class="hint" style="margin:0">Tous les jeux de cette collection sont déjà dans la ludothèque.</p>') +
+      '<div class="actionbar glass-2 gs-bar"><div class="progress"><strong id="gs-count">' + (s.adding ? 'Ajout en cours…' : gsCountText(picked)) + '</strong><span class="hint" id="gs-prog" style="margin:0">' + (s.adding ? s.adding.done + ' / ' + s.adding.total : 'Minimum 2 joueurs, un seul nombre idéal par jeu. Le résumé se complète ensuite fiche par fiche.') + '</span></div>' +
+      '<button class="btn btn-teal btn-lg" id="gs-go" data-act="gsAdd"' + (picked && !s.adding ? '' : ' disabled') + '>' + ic('plus', 19) + ' Ajouter à la ludothèque</button></div>';
+  }
+  function bggBody() {
+    var s = ui.gs;
+    return '<p class="hint" style="margin:0">Tapez votre nom d’utilisateur BoardGameGeek : on récupère les jeux de votre ludothèque, puis vous cochez ceux à ajouter. L’affiche et les nombres de joueurs viennent de BoardGameGeek ; le résumé est à compléter ensuite.</p>' +
+      '<div class="import-row"><input class="input" id="gs-user" placeholder="Nom d’utilisateur BoardGameGeek" value="' + esc(s.user) + '" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Nom d’utilisateur BoardGameGeek"><button class="btn" data-act="gsLoad"' + (s.busy ? ' disabled' : '') + '>' + ic('download', 18) + ' ' + (s.busy ? 'Chargement…' : 'Charger la collection') + '</button></div>' +
+      (s.busy ? '<p class="hint gs-busy">' + ic('clock', 16) + ' Récupération de la collection… quelques secondes.</p>' : '') +
+      (s.err ? '<p class="auth-msg bad" role="alert">' + esc(s.err) + '</p>' : '') +
+      (s.list && !s.busy ? gsList() : '') +
+      '<p class="hint" style="margin:0">Données et images : BoardGameGeek, récupérées via GameShelf.io (service tiers, solution provisoire en attendant l’accès direct à l’API de BoardGameGeek).</p>';
+  }
+  /* filtre d'affichage, sans reconstruire la page */
+  function gsFilter() {
+    var s = ui.gs, q = normQ((s.q || '').trim()), tiles = document.querySelectorAll('#gs-grid .gs-t'), n = 0, i;
+    for (i = 0; i < tiles.length; i++) { var ok = !q || tiles[i].getAttribute('data-q').indexOf(q) >= 0; tiles[i].hidden = !ok; if (ok) n++; }
+    var none = document.getElementById('gs-none'); if (none) none.hidden = n > 0 || !tiles.length;
+    var c = document.getElementById('gs-qn'); if (c) c.textContent = q ? n + ' / ' + tiles.length : '';
+  }
+  function gsSync() {
+    var n = gsPicked().length, c = $('#gs-count'), b = $('#gs-go');
+    if (c && !ui.gs.adding) c.textContent = gsCountText(n);
+    if (b) b.disabled = !n || !!ui.gs.adding;
+  }
+  function gsSetTile(id, on) { var t = document.querySelector('#gs-grid .gs-t[data-id="' + id + '"]'); if (t) t.setAttribute('aria-pressed', on ? 'true' : 'false'); }
   function tabGames() {
     var edit = ui.gf && ui.gf.id, manual = ui.addMode === 'manual' || edit;
     if (manual && !ui.gf) ui.gf = newGf();
@@ -2196,7 +2329,7 @@ var Badges = (function () {
     var seg = edit ? '' : '<div class="seg" role="group" aria-label="Mode d’ajout"><button type="button" aria-pressed="' + !manual + '" data-act="addMode" data-m="bgg">' + ic('search', 17) + ' BoardGameGeek</button><button type="button" aria-pressed="' + manual + '" data-act="addMode" data-m="manual">' + ic('edit', 17) + ' À la main</button></div>';
     var imp = '<section class="import glass-2" id="gf-top"><div class="import-head"><div class="panel-head" style="margin:0">' + head + '</div>' + seg + '</div>' + (manual ? gameForm() : bggBody()) + '</section>';
     return imp + '<div class="sec-head"><h2>Ludothèque (' + M.games.length + ')</h2><p>' + (ST.admin ? 'Ajustez les nombres de joueurs ici, ou ouvrez la fiche complète avec le crayon.' : 'Vous pouvez ajouter des jeux et modifier ou retirer uniquement ceux que vous avez ajoutés.') + '</p></div><div class="glist">' + M.games.map(function (g) {
-      return '<div class="grow">' + box(g) + '<div><h3>' + esc(g.name) + '</h3>' + facts(g) + '</div>' + (canEditGame(g) ? '<div class="stepper-wrap" style="display:flex;gap:14px">' + stepper(g, 'min', 'Mini') + stepper(g, 'ideal', 'Idéal') + stepper(g, 'max', 'Maxi') + '</div>' : '<div class="stepper-wrap ro"><small class="hint">' + (g.owner && g.ownerName ? 'Ajouté par ' + esc(g.ownerName) : 'Ajouté par l’admin') + '</small></div>') +
+      return '<div class="grow">' + box(g) + '<div><h3>' + esc(g.name) + '</h3>' + facts(g) + (g.bgg && !g.summary ? '<small class="gs-todo">' + ic('edit', 12) + ' Résumé à compléter</small>' : '') + '</div>' + (canEditGame(g) ? '<div class="stepper-wrap" style="display:flex;gap:14px">' + stepper(g, 'min', 'Mini') + stepper(g, 'ideal', 'Idéal') + stepper(g, 'max', 'Maxi') + '</div>' : '<div class="stepper-wrap ro"><small class="hint">' + (g.owner && g.ownerName ? 'Ajouté par ' + esc(g.ownerName) : 'Ajouté par l’admin') + '</small></div>') +
         (!canEditGame(g) ? '' : '<div class="grow-btns"><button class="icon-btn edit" title="Modifier la fiche" aria-label="Modifier ' + esc(g.name) + '" data-act="editGame" data-gid="' + g.id + '">' + ic('edit', 16) + '</button>' +
         '<button class="icon-btn" title="Retirer de la ludothèque" aria-label="Retirer ' + esc(g.name) + '" data-act="removeGame" data-gid="' + g.id + '">' + ic('trash', 16) + '</button></div>') + '</div>';
     }).join('') + '</div>';
@@ -2399,7 +2532,7 @@ var Badges = (function () {
     else if (ST.error) h = viewError();
     else if (ui.route === 'session') h = viewSession(); else if (ui.route === 'games') h = viewGames(); else if (ui.route === 'admin') h = viewAdmin(); else if (ui.route === 'profile') h = viewProfile(); else h = viewHome();
     var cf = document.activeElement && document.activeElement.id === 'chat-in', cl0 = $('#chat-list'), atEnd = !cl0 || cl0.scrollHeight - cl0.scrollTop - cl0.clientHeight < 60, selS = cf ? document.activeElement.selectionStart : 0;
-    $('#view').innerHTML = h; filterPicker();
+    $('#view').innerHTML = h; filterPicker(); gsFilter();
     var cl = $('#chat-list'), ci = $('#chat-in');
     if (cl && (atEnd || ui.chatKeep)) cl.scrollTop = cl.scrollHeight;
     if (ci && (cf || ui.chatKeep)) { ci.focus(); try { ci.setSelectionRange(cf ? selS : 0, cf ? selS : 0); } catch (e) {} }
@@ -2899,10 +3032,75 @@ var Badges = (function () {
       g.tags = String(f.tags).split(',').map(norm).filter(Boolean).slice(0, 5);
       [['time', f.time, 1], ['age', f.age, 1], ['year', f.year, 1], ['weight', f.weight, 0.1]].forEach(function (x) { var v = num(x[1]); if (v !== null && v > 0) g[x[0]] = x[2] === 1 ? Math.round(v) : Math.round(v * 10) / 10; else delete g[x[0]]; });
       if (url) g.img = url; else delete g.img;
+      if (!url || f.blob) delete g.imgBig;
       try { await ST.db.doc('games/' + id).set(g); } catch (e) { f.busy = false; f.err = 'Enregistrement impossible : ' + ((e && e.message) || 'réessayez dans un instant.'); return render(); }
       if (oldImg && oldImg !== url) Backend.removeCover(oldImg);
       toast(f.id ? 'Fiche enregistrée.' : name + ' ajouté à la ludothèque.');
       ui.gf = f.id ? null : newGf(); render(true);
+    },
+    gsLoad: function () {
+      var s = ui.gs, name = norm(s.user).replace(/^@/, ''); if (s.busy) return;
+      if (!name) { s.err = 'Saisissez votre nom d’utilisateur BoardGameGeek.'; return render(); }
+      s.user = name; s.busy = true; s.err = ''; s.list = null; s.sel = {}; s.q = ''; render();
+      try { localStorage.setItem(GS_KEY, name); } catch (e) {}
+      var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function () { if (ctl) ctl.abort(); }, 60000);
+      fetch(GS_URL + '?name=' + encodeURIComponent(name), ctl ? { signal: ctl.signal } : {}).then(function (r) {
+        if (r.status === 400 || r.status === 404) throw new Error('nouser');
+        if (!r.ok) throw new Error('http');
+        return r.json();
+      }).then(function (j) {
+        var all = j && j.games ? Object.keys(j.games).map(function (k) { var g = j.games[k] || {}; g.id = g.id || k; return g; }) : [];
+        var owned = all.filter(function (g) { return (g.status || []).indexOf('Owned') >= 0 && g.type !== 'Expansion' && g.name; });
+        if (!owned.length) throw new Error('empty');
+        var list = [], solo = 0;
+        owned.forEach(function (g) { var p = gsPrep(g); if (p.solo) solo++; else list.push(p); });
+        list.sort(function (a, b) { return a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }); });
+        s.list = list; s.who = name; s.total = owned.length; s.solo = solo;
+      }).catch(function (e) {
+        var m = String((e && e.message) || '');
+        s.err = m === 'nouser' ? 'Utilisateur BoardGameGeek introuvable : vérifiez l’orthographe de son nom.'
+          : m === 'empty' ? 'Aucun jeu possédé trouvé pour « ' + name + ' » (collection vide ou privée).'
+          : e && e.name === 'AbortError' ? 'Le service met trop de temps à répondre. Réessayez dans un instant.'
+          : 'Impossible de récupérer la collection pour le moment (service GameShelf indisponible ?). Réessayez plus tard ou ajoutez le jeu à la main.';
+      }).then(function () { clearTimeout(to); s.busy = false; render(); });
+    },
+    gsToggle: function (el) {
+      var p = gsFind(el.dataset.id), s = ui.gs; if (!p || gsState(p) !== 'new') return;
+      if (s.sel[p.id]) delete s.sel[p.id]; else s.sel[p.id] = 1;
+      el.setAttribute('aria-pressed', s.sel[p.id] ? 'true' : 'false'); gsSync();
+    },
+    gsIdeal: function (el) {
+      var p = gsFind(el.dataset.id), n = +el.dataset.n; if (!p || p.cands.indexOf(n) < 0) return;
+      p.ideal = n; var bs = el.parentNode.querySelectorAll('.gs-n'), i;
+      for (i = 0; i < bs.length; i++) bs[i].setAttribute('aria-pressed', +bs[i].dataset.n === n ? 'true' : 'false');
+    },
+    gsAll: function () {
+      var tiles = document.querySelectorAll('#gs-grid .gs-t:not([hidden]):not(.is-off)'), i;
+      for (i = 0; i < tiles.length; i++) { ui.gs.sel[tiles[i].dataset.id] = 1; tiles[i].setAttribute('aria-pressed', 'true'); }
+      gsSync();
+    },
+    gsNone: function () {
+      ui.gs.sel = {}; var tiles = document.querySelectorAll('#gs-grid .gs-t'), i;
+      for (i = 0; i < tiles.length; i++) tiles[i].setAttribute('aria-pressed', 'false');
+      gsSync();
+    },
+    gsHide: function () { ui.gs.hideAdded = !ui.gs.hideAdded; render(); },
+    gsAdd: function () {
+      var s = ui.gs, picks = gsPicked(); if (!picks.length || s.adding || !canHost()) return;
+      var rows = picks.map(gsGame), ok = [], fails = [], last = null;
+      s.adding = { done: 0, total: rows.length }; render();
+      var step = function (i) {
+        if (i >= rows.length) return Promise.resolve();
+        return Promise.all(rows.slice(i, i + 6).map(function (g) {
+          return gsDesc(g).then(function () { return ST.db.doc('games/' + g.id).set(g); }).then(function () { ok.push(g.id); }, function (e) { fails.push(g.name); last = e; });
+        })).then(function () { s.adding.done = Math.min(rows.length, i + 6); var pr = $('#gs-prog'); if (pr) pr.textContent = s.adding.done + ' / ' + s.adding.total; return step(i + 6); });
+      };
+      step(0).then(function () {
+        s.adding = null; ok.forEach(function (id) { delete s.sel[id]; });
+        if (fails.length) dbErr(last);
+        if (ok.length) toast(plural(ok.length, 'jeu ajouté', 'jeux ajoutés') + ' à la ludothèque.' + (fails.length ? ' ' + plural(fails.length, 'échec', 'échecs') + '.' : ''));
+        render();
+      });
     },
     impSearch: function () {
       var q = ui.imp.q.trim().toLowerCase(); ui.imp.hit = null; ui.imp.miss = false;
@@ -2930,6 +3128,7 @@ var Badges = (function () {
     var t = e.target;
     if ((e.key === 'Enter' || e.key === ' ') && t.getAttribute && t.getAttribute('role') === 'button' && t.dataset.act) { e.preventDefault(); ACT[t.dataset.act](t, e); return; }
     if (e.key === 'Enter' && t.id === 'imp-q') ACT.impSearch();
+    if (e.key === 'Enter' && t.id === 'gs-user') { e.preventDefault(); ACT.gsLoad(); }
   });
   /* met à jour le bouton « Programmer » sans reconstruire la page (sinon le champ perd le focus pendant la saisie) */
   function syncCreate() { var b = document.querySelector('[data-act="createSession"]'); if (b) b.disabled = !(ui.form.gameIds.length && ui.form.date && ui.form.time); }
@@ -2950,6 +3149,8 @@ var Badges = (function () {
     else if (t.id === 'f-note') ui.form.note = t.value;
     else if (t.id === 'f-q') { ui.form.q = t.value; filterPicker(); }
     else if (t.id === 'imp-q') ui.imp.q = t.value;
+    else if (t.id === 'gs-user') ui.gs.user = t.value;
+    else if (t.id === 'gs-q') { ui.gs.q = t.value; gsFilter(); }
     else if (t.id === 'search') { ui.q = t.value; $('#ggrid').innerHTML = gamesGrid(); }
   });
   document.addEventListener('keydown', function (e) {
