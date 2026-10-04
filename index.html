@@ -875,7 +875,7 @@ html{overflow-x:hidden;max-width:100%}
 .forgot-link{align-self:flex-end;margin-top:6px;padding:4px 2px;font-size:13.5px}
 .hint.tries{text-align:center;margin:-4px 0 0;font-weight:700}
 .hint.tries.low{color:var(--bad,var(--tomato))}
-.malus-note.eq{border-style:solid;border-color:var(--cobalt)}
+.malus-note.eqty{border-style:solid;border-color:var(--cobalt)}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -2613,7 +2613,7 @@ var Badges = (function () {
       ? '<b>Malus d’absence actif.</b> En cas de conflit pour un jeu, vous passez après les personnes sans malus. Vous gardez votre place à la session. Il diminue à chaque session jouée et s’efface au plus tard le ' + longDate(mend) + '.'
       : '<b>Avertissement.</b> Une absence récente : pas de conséquence pour l’instant. Une deuxième dans les 28 jours déclenche un malus d’affectation (vous passez après les autres en cas de conflit sur un jeu). Il s’efface le ' + longDate(mend) + ', ou dès que vous jouez une session.') + '</div></div>';
     var eq = Badges.equity(badgeEvents(ST.uid), D.iso(new Date()));
-    if (eq.boost >= 0.1) mnote += '<div class="malus-note eq"><span>🤝</span><div><b>Coup de pouce d’équité.</b> Vos dernières sessions ne vous ont pas toujours donné vos premiers choix : en cas de conflit pour un jeu, vous passez avant les personnes qui ont été bien servies. Il disparaît dès que vos premiers choix reviennent.</div></div>';
+    if (eq.boost >= 0.1) mnote += '<div class="malus-note eqty"><span>🤝</span><div><b>Coup de pouce d’équité.</b> Vos dernières sessions ne vous ont pas toujours donné vos premiers choix : en cas de conflit pour un jeu, vous passez avant les personnes qui ont été bien servies. Il disparaît dès que vos premiers choix reviennent.</div></div>';
     head += mnote;
     return head + Badges.CATS.map(function (c) {
       var l = res.list.filter(function (b) { return b.cat === c[0]; });
