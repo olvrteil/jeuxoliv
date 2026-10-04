@@ -3411,7 +3411,7 @@ var Badges = (function () {
         a.busy = false;
         if (r.error) { a.msg = r.error; a.ok = false; return render(true); }
         a.mode = 'in'; a.ok = true;
-        a.msg = 'Si un compte existe avec cette adresse, un e-mail avec un lien vient d’être envoyé. Pensez à regarder les courriers indésirables.';
+        a.msg = 'Si un compte existe avec cette adresse, un e-mail avec un lien vient d’être envoyé. Il vient de notre service d’authentification (expéditeur « Supabase Auth ») : pensez à regarder les courriers indésirables.';
         render(true);
       });
     } else if (f.id === 'reset-form') {
