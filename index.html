@@ -876,6 +876,13 @@ html{overflow-x:hidden;max-width:100%}
 .hint.tries{text-align:center;margin:-4px 0 0;font-weight:700}
 .hint.tries.low{color:var(--bad,var(--tomato))}
 .malus-note.eqty{border-style:solid;border-color:var(--cobalt)}
+
+.pill-cancel{background:var(--tomato);color:var(--on-tomato);border-color:var(--tomato-edge)}
+.scard.is-cancelled .fan,.scard.is-cancelled .scard-games,.scard.is-cancelled .seats-row,.scard.is-cancelled .scard-note{opacity:.4;filter:grayscale(.85)}
+.cancel-stamp{position:absolute;inset:0;z-index:3;display:grid;place-items:center;pointer-events:none}
+.cancel-stamp span{display:block;transform:rotate(-9deg);padding:.12em .5em .16em;border:.16em solid var(--tomato);border-radius:.22em;color:var(--tomato);background:color-mix(in srgb,var(--bg) 78%,transparent);font-weight:900;font-size:clamp(2.4rem,9vw,3.3rem);letter-spacing:.07em;text-transform:uppercase;line-height:1;box-shadow:0 0 0 .07em var(--bg),0 10px 28px rgba(0,0,0,.22)}
+.cancel-ico{background:var(--tomato);color:var(--on-tomato);box-shadow:none}
+.cancelled-panel .ok-head h2{color:var(--tomato)}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -1718,7 +1725,12 @@ var Badges = (function () {
   var autoRes = function (sid) { var d = M.auto[sid]; return d && d.tables ? d : null; };
   /* open : inscriptions ouvertes | pending : l'heure est passée, la clôture automatique se prépare
      auto : clôturée automatiquement, tables publiées | closed : clôturée par l'admin | published : tables publiées par l'admin */
+  function cancelInfo(s) {
+    if (s.status === 'cancelled') return s.cancel || { by: 'manual' };
+    var d = M.auto[s.id]; return d && d.cancelled ? { by: 'auto', n: d.n || 0 } : null;
+  }
   function phase(s) {
+    if (cancelInfo(s)) return 'cancelled';
     if (s.status === 'published') return 'published';
     if (s.status === 'closed') return 'closed';
     if (Date.now() >= startMs(s)) return autoRes(s.id) ? 'auto' : 'pending';
@@ -1757,6 +1769,7 @@ var Badges = (function () {
   };
   var statusPill = function (s) {
     var ph = phase(s);
+    if (ph === 'cancelled') return '<span class="pill pill-cancel">Annulée</span>';
     if (ph === 'published' || ph === 'auto') return '<span class="pill pill-pub">Tables publiées</span>';
     if (ph === 'closed') return '<span class="pill pill-closed">Clôturée</span>';
     if (ph === 'pending') return '<span class="pill pill-closed">Clôture en cours</span>';
@@ -1948,7 +1961,7 @@ var Badges = (function () {
     else if (ph === 'open' && mine) { label = 'Mon inscription'; cls += ' btn-glass'; }
     else if (ph === 'published' || ph === 'auto') { label = 'Voir les tables'; cls += ' btn-teal'; }
     else { label = 'Voir la session'; cls += ' btn-glass'; }
-    return '<article class="scard glass" style="--bgimg:url(' + bgOf(games[0]) + ')"><span class="scard-bg"></span>' +
+    return '<article class="scard glass' + (ph === 'cancelled' ? ' is-cancelled' : '') + '" style="--bgimg:url(' + bgOf(games[0]) + ')"><span class="scard-bg"></span>' + (ph === 'cancelled' ? '<div class="cancel-stamp" role="img" aria-label="Session annulée"><span>Annulé</span></div>' : '') +
       '<div class="scard-top">' + ticket(s) + '<div class="scard-meta">' + statusPill(s) + (s.single ? '<span class="pill pill-single">Un seul jeu</span>' : '') + (s.ownerName ? '<span class="pill pill-host">' + ic('users', 13) + ' Organisé par ' + esc(s.ownerName) + '</span>' : '') + (mine ? (waitPos(s, ST.uid) ? '<span class="pill pill-wait">' + ic('clock', 13) + ' En attente · n°' + waitPos(s, ST.uid) + '</span>' : '<span class="pill pill-me">' + ic('check', 13) + ' Inscrit·e</span>') : '') + '</div></div>' +
       '<div class="fan">' + games.map(function (g, j) { return '<div class="fan-i" style="--j:' + j + ';--n:' + games.length + '">' + box(g) + '</div>'; }).join('') + '</div>' +
       '<p class="scard-games">' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</p>' + (s.note && s.note.trim() ? '<p class="scard-note">' + esc(s.note.trim()) + '</p>' : '') +
@@ -1971,11 +1984,12 @@ var Badges = (function () {
       if (ui.draft && ui.draft.sid === s.id) main = rankingPanel(s, games, mine);
       else if (mine) main = myRegPanel(s, mine, games);
       else main = fullPanel(s, games);
-    } else if (ph === 'published' || ph === 'auto') main = publishedPanel(s, ph === 'auto');
+    } else if (ph === 'cancelled') main = cancelledPanel(s, mine);
+    else if (ph === 'published' || ph === 'auto') main = publishedPanel(s, ph === 'auto');
     else main = closedPanel(s, mine, games, ph === 'pending');
     return '<button class="back" data-act="home">' + ic('back', 18) + ' Toutes les sessions</button>' +
       '<div class="sess-head">' + ticket(s, 'big') + '<div><h1>' + longDate(s.date) + '</h1><div class="sub">' + statusPill(s) + '<span>' + (ph === 'open' ? 'Inscriptions jusqu’à ' + hm(s.time) : hm(s.time)) + '</span><span>' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</span></div></div></div>' +
-      noteBox(s) + (s.single && ph === 'open' ? '<p class="single-note">' + ic('dice', 18) + '<span>Un seul jeu sera joué par tout le monde. Il est choisi à la clôture selon le nombre de joueurs et vos préférences : classez donc tous les jeux honnêtement.</span></p>' : '') + (ph === 'open' ? roBanner() : '') + '<div class="cols"><div>' + main + '</div><aside class="aside">' + asidePanels(s) + '</aside></div>' + chatPanel(s);
+      noteBox(s) + (s.single && ph === 'open' ? '<p class="single-note">' + ic('dice', 18) + '<span>Un seul jeu sera joué par tout le monde. Il est choisi à la clôture selon le nombre de joueurs et vos préférences : classez donc tous les jeux honnêtement.</span></p>' : '') + (ph === 'open' ? roBanner() : '') + '<div class="cols"><div>' + main + '</div><aside class="aside">' + (ph === 'cancelled' ? '' : asidePanels(s)) + '</aside></div>' + (ph === 'cancelled' ? '' : chatPanel(s));
   }
   /* ---------- Messages de la session (tchat) ---------- */
   function msgsOf(s) { return Object.keys(M.msg).map(function (k) { var m = M.msg[k]; m.id = k; return m; }).filter(function (m) { return m.sid === s.id; }).sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); }); }
@@ -2040,6 +2054,23 @@ var Badges = (function () {
     return '<div class="panel glass-2"><div class="panel-head"><h2>Les jeux de la session</h2></div><div class="rank-grid">' + games.map(function (g) {
       return '<article class="rcard" role="button" tabindex="0" data-act="gameInfo" data-gid="' + g.id + '"><div class="rcard-box">' + box(g) + '</div><div class="rcard-body"><h3>' + esc(g.name) + '</h3>' + facts(g) + '<p class="sum">' + esc(g.summary) + '</p></div></article>';
     }).join('') + '</div></div>';
+  }
+  /* ---------- Session annulée (moins de 2 inscrits à la clôture, ou décision de l'organisateur) ---------- */
+  function cancelWhy(s) {
+    var c = cancelInfo(s) || {};
+    return c.by === 'auto' ? 'Moins de 2 inscrits à l’heure de la clôture : la session n’a pas lieu.' : c.low ? 'Moins de 2 inscrits : l’organisateur a annulé la session.' : 'L’organisateur a annulé cette session.';
+  }
+  function cancelledPanel(s, mine, manage) {
+    var c = cancelInfo(s) || {}, canBack = manage && canManage(s) && c.by !== 'auto' && Date.now() < startMs(s);
+    return '<div class="panel glass-2 cancelled-panel"><div class="ok-head"><span class="ok-ico cancel-ico">' + ic('x', 24) + '</span><div><h2>Session annulée</h2><p class="hint" style="margin:4px 0 0">' + cancelWhy(s) + (mine ? ' Votre inscription est sans suite.' : '') + '</p></div></div>' +
+      (canBack ? '<button class="btn btn-glass" style="margin-top:18px" data-act="restoreSession" data-sid="' + s.id + '">' + ic('undo', 17) + ' Rétablir la session</button>' : '') + '</div>';
+  }
+  function closeBtns(s, n) {
+    var ask = ui.confirm === 'cancel:' + s.id, low = n < 2;
+    var cancel = '<button class="btn ' + (low ? 'btn-red btn-lg' : 'btn-glass') + ' btn-block" style="margin-top:' + (low ? 22 : 12) + 'px" data-act="cancelSession" data-sid="' + s.id + '">' + ic('x', 18) + (ask ? ' Confirmer l’annulation' + (n ? ' (' + n + ' inscrit·e' + (n > 1 ? 's' : '') + ' prévenu·e' + (n > 1 ? 's' : '') + ')' : '') : ' Annuler la session') + '</button>' +
+      (low ? '<p class="hint" style="margin:10px 0 0">Moins de 2 inscrits : la session ne peut pas avoir lieu. ' + (Date.now() >= startMs(s) ? 'Elle va être annulée automatiquement.' : 'Elle sera annulée automatiquement à l’heure de la clôture si personne ne s’inscrit d’ici là.') + ' Les inscrits sont prévenus par notification.</p>' : '');
+    if (low) return cancel;
+    return '<button class="btn btn-red btn-lg btn-block" style="margin-top:22px" data-act="closeSession" data-sid="' + s.id + '">' + ic('lock', 19) + ' Clôturer et affecter maintenant</button>' + cancel;
   }
   function closedPanel(s, mine, games, pending) {
     return '<div class="panel glass-2"><div class="ok-head"><span class="ok-ico" style="background:var(--ink);color:var(--bg);box-shadow:none">' + ic('lock', 22) + '</span><div><h2>' + (pending ? 'Clôture en cours' : 'Inscriptions clôturées') + '</h2><p class="hint" style="margin:4px 0 0">' + (pending ? 'L’heure est passée : les tables se composent à l’instant. Cela prend quelques secondes.' : 'Les tables seront annoncées dès que l’organisateur les aura publiées.') + '</p></div></div>' +
@@ -2517,6 +2548,7 @@ var Badges = (function () {
     if (!s || !canManage(s)) { ui.msid = null; return viewAdmin(); }
     var games = gamesOf(s), seats = seatsOf(s), regs = regList(s), n = regs.length, ph = phase(s);
     var head = '<button class="back" data-act="mBack">' + ic('back', 18) + ' Toutes les sessions</button><div class="sess-head">' + ticket(s, 'big') + '<div><h1>' + longDate(s.date) + '</h1><div class="sub">' + statusPill(s) + '<span>' + hm(s.time) + '</span><span>' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</span></div></div></div>' + '<div class="panel glass-2 sess-groups"><div class="small-h">Groupes destinataires</div>' + groupPicker(groupsOf(s), 'sessGroup').replace(/data-act="sessGroup"/g, 'data-act="sessGroup" data-sid="' + s.id + '"') + '</div>' + noteEditor(s) + '<div class="dup-row"><button class="btn btn-glass btn-sm" data-act="dupSession" data-sid="' + s.id + '">' + ic('copy', 16) + ' Dupliquer sur une autre date</button></div>';
+    if (ph === 'cancelled') return head + cancelledPanel(s, null, true);
     if (ph === 'open' || ph === 'pending') {
       var p = seats ? Math.min(100, Math.round(n / seats * 100)) : 0, fakes = Object.keys(M.regs).some(function (u) { return M.regs[u].fake && M.regs[u].s && M.regs[u].s[s.id]; });
       return head + '<div class="cols"><div class="panel glass-2"><div class="panel-head"><h2>Inscrits (' + n + ')</h2><p>Pour chaque inscrit : l’ordre de ses jeux, du préféré au moins préféré. La croix indique un jeu refusé.</p></div>' +
@@ -2524,7 +2556,7 @@ var Badges = (function () {
           : '<div class="empty"><svg class="meeple" viewBox="0 0 100 100"><use href="#meeple"/></svg><p>Aucun inscrit pour l’instant.</p></div>') + '</div>' +
         '<aside class="aside"><div class="panel glass-2"><div class="small-h">Clôture et affectation</div><div class="gauge"><div class="ring ' + (n >= seats ? 'full' : '') + '" style="--p:' + p + '"><div><b>' + n + '</b><span>sur ' + seats + '</span></div></div><p>' + (ph === 'pending' ? 'L’heure est passée : la clôture automatique se déclenche dès qu’une personne a la page ouverte.' : 'Clôture automatique à <b>' + hm(s.time) + '</b> si vous ne l’avez pas faite avant. Les tables sont alors publiées tout de suite.') + '</p></div>' +
         '<div class="field" style="margin-top:22px"><label for="balance">Équilibre de l’affectation</label><input class="range" id="balance" type="range" min="0" max="100" step="5" value="' + M.settings.balance + '"><div class="range-l"><span>Une table par envie</span><span>Moins de tables</span></div></div>' +
-        '<div class="pv-wrap" id="pv">' + closePreview(s) + '</div><button class="btn btn-red btn-lg btn-block" style="margin-top:22px" data-act="closeSession" data-sid="' + s.id + '"' + (n ? '' : ' disabled') + '>' + ic('lock', 19) + ' Clôturer et affecter maintenant</button></div>' +
+        '<div class="pv-wrap" id="pv">' + closePreview(s) + '</div>' + closeBtns(s, n) + '</div>' +
         singlePanel(s) + addGamePanel(s) +
         (!ST.admin ? '' : '<div class="panel glass"><div class="small-h">Outils de test</div><div class="tools"><button class="btn btn-glass btn-sm" data-act="fake" data-sid="' + s.id + '" data-n="6"' + (n >= seats ? ' disabled' : '') + '>' + ic('plus', 15) + ' 6 inscrits fictifs</button><button class="btn btn-glass btn-sm" data-act="fake" data-sid="' + s.id + '" data-n="14"' + (n >= seats ? ' disabled' : '') + '>' + ic('plus', 15) + ' 14</button>' + (fakes ? '<button class="link" data-act="clearFakes" data-sid="' + s.id + '">Retirer les fictifs</button>' : '') + '</div></div>') + '</aside></div>';
     }
@@ -2757,7 +2789,9 @@ var Badges = (function () {
       if (!l || !l.acquired) return;
       return ref.get().then(function (cur) {
         var d = cur.exists ? cur.data() : null;
-        if (d && d.tables) return;
+        if (d && (d.tables || d.cancelled)) return;
+        var nReg = allRegs(s).length;
+        if (nReg < 2) return ref.set({ cancelled: true, by: 'auto', n: nReg, ts: Date.now() });   /* 0 ou 1 inscrit : session annulée, inscrits prévenus (trigger SQL) */
         var res = computeResult(s); res.ts = Date.now();
         return ref.set(res);
       });
@@ -3073,8 +3107,22 @@ var Badges = (function () {
       var c = clone(d); if (c.s) delete c.s[el.dataset.sid];
       wr(ST.db.doc('regs/' + uid).set(c));
     },
+    cancelSession: function (el) {
+      var s = sessionById(el.dataset.sid); if (!s || !canManage(s)) return;
+      var ph = phase(s); if (ph !== 'open' && ph !== 'pending') return;
+      var k = 'cancel:' + s.id, n = allRegs(s).length;
+      if (ui.confirm !== k) { ui.confirm = k; return render(); }
+      ui.confirm = null;
+      wr(ST.db.doc('sessions/' + s.id).update({ status: 'cancelled', cancel: { by: 'manual', low: n < 2, ts: Date.now() } }),
+        'Session annulée.' + (n ? ' Les inscrits sont prévenus.' : ''));
+    },
+    restoreSession: function (el) {
+      var s = sessionById(el.dataset.sid); if (!s || !canManage(s) || s.status !== 'cancelled' || Date.now() >= startMs(s)) return;
+      wr(ST.db.doc('sessions/' + s.id).update({ status: 'open', cancel: null }), 'Session rétablie : les inscriptions sont rouvertes.');
+    },
     closeSession: function (el) {
       var s = sessionById(el.dataset.sid); if (!regList(s).length) return;
+      if (allRegs(s).length < 2) return ACT.cancelSession(el);
       var res = computeResult(s); ui.anim = true;
       wr(ST.db.doc('drafts/' + s.id).set(res).then(function () { return ST.db.doc('sessions/' + s.id).update({ status: 'closed' }); }),
         res.unplaced.length ? 'Tables composées. Certains joueurs restent sans table.' : 'Tables composées. Vérifiez puis publiez.').then(function () { window.scrollTo(0, 0); });
