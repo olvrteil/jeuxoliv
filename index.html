@@ -887,6 +887,72 @@ html{overflow-x:hidden;max-width:100%}
 .sn-msg.sn-new{background:var(--tomato);color:var(--on-tomato);border-radius:999px;padding:4px 11px 4px 9px;font-weight:800;gap:6px;animation:snping 2s infinite}
 .sn-msg.sn-new svg{stroke:currentColor}
 @keyframes snping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--tomato) 55%,transparent)}70%,100%{box-shadow:0 0 0 9px transparent}}
+
+/* Statistiques */
+@media (max-width:640px){.nav.n5 button{font-size:10px;padding:8px 0;gap:3px;letter-spacing:-.01em}}
+.sx-h{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;padding:26px 0 18px}
+.sx-h h1{font-size:clamp(2rem,4.4vw,3.2rem)}
+.sx-views{margin-bottom:16px}.sx-views button{display:inline-flex;align-items:center;gap:8px}
+.sx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.sx-kpi{padding:18px 18px 16px;position:relative;overflow:hidden}
+.sx-kpi .k-l{font:800 11px/1 var(--font-b);letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.sx-kpi .k-v{font:800 clamp(2rem,4vw,2.8rem)/1 var(--font-d);letter-spacing:-.03em;margin:10px 0 8px}
+.sx-kpi .k-v small{font-size:.5em;color:var(--muted);font-weight:700;letter-spacing:0}
+.sx-trend{display:inline-flex;align-items:center;gap:5px;font:800 12px/1 var(--font-b);padding:4px 9px;border-radius:999px;background:var(--hair);color:var(--muted)}
+.sx-trend.up{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.sx-trend.dn{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.sx-ico{position:absolute;right:12px;top:10px;width:46px;height:46px}
+.sx-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;margin-top:14px}
+.sx-grid .panel{margin:0}
+.sx-t{font:800 18px/1.15 var(--font-d);letter-spacing:-.01em;margin:-2px 0 4px}
+.sx-s{color:var(--muted);font-size:13.5px;margin-bottom:14px}
+.sx-bars text{font:700 14px var(--font-b);fill:var(--muted)}
+.sx-hb{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;margin-top:11px}
+.sx-hb .nm{font-weight:800;font-size:14.5px;line-height:1.1}
+.sx-hb .nm i{display:block;font-style:normal;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px}
+.sx-hb .tr{height:12px;border-radius:99px;background:var(--hair);margin-top:7px;position:relative;overflow:hidden}
+.sx-hb .tr b{position:absolute;inset:0 auto 0 0;border-radius:99px;background:var(--c)}
+.sx-hb .n{font:800 15px var(--font-d)}
+.sx-gm{width:36px;height:36px;border-radius:10px;overflow:hidden;border:2px solid var(--stroke);display:block}
+.sx-gm svg,.sx-gm img{width:100%;height:100%;object-fit:cover;display:block}
+.sx-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:14px;font:700 12.5px var(--font-b);color:var(--muted)}
+.sx-legend i{display:inline-block;width:11px;height:11px;border-radius:4px;margin-right:6px;vertical-align:-1px}
+.sx-donut-w{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.sx-donut{position:relative;width:150px;height:150px;flex:none}
+.sx-donut .mid{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.sx-donut .mid b{font:800 34px/1 var(--font-d);letter-spacing:-.03em}
+.sx-donut .mid span{font:700 11px var(--font-b);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.sx-leg{flex:1;min-width:150px}
+.sx-leg div{display:flex;justify-content:space-between;gap:18px;font-weight:700;margin:7px 0}
+.sx-leg i{display:inline-block;width:11px;height:11px;border-radius:4px;margin-right:8px}
+.sx-leg b{font-family:var(--font-d)}
+.sx-rnklist{display:grid;gap:10px;margin-top:6px}
+.sx-rnk{display:grid;grid-template-columns:26px 36px 1fr auto;gap:12px;align-items:center;padding:8px 10px;border-radius:16px;background:var(--hair)}
+.sx-rnk[role=button]{cursor:pointer}
+.sx-rnk .pos{font:800 15px var(--font-d);color:var(--muted);text-align:center}
+.sx-rnk:nth-child(1) .pos{color:var(--warn)}
+.sx-rnk .nm{font-weight:800;min-width:0}
+.sx-rnk .nm i{display:block;font-style:normal;font-weight:600;font-size:12px;color:var(--muted)}
+.sx-rnk .sc{font:800 14px var(--font-d);padding:4px 10px;border-radius:99px;background:var(--glass-2)}
+.sx-cxl{display:flex;gap:14px;align-items:center;margin-top:14px;padding:12px 14px;border-radius:16px;background:color-mix(in srgb,var(--tomato) 12%,transparent)}
+.sx-cxl b{font:800 22px var(--font-d);color:var(--tomato)}
+.sx-cxl span{font-size:13.5px;color:var(--muted);line-height:1.3}
+.sx-cxl strong{color:var(--ink)}
+.sx-foot{color:var(--muted);font-size:12.5px;text-align:center;margin:22px 0 4px}
+.sx-sort{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px;font:700 12.5px var(--font-b);color:var(--muted)}
+.sx-plist{display:grid;gap:8px}
+.sx-prow{display:grid;grid-template-columns:32px 1fr auto 18px;gap:12px;align-items:center;padding:10px 12px;border-radius:16px;background:var(--hair);cursor:pointer;transition:background .15s,transform .15s}
+.sx-prow:hover{background:var(--glass-2)}.sx-prow:active{transform:scale(.99)}
+.sx-prow .sx-who{min-width:0}.sx-prow .sx-who b{display:block;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sx-prow .tr{height:6px;border-radius:99px;background:var(--hair);margin-top:6px;overflow:hidden}
+.sx-prow .tr i{display:block;height:100%;border-radius:99px;background:var(--teal)}
+.sx-prow .nums{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.sx-prow .nums span{font:700 12px var(--font-b);padding:5px 9px;border-radius:99px;background:var(--glass-2);color:var(--muted);white-space:nowrap}
+.sx-prow .nums b{font:800 14px var(--font-d);color:var(--ink)}
+.sx-prow .nums .ko{background:color-mix(in srgb,var(--tomato) 16%,transparent)}.sx-prow .nums .ko b{color:var(--bad)}
+.sx-prow .chev{color:var(--muted);display:grid;place-items:center}
+@media (max-width:860px){.sx-kpis{grid-template-columns:1fr 1fr}.sx-grid{grid-template-columns:1fr}}
+@media (max-width:640px){.sx-kpi{padding:14px}.sx-ico{width:34px;height:34px}.sx-h{padding-top:18px}.sx-donut-w{justify-content:center}.sx-prow{grid-template-columns:32px 1fr 18px}.sx-prow .nums{grid-column:2/3;justify-content:flex-start}.sx-prow .chev{grid-row:1;grid-column:3}}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -907,7 +973,7 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.10 - octobre 2026 - Olvrteil</span><button type="button" id="pushLink" hidden></button></footer>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.11 - octobre 2026 - Olvrteil</span><button type="button" id="pushLink" hidden></button></footer>
 </div>
 <div id="modal-root"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1687,6 +1753,7 @@ var Badges = (function () {
     undo: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
     send: '<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',
     swap: '<path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
     gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'
   };
   var ic = function (n, s) { return '<svg class="ic" width="' + (s || 18) + '" height="' + (s || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[n] + '</svg>'; };
@@ -1700,6 +1767,7 @@ var Badges = (function () {
   var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'] }, route: 'home', grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
     form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false }, gs: gsNew(),
     auth: { mode: 'in', email: '', name: '', code: '', msg: '', ok: false, busy: false }, addMode: 'manual', gf: null };
+  ui.stats = { days: 90, view: 'main', pid: null, sort: 'part' };
 
   var G = function (id) { return M.games.filter(function (g) { return g.id === id; })[0]; };
   var sessionById = function (id) { return M.sessions.filter(function (s) { return s.id === id; })[0]; };
@@ -2680,19 +2748,20 @@ var Badges = (function () {
       '<div class="bd-txt"><b>' + esc(b.name) + '</b><span>' + esc(b.desc) + '</span>' +
       (!b.got && b.goal > 1 ? '<div class="bd-bar" role="progressbar" aria-valuemin="0" aria-valuemax="' + b.goal + '" aria-valuenow="' + b.prog + '"><i style="width:' + pct + '%"></i></div><small>' + b.prog + ' / ' + b.goal + '</small>' : '') + '</div></div>';
   }
-  function viewProfile() {
+  function viewProfile(pu) {
     if (ST.auth !== 'in' || !ST.uid) return viewHome();
-    var res = myBadges(), nm = norm(NAME) || ST.profileName || 'Vous', got = res.list.filter(function (b) { return b.got && !b.neg; }).length, tot = res.list.filter(function (b) { return !b.neg; }).length;
+    var other = !!pu && pu !== ST.uid, uid = other ? pu : ST.uid;
+    var res = Badges.compute(badgeEvents(uid)), nm = other ? nameOf(uid) : (norm(NAME) || ST.profileName || 'Vous'), got = res.list.filter(function (b) { return b.got && !b.neg; }).length, tot = res.list.filter(function (b) { return !b.neg; }).length;
     var nxt = res.list.filter(function (b) { return b.cat === 'part' && !b.got; })[0];
-    var head = '<section class="prof-hero glass-2"><div class="prof-av">' + avatar(nm) + '</div><div class="prof-id"><p class="eyebrow">Mon profil</p><h1>' + esc(nm) + '</h1>' +
+    var head = '<section class="prof-hero glass-2"><div class="prof-av">' + avatar(nm) + '</div><div class="prof-id"><p class="eyebrow">' + (other ? 'Profil joueur' : 'Mon profil') + '</p><h1>' + esc(nm) + '</h1>' +
       (nxt ? '<p class="prof-next">Prochain palier : <b>' + esc(nxt.name) + '</b> · ' + nxt.prog + ' / ' + nxt.goal + '</p><div class="bd-bar big"><i style="width:' + Math.round(nxt.prog / nxt.goal * 100) + '%"></i></div>' : '<p class="prof-next">Tous les paliers de participation sont atteints. Respect.</p>') + '</div></section>' +
       '<div class="prof-stats"><div class="pstat"><b>' + res.played + '</b><span>session' + (res.played > 1 ? 's' : '') + ' jouée' + (res.played > 1 ? 's' : '') + '</span></div><div class="pstat miss"><b>' + res.missed + '</b><span>session' + (res.missed > 1 ? 's' : '') + ' manquée' + (res.missed > 1 ? 's' : '') + '</span></div><div class="pstat"><b>' + got + '<small>/' + tot + '</small></b><span>badges obtenus</span></div></div>';
-    var ml = Badges.malus(badgeEvents(ST.uid), D.iso(new Date())), mend = Badges.malusEnd(ml), mnote = '';
+    var ml = Badges.malus(badgeEvents(uid), D.iso(new Date())), mend = Badges.malusEnd(ml), mnote = '';
     if (ml.active) mnote = '<div class="malus-note ' + (ml.points ? 'hot' : '') + '"><span>' + (ml.points ? '⚖️' : '⚠️') + '</span><div>' + (ml.points
-      ? '<b>Malus d’absence actif.</b> En cas de conflit pour un jeu, vous passez après les personnes sans malus. Vous gardez votre place à la session. Il diminue à chaque session jouée et s’efface au plus tard le ' + longDate(mend) + '.'
-      : '<b>Avertissement.</b> Une absence récente : pas de conséquence pour l’instant. Une deuxième dans les 28 jours déclenche un malus d’affectation (vous passez après les autres en cas de conflit sur un jeu). Il s’efface le ' + longDate(mend) + ', ou dès que vous jouez une session.') + '</div></div>';
-    var eq = Badges.equity(badgeEvents(ST.uid), D.iso(new Date()));
-    if (eq.boost >= 0.1) mnote += '<div class="malus-note eqty"><span>🤝</span><div><b>Coup de pouce d’équité.</b> Vos dernières sessions ne vous ont pas toujours donné vos premiers choix : en cas de conflit pour un jeu, vous passez avant les personnes qui ont été bien servies. Il disparaît dès que vos premiers choix reviennent.</div></div>';
+      ? '<b>Malus d’absence actif.</b> En cas de conflit pour un jeu, ' + (other ? 'cette personne passe' : 'vous passez') + ' après les personnes sans malus. ' + (other ? 'Elle garde' : 'Vous gardez') + ' ' + (other ? 'sa' : 'votre') + ' place à la session. Il diminue à chaque session jouée et s’efface au plus tard le ' + longDate(mend) + '.'
+      : '<b>Avertissement.</b> Une absence récente : pas de conséquence pour l’instant. Une deuxième dans les 28 jours déclenche un malus d’affectation (' + (other ? 'la personne passe' : 'vous passez') + ' après les autres en cas de conflit sur un jeu). Il s’efface le ' + longDate(mend) + ', ou dès que ' + (other ? 'la personne joue' : 'vous jouez') + ' une session.') + '</div></div>';
+    var eq = Badges.equity(badgeEvents(uid), D.iso(new Date()));
+    if (eq.boost >= 0.1) mnote += '<div class="malus-note eqty"><span>🤝</span><div><b>Coup de pouce d’équité.</b> ' + (other ? 'Les dernières sessions ne lui ont pas toujours donné ses premiers choix : en cas de conflit pour un jeu, elle passe avant les personnes qui ont été bien servies. Il disparaît dès que ses premiers choix reviennent.' : 'Vos dernières sessions ne vous ont pas toujours donné vos premiers choix : en cas de conflit pour un jeu, vous passez avant les personnes qui ont été bien servies. Il disparaît dès que vos premiers choix reviennent.') + '</div></div>';
     head += mnote;
     return head + Badges.CATS.map(function (c) {
       var l = res.list.filter(function (b) { return b.cat === c[0]; });
@@ -2727,6 +2796,138 @@ var Badges = (function () {
     })(t0);
   }
 
+  /* ---------- Statistiques (admin : tout ; organisateur : ses sessions) ---------- */
+  function wkKey(iso) { var d = toDate(iso), k = (d.getDay() + 6) % 7; d.setDate(d.getDate() - k); return D.iso(d); }
+  function statsAgg(scope, lo, hi) {
+    var o = { ses: 0, cx: { auto: 0, man: 0 }, regs: 0, seats: 0, rank: [0, 0, 0], uns: 0, weeks: {}, games: {}, pl: {} };
+    function P(u) { return o.pl[u] || (o.pl[u] = { n: 0, abs: 0 }); }
+    function W(k) { return o.weeks[k] || (o.weeks[k] = { n: 0, cx: 0, ses: 0 }); }
+    function GM(g) { return o.games[g] || (o.games[g] = { ask: 0, got: 0 }); }
+    scope.forEach(function (s) {
+      var st = startMs(s); if (st < lo || st >= hi) return;
+      var ph = phase(s), w = W(wkKey(s.date));
+      if (ph === 'cancelled') { o.cx[cancelInfo(s).by === 'auto' ? 'auto' : 'man']++; w.cx++; return; }
+      if (ph !== 'published' && ph !== 'auto') return;
+      var r = resultOf(s); if (!r) return;
+      o.ses++; w.ses++; o.seats += seatsOf(s);
+      r.tables.forEach(function (tb) {
+        tb.ids.forEach(function (u) {
+          if (isLeft(s, u)) return;
+          o.regs++; w.n++;
+          var e = entryOf(u, s.id), first = e && e.order && e.order[0];
+          if (first) { GM(first).ask++; if (tb.gid === first) GM(first).got++; var rk = rankOf(e, tb.gid); o.rank[rk <= 1 ? 0 : rk === 2 ? 1 : 2]++; }
+          if (s.absent && s.absent[u]) P(u).abs++; else P(u).n++;
+        });
+      });
+      (r.unplaced || []).forEach(function (u) {
+        if (isLeft(s, u)) return;
+        o.uns++; var e = entryOf(u, s.id); if (e && e.order && e.order[0]) GM(e.order[0]).ask++;
+      });
+    });
+    return o;
+  }
+  function statsData() {
+    var days = ui.stats.days, now = Date.now(), lo = days ? now - days * 864e5 : 0, scope = sorted().filter(canManage);
+    var cur = statsAgg(scope, lo, now), prev = days ? statsAgg(scope, lo - days * 864e5, lo) : null, before = days ? statsAgg(scope, 0, lo) : null;
+    return { cur: cur, prev: prev, before: before };
+  }
+  function pctOf(a, b) { return b ? Math.round(a / b * 100) : 0; }
+  function trendChip(delta, unit) {
+    if (delta === null) return '';
+    if (!delta) return '<span class="sx-trend">= stable</span>';
+    return '<span class="sx-trend ' + (delta > 0 ? 'up' : 'dn') + '">' + (delta > 0 ? '▲ ' : '▼ ') + Math.abs(delta) + unit + '</span>';
+  }
+  function sxIco(body) { return '<svg class="sx-ico" viewBox="0 0 64 64" aria-hidden="true">' + body + '</svg>'; }
+  function sxWeekChart(o) {
+    var keys = Object.keys(o.weeks).sort(), out = [], i;
+    if (!keys.length) return '';
+    var d = toDate(keys[0]), end = toDate(keys[keys.length - 1]);
+    while (d <= end) { out.push(D.iso(d)); d.setDate(d.getDate() + 7); }
+    out = out.slice(-12);
+    var vals = out.map(function (k) { return o.weeks[k] || { n: 0, cx: 0 }; }), mx = Math.max.apply(null, vals.map(function (v) { return v.n; }).concat([1]));
+    var top = Math.max(8, Math.ceil(mx / 4) * 4), W = 560, H = 230, pl = 30, pr = 8, pt = 18, pb = 30, bw = (W - pl - pr) / out.length, s = '', g, pm = -1;
+    for (g = 0; g <= 4; g++) { var yy = pt + (H - pt - pb) * (1 - g / 4); s += '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + yy.toFixed(1) + '" y2="' + yy.toFixed(1) + '" stroke="var(--hair)"/><text x="' + (pl - 8) + '" y="' + (yy + 5).toFixed(1) + '" text-anchor="end">' + Math.round(top * g / 4) + '</text>'; }
+    out.forEach(function (k, j) {
+      var v = vals[j], x = pl + j * bw + bw * .17, w = bw * .66, hh = (H - pt - pb) * v.n / top, y = H - pb - hh, dt = toDate(k), lab = String(dt.getDate());
+      if (dt.getMonth() !== pm) lab += ' ' + fr(k, { month: 'short' }).replace('.', ''); pm = dt.getMonth();
+      if (!v.n && v.cx) s += '<rect x="' + x.toFixed(1) + '" y="' + (H - pb - 34) + '" width="' + w.toFixed(1) + '" height="34" rx="9" fill="url(#sxh)" stroke="var(--tomato)" stroke-width="2" stroke-dasharray="4 3"/><text x="' + (x + w / 2).toFixed(1) + '" y="' + (H - pb - 42) + '" text-anchor="middle" style="fill:var(--tomato)">annulée</text>';
+      else if (v.n) s += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="9" fill="' + (j === out.length - 1 ? 'var(--teal)' : 'var(--sun)') + '" stroke="var(--stroke)" stroke-width="2.2"/><text x="' + (x + w / 2).toFixed(1) + '" y="' + (y - 6).toFixed(1) + '" text-anchor="middle" style="fill:var(--ink);font-size:16px;font-weight:800">' + v.n + '</text>';
+      s += '<text x="' + (pl + j * bw + bw / 2).toFixed(1) + '" y="' + (H - 9) + '" text-anchor="middle">' + esc(lab) + '</text>';
+    });
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" class="sx-bars" role="img" aria-label="Inscrits par semaine"><defs><pattern id="sxh" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="var(--tomato)" stroke-width="2" opacity=".5"/></pattern></defs>' + s + '</svg>';
+  }
+  function sxDonut(o) {
+    var segs = [['1er vœu', o.rank[0], 'var(--teal)'], ['2e vœu', o.rank[1], 'var(--sun)'], ['3e vœu et plus', o.rank[2], 'var(--cobalt)'], ['Non placé·e', o.uns, 'var(--tomato)']], tot = segs.reduce(function (a, x) { return a + x[1]; }, 0);
+    if (!tot) return '<p class="hint">Pas encore de données.</p>';
+    var r = 58, C = 2 * Math.PI * r, off = 0, arcs = '';
+    segs.forEach(function (x) { if (!x[1]) return; var L = C * x[1] / tot; arcs += '<circle cx="75" cy="75" r="' + r + '" fill="none" stroke="' + x[2] + '" stroke-width="22" stroke-dasharray="' + Math.max(0.1, L - (segs.filter(function (z) { return z[1]; }).length > 1 ? 2 : 0)).toFixed(1) + ' ' + C.toFixed(1) + '" stroke-dashoffset="' + (-off).toFixed(1) + '" transform="rotate(-90 75 75)"/>'; off += L; });
+    return '<div class="sx-donut-w"><div class="sx-donut"><svg viewBox="0 0 150 150" width="150" height="150" role="img" aria-label="Rang du vœu obtenu"><circle cx="75" cy="75" r="' + r + '" fill="none" stroke="var(--hair)" stroke-width="22"/>' + arcs + '</svg><div class="mid"><b>' + pctOf(o.rank[0] + o.rank[1], tot) + '%</b><span>1er ou 2e</span></div></div>' +
+      '<div class="sx-leg">' + segs.map(function (x) { return '<div><span><i style="background:' + x[2] + '"></i>' + x[0] + '</span><b>' + pctOf(x[1], tot) + '%</b></div>'; }).join('') + '</div></div>';
+  }
+  function sxGames(o) {
+    var rows = Object.keys(o.games).filter(function (id) { return G(id); }).sort(function (a, b) { return o.games[b].ask - o.games[a].ask; }).slice(0, 6), mx = rows.length ? o.games[rows[0]].ask : 1;
+    if (!rows.length) return '<p class="hint">Pas encore de données.</p>';
+    return rows.map(function (id) {
+      var g = G(id), d = o.games[id];
+      return '<div class="sx-hb"><span class="sx-gm">' + art(g) + '</span><div><div class="nm">' + esc(g.name) + '<i>' + plural(d.ask, 'demande', 'demandes') + ' en 1er vœu · ' + plural(d.got, 'obtenu', 'obtenus') + '</i></div><div class="tr" style="--c:var(--p' + hue(g.name) + ')"><b style="width:' + Math.round(d.ask / mx * 100) + '%;opacity:.3"></b><b style="width:' + Math.round(d.got / mx * 100) + '%"></b></div></div><span class="n">' + pctOf(d.got, d.ask) + '%</span></div>';
+    }).join('') + '<div class="sx-legend"><span><i style="background:var(--ink);opacity:.3"></i>demandé en 1er vœu</span><span><i style="background:var(--ink)"></i>obtenu</span></div>';
+  }
+  function sxRank(o) {
+    var rows = Object.keys(o.pl).filter(function (u) { return o.pl[u].n && M.regs[u] && !M.regs[u].fake; }).sort(function (a, b) { return o.pl[b].n - o.pl[a].n || nameOf(a).localeCompare(nameOf(b), 'fr'); }).slice(0, 5);
+    if (!rows.length) return '<p class="hint">Pas encore de données.</p>';
+    return '<div class="sx-rnklist">' + rows.map(function (u, i) { var n = o.pl[u].n; return '<div class="sx-rnk" data-act="' + (ST.admin ? 'statsPlayer' : 'noop') + '" data-uid="' + esc(u) + '"' + (ST.admin ? ' role="button" tabindex="0"' : '') + '><span class="pos">' + (i + 1) + '</span>' + avatar(nameOf(u), 'sm') + '<span class="nm">' + esc(nameOf(u)) + '<i>' + n + ' session' + (n > 1 ? 's' : '') + ' sur ' + o.ses + '</i></span><span class="sc">' + pctOf(n, o.ses) + '%</span></div>'; }).join('') + '</div>';
+  }
+  function statsTabs() {
+    var h = '<div class="sx-h"><div><p class="eyebrow">' + (ST.admin ? 'Toutes les sessions' : 'Vos sessions') + '</p><h1>Statistiques</h1></div>';
+    if (ui.stats.view === 'main') h += '<div class="seg" role="group" aria-label="Période">' + [[30, '30 jours'], [90, '90 jours'], [0, 'Tout']].map(function (p) { return '<button aria-pressed="' + (ui.stats.days === p[0]) + '" data-act="statsPeriod" data-days="' + p[0] + '">' + p[1] + '</button>'; }).join('') + '</div>';
+    h += '</div>';
+    if (ST.admin) h += '<div class="seg sx-views" role="group" aria-label="Vue"><button aria-pressed="' + (ui.stats.view === 'main') + '" data-act="statsView" data-v="main">' + ic('chart', 16) + ' Vue d’ensemble</button><button aria-pressed="' + (ui.stats.view === 'players') + '" data-act="statsView" data-v="players">' + ic('users', 16) + ' Joueurs</button></div>';
+    return h;
+  }
+  function statsMain() {
+    var d = statsData(), c = d.cur, p = d.prev, b = d.before, members = Object.keys(M.regs).filter(function (u) { return M.regs[u].name && !M.regs[u].fake; }).length;
+    if (!c.ses && !c.cx.auto && !c.cx.man) return '<div class="empty glass"><h2>Pas encore de statistiques</h2><p>Elles apparaîtront dès qu’une session terminée aura ses tables.</p></div>';
+    var act = Object.keys(c.pl).filter(function (u) { return c.pl[u].n; }), fill = pctOf(c.regs, c.seats), first = pctOf(c.rank[0], c.rank[0] + c.rank[1] + c.rank[2] + c.uns);
+    var pFill = p && p.seats ? pctOf(p.regs, p.seats) : null, pFirst = p ? pctOf(p.rank[0], p.rank[0] + p.rank[1] + p.rank[2] + p.uns) : null;
+    var news = b ? act.filter(function (u) { return !b.pl[u]; }).length : null, cx = c.cx.auto + c.cx.man;
+    var die = '<rect x="6" y="6" width="52" height="52" rx="13" fill="var(--glass-2)" stroke="var(--stroke)" stroke-width="3"/><g fill="var(--tomato)"><circle cx="21" cy="21" r="4.6"/><circle cx="43" cy="21" r="4.6"/><circle cx="32" cy="32" r="4.6"/><circle cx="21" cy="43" r="4.6"/><circle cx="43" cy="43" r="4.6"/></g>';
+    var hex = '<polygon points="32,4 56.2,18 56.2,46 32,60 7.8,46 7.8,18" fill="var(--sun)" stroke="var(--stroke)" stroke-width="3" stroke-linejoin="round"/>';
+    var star = '<circle cx="32" cy="32" r="26" fill="var(--teal)" stroke="var(--stroke)" stroke-width="3"/><path d="M32 16l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#fff"/>';
+    var mee = '<circle cx="32" cy="32" r="26" fill="var(--glass-2)" stroke="var(--stroke)" stroke-width="3"/><g transform="translate(14 14) scale(.36)" style="color:var(--cobalt)"><use href="#meeple"/></g>';
+    var kp = '<section class="sx-kpis">' +
+      '<div class="sx-kpi glass"><div class="k-l">Inscriptions</div><div class="k-v">' + c.regs + '</div>' + (p && p.regs ? trendChip(Math.round((c.regs - p.regs) / p.regs * 100), ' %') : '') + sxIco(die) + '</div>' +
+      '<div class="sx-kpi glass"><div class="k-l">Remplissage</div><div class="k-v">' + fill + '<small> %</small></div>' + (pFill !== null ? trendChip(fill - pFill, ' pts') : '') + sxIco(hex) + '</div>' +
+      '<div class="sx-kpi glass"><div class="k-l">1er vœu obtenu</div><div class="k-v">' + first + '<small> %</small></div>' + (pFirst !== null && p && (p.rank[0] + p.rank[1] + p.rank[2] + p.uns) ? trendChip(first - pFirst, ' pts') : '') + sxIco(star) + '</div>' +
+      '<div class="sx-kpi glass"><div class="k-l">Joueurs actifs</div><div class="k-v">' + act.length + '<small> / ' + members + '</small></div>' + (news ? '<span class="sx-trend up">▲ ' + news + ' nouveau' + (news > 1 ? 'x' : '') + '</span>' : '') + sxIco(mee) + '</div></section>';
+    var cxl = cx ? '<div class="sx-cxl"><b>' + cx + '</b><span><strong>session' + (cx > 1 ? 's annulées' : ' annulée') + '</strong> sur la période' + (c.cx.auto ? ' (' + c.cx.auto + ' automatiquement, moins de 2 inscrits' + (c.cx.man ? ', ' + c.cx.man + ' manuellement' : '') + ')' : ' (manuellement)') + '</span></div>' : '';
+    return kp + '<section class="sx-grid">' +
+      '<div class="panel glass"><div class="sx-t">Participation par semaine</div><div class="sx-s">Inscrits par semaine, sessions terminées</div>' + sxWeekChart(c) + cxl + '</div>' +
+      '<div class="panel glass"><div class="sx-t">Satisfaction</div><div class="sx-s">Rang du vœu obtenu après affectation</div>' + sxDonut(c) + '</div>' +
+      '<div class="panel glass"><div class="sx-t">Jeux les plus demandés</div><div class="sx-s">Demandes en 1er vœu, et part obtenue</div>' + sxGames(c) + '</div>' +
+      '<div class="panel glass"><div class="sx-t">Les plus assidus</div><div class="sx-s">Part des sessions jouées sur la période</div>' + sxRank(c) + '</div></section>' +
+      '<p class="sx-foot">Calculé à partir des inscriptions existantes. Aucun suivi individuel ni traceur externe.</p>';
+  }
+  function statsPlayers() {
+    var uids = Object.keys(M.regs).filter(function (u) { return M.regs[u].name && !M.regs[u].fake; }), rows = uids.map(function (u) {
+      var rs = Badges.compute(badgeEvents(u)); return { u: u, name: M.regs[u].name, played: rs.played, missed: rs.missed, badges: rs.earned.length };
+    }), so = ui.stats.sort;
+    rows.sort(function (a, b) { return so === 'abs' ? b.missed - a.missed || b.played - a.played : so === 'name' ? a.name.localeCompare(b.name, 'fr') : b.played - a.played || a.name.localeCompare(b.name, 'fr'); });
+    var tp = rows.reduce(function (a, r) { return a + r.played; }, 0), mxp = Math.max.apply(null, rows.map(function (r) { return r.played; }).concat([1]));
+    if (!rows.length) return '<div class="empty glass"><h2>Aucun joueur pour l’instant</h2></div>';
+    return '<div class="panel glass"><div class="sx-t">' + plural(rows.length, 'joueur', 'joueurs') + '</div><div class="sx-s">' + plural(tp, 'participation', 'participations') + ' au total depuis le début (ou la dernière remise à zéro des badges). Touchez une personne pour voir son profil.</div>' +
+      '<div class="sx-sort"><span>Trier par</span><div class="seg" role="group">' + [['part', 'Participations'], ['abs', 'Absences'], ['name', 'Nom']].map(function (t) { return '<button aria-pressed="' + (so === t[0]) + '" data-act="statsSort" data-s="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div></div>' +
+      '<div class="sx-plist">' + rows.map(function (r) {
+        return '<div class="sx-prow" role="button" tabindex="0" data-act="statsPlayer" data-uid="' + esc(r.u) + '">' + avatar(r.name, 'sm') + '<div class="sx-who"><b>' + esc(r.name) + '</b><div class="tr"><i style="width:' + Math.round(r.played / mxp * 100) + '%"></i></div></div>' +
+          '<div class="nums"><span class="ok" title="Participations"><b>' + r.played + '</b> joué' + (r.played > 1 ? 'es' : 'e') + '</span><span class="' + (r.missed ? 'ko' : 'zero') + '" title="Absences"><b>' + r.missed + '</b> absence' + (r.missed > 1 ? 's' : '') + '</span><span class="bg" title="Badges">🏅 <b>' + r.badges + '</b></span></div><span class="chev">' + ic('arrow', 16) + '</span></div>';
+      }).join('') + '</div></div>';
+  }
+  function viewStats() {
+    if (!canHost()) return viewHome();
+    if (ST.admin && ui.stats.pid && M.regs[ui.stats.pid]) return '<div style="padding-top:18px"><button class="btn btn-glass btn-sm" data-act="statsBack">' + ic('back', 16) + ' Tous les joueurs</button></div>' + viewProfile(ui.stats.pid);
+    if (!ST.admin) ui.stats.view = 'main';
+    return statsTabs() + (ui.stats.view === 'players' ? statsPlayers() : statsMain());
+  }
+
   /* ---------- Rendu ---------- */
   function navKey() { return ui.route === 'session' ? 'home' : ui.route; }
   function updateHeader() {
@@ -2740,7 +2941,7 @@ var Badges = (function () {
     var y = window.scrollY, h;
     if (ST.auth === 'out') h = viewLogin(); else if (ST.auth === 'join') h = viewJoin(); else if (ST.auth === 'recovery') h = viewRecovery(); else if (ST.auth === 'config' || ST.auth === 'lib' || ST.auth === 'net') h = viewConfig(); else if (ST.auth === 'boot' || !ST.ready) h = viewLoading();
     else if (ST.error) h = viewError();
-    else if (ui.route === 'session') h = viewSession(); else if (ui.route === 'games') h = viewGames(); else if (ui.route === 'admin') h = viewAdmin(); else if (ui.route === 'profile') h = viewProfile(); else h = viewHome();
+    else if (ui.route === 'session') h = viewSession(); else if (ui.route === 'games') h = viewGames(); else if (ui.route === 'admin') h = viewAdmin(); else if (ui.route === 'profile') h = viewProfile(); else if (ui.route === 'stats') h = canHost() ? viewStats() : viewHome(); else h = viewHome();
     var cf = document.activeElement && document.activeElement.id === 'chat-in', cl0 = $('#chat-list'), atEnd = !cl0 || cl0.scrollHeight - cl0.scrollTop - cl0.clientHeight < 60, selS = cf ? document.activeElement.selectionStart : 0;
     $('#view').innerHTML = h; filterPicker(); gsFilter();
     var cl = $('#chat-list'), ci = $('#chat-in');
@@ -2749,9 +2950,10 @@ var Badges = (function () {
     ui.chatKeep = false;
     var items = [['home', 'Sessions', 'cal'], ['games', 'Ludothèque', 'dice']];
     items.push(['profile', 'Profil', 'trophy']);
+    if (canHost()) items.push(['stats', 'Stats', 'chart']);
     if (canHost()) items.push(['admin', ST.admin ? 'Admin' : 'Organiser', 'gear']);
     if (ST.auth !== 'in') items = [];
-    $('#nav').style.gridTemplateColumns = 'repeat(' + (items.length || 1) + ',1fr)';
+    $('#nav').style.gridTemplateColumns = 'repeat(' + (items.length || 1) + ',minmax(0,1fr))'; $('#nav').classList.toggle('n5', items.length >= 5);
     $('#nav').innerHTML = items.map(function (t) { return '<button data-go="' + t[0] + '" aria-current="' + (t[0] === navKey() ? 'page' : 'false') + '">' + ic(t[2], 18) + (t[0] === 'admin' && wdPendingCount() ? '<i class="nav-dot">' + wdPendingCount() + '</i>' : '') + '<span>' + t[1] + '</span></button>'; }).join('');
     maybeReveal(); maybeBadges(); renderModal(); updateHeader(); updatePushLink(); touchRead(); ui.anim = false;
     if (!noKeep) window.scrollTo(0, y);
@@ -2767,7 +2969,7 @@ var Badges = (function () {
     });
   }
   document.addEventListener('focusout', function () { if (pendingRender) { pendingRender = false; setTimeout(function () { var a = document.activeElement; if (!(a && /^(INPUT|TEXTAREA)$/.test(a.tagName))) render(); }, 0); } });
-  function go(route) { if (ui.modal && ui.modal.type === 'badges') { var bm = ui.modal; ui.modal = null; saveBadgesSeen(bm.all); } if (route === 'home') ui.fanSeed = Math.random().toString(36).slice(2); ui.route = route; ui.sid = null; ui.msid = null; ui.confirm = null; ui.draft = null; render(true); window.scrollTo(0, 0); }
+  function go(route) { if (ui.modal && ui.modal.type === 'badges') { var bm = ui.modal; ui.modal = null; saveBadgesSeen(bm.all); } if (route === 'home') ui.fanSeed = Math.random().toString(36).slice(2); if (route === 'stats') ui.stats.pid = null; ui.route = route; ui.sid = null; ui.msid = null; ui.confirm = null; ui.draft = null; render(true); window.scrollTo(0, 0); }
   var tt;
   function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('on'); }, 3200); }
   function bump(id) {
@@ -2865,6 +3067,11 @@ var Badges = (function () {
   var fakeId = function (n) { return 'fake_' + key(n).replace(/[^a-z0-9]/g, ''); };
   var ACT = {
     noop: function () {},
+    statsPeriod: function (el) { ui.stats.days = +el.dataset.days; render(); },
+    statsView: function (el) { ui.stats.view = el.dataset.v; ui.stats.pid = null; render(); },
+    statsSort: function (el) { ui.stats.sort = el.dataset.s; render(); },
+    statsPlayer: function (el) { if (!ST.admin) return; ui.stats.pid = el.dataset.uid; ui.stats.view = 'players'; render(); window.scrollTo(0, 0); },
+    statsBack: function () { ui.stats.pid = null; render(); window.scrollTo(0, 0); },
     home: function () { go('home'); },
     toNew: function () { ui.route = 'admin'; ui.adminTab = 'new'; ui.msid = null; render(true); window.scrollTo(0, 0); },
     open: function (el) { enterSession(el.dataset.sid); },
