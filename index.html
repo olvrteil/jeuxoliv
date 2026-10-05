@@ -883,6 +883,10 @@ html{overflow-x:hidden;max-width:100%}
 .cancel-stamp span{display:block;transform:rotate(-9deg);padding:.12em .5em .16em;border:.16em solid var(--tomato);border-radius:.22em;color:var(--tomato);background:color-mix(in srgb,var(--bg) 78%,transparent);font-weight:900;font-size:clamp(2.4rem,9vw,3.3rem);letter-spacing:.07em;text-transform:uppercase;line-height:1;box-shadow:0 0 0 .07em var(--bg),0 10px 28px rgba(0,0,0,.22)}
 .cancel-ico{background:var(--tomato);color:var(--on-tomato);box-shadow:none}
 .cancelled-panel .ok-head h2{color:var(--tomato)}
+
+.sn-msg.sn-new{background:var(--tomato);color:var(--on-tomato);border-radius:999px;padding:4px 11px 4px 9px;font-weight:800;gap:6px;animation:snping 2s infinite}
+.sn-msg.sn-new svg{stroke:currentColor}
+@keyframes snping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--tomato) 55%,transparent)}70%,100%{box-shadow:0 0 0 9px transparent}}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -1290,6 +1294,16 @@ html{overflow-x:hidden;max-width:100%}
   };
   B.triesLeft = async function () {
     try { var r = await sb.rpc('join_tries_left'); return r.error || typeof r.data !== 'number' ? null : r.data; } catch (e) { return null; }
+  };
+  /* Messages lus (tchat) : une date de dernière lecture par session, enregistrée pour la personne et synchronisée entre ses appareils */
+  B.chatReads = async function () {
+    try {
+      var r = await sb.rpc('chat_reads_get'); if (r.error || !Array.isArray(r.data)) return null;
+      var m = {}; r.data.forEach(function (x) { m[x.sid] = Number(x.read_ts) || 0; }); return m;
+    } catch (e) { return null; }
+  };
+  B.markChatRead = async function (sid, ts) {
+    try { var r = await sb.rpc('chat_mark_read', { p_sid: sid, p_ts: ts }); return !r.error; } catch (e) { return false; }
   };
   B.resetPassword = async function (email) {
     try {
@@ -1965,7 +1979,7 @@ var Badges = (function () {
       '<div class="scard-top">' + ticket(s) + '<div class="scard-meta">' + statusPill(s) + (s.single ? '<span class="pill pill-single">Un seul jeu</span>' : '') + (s.ownerName ? '<span class="pill pill-host">' + ic('users', 13) + ' Organisé par ' + esc(s.ownerName) + '</span>' : '') + (mine ? (waitPos(s, ST.uid) ? '<span class="pill pill-wait">' + ic('clock', 13) + ' En attente · n°' + waitPos(s, ST.uid) + '</span>' : '<span class="pill pill-me">' + ic('check', 13) + ' Inscrit·e</span>') : '') + '</div></div>' +
       '<div class="fan">' + games.map(function (g, j) { return '<div class="fan-i" style="--j:' + j + ';--n:' + games.length + '">' + box(g) + '</div>'; }).join('') + '</div>' +
       '<p class="scard-games">' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</p>' + (s.note && s.note.trim() ? '<p class="scard-note">' + esc(s.note.trim()) + '</p>' : '') +
-      '<div class="seats-row">' + seatStrip(n, seats) + '<span class="seat-num"><span class="sn-main"><b>' + n + '</b> / ' + seats + ' places</span>' + (msgsOf(s).length ? '<span class="sn-sep">-</span><span class="sn-msg" title="Messages" aria-label="' + msgsOf(s).length + ' message' + (msgsOf(s).length > 1 ? 's' : '') + '">' + ic('chat', 15) + msgsOf(s).length + '</span>' : '') + (waitList(s).length ? '<span class="sn-sep">·</span><span class="sn-main">' + waitList(s).length + ' en attente</span>' : '') + '</span></div>' +
+      '<div class="seats-row">' + seatStrip(n, seats) + '<span class="seat-num"><span class="sn-main"><b>' + n + '</b> / ' + seats + ' places</span>' + (unreadOf(s).length ? '<span class="sn-msg sn-new" title="Messages non lus" aria-label="' + unreadOf(s).length + ' nouveau' + (unreadOf(s).length > 1 ? 'x' : '') + ' message' + (unreadOf(s).length > 1 ? 's' : '') + ' non lu' + (unreadOf(s).length > 1 ? 's' : '') + '">' + ic('chat', 15) + unreadOf(s).length + ' nouveau' + (unreadOf(s).length > 1 ? 'x' : '') + '</span>' : msgsOf(s).length ? '<span class="sn-sep">-</span><span class="sn-msg" title="Messages" aria-label="' + msgsOf(s).length + ' message' + (msgsOf(s).length > 1 ? 's' : '') + '">' + ic('chat', 15) + msgsOf(s).length + '</span>' : '') + (waitList(s).length ? '<span class="sn-sep">·</span><span class="sn-main">' + waitList(s).length + ' en attente</span>' : '') + '</span></div>' +
       '<button class="' + cls + '" data-act="open" data-sid="' + s.id + '">' + label + ' ' + ic('arrow', 17) + '</button></article>';
   }
 
@@ -1993,6 +2007,39 @@ var Badges = (function () {
   }
   /* ---------- Messages de la session (tchat) ---------- */
   function msgsOf(s) { return Object.keys(M.msg).map(function (k) { var m = M.msg[k]; m.id = k; return m; }).filter(function (m) { return m.sid === s.id; }).sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); }); }
+  /* ---------- Messages non lus (synchronisés entre appareils via Supabase) ---------- */
+  var READKEY = function () { return 'jdo-reads-' + (ST.uid || ''); };
+  function loadLocalReads() { try { ST.reads = JSON.parse(localStorage.getItem(READKEY()) || '{}') || {}; } catch (e) { ST.reads = {}; } }
+  function saveLocalReads() { try { localStorage.setItem(READKEY(), JSON.stringify(ST.reads)); } catch (e) {} }
+  /* un message est non lu s'il vient de quelqu'un d'autre et qu'il est plus récent que ma dernière lecture ;
+     sans date de lecture, seuls comptent les messages postérieurs à mon inscription (rien si je ne suis pas inscrit·e) */
+  function unreadOf(s) {
+    if (!ST.uid || !s) return [];
+    var base = ST.reads && ST.reads[s.id];
+    if (base === undefined) { var en = entryOf(ST.uid, s.id); if (!en) return []; base = en.ts || 0; }
+    return msgsOf(s).filter(function (m) { return m.uid !== ST.uid && (m.ts || 0) > base; });
+  }
+  var readBusy = {};
+  function touchRead() {
+    if (ui.route !== 'session' || !ui.sid || !ST.uid || document.visibilityState === 'hidden') return;
+    var s = sessionById(ui.sid); if (!s) return;
+    var known = ST.reads && ST.reads[s.id] !== undefined;
+    if (known && !unreadOf(s).length) return;
+    if (readBusy[s.id] && Date.now() - readBusy[s.id] < 3000) { clearTimeout(readBusy.t); readBusy.t = setTimeout(touchRead, 3100); return; }
+    readBusy[s.id] = Date.now();
+    var last = msgsOf(s).reduce(function (a, m) { return Math.max(a, m.ts || 0); }, 0), ts = Math.max(Date.now(), last);
+    ST.reads = ST.reads || {}; ST.reads[s.id] = Math.max(ST.reads[s.id] || 0, ts); saveLocalReads();
+    Backend.markChatRead(s.id, ts);
+  }
+  function loadReads() {
+    if (!ST.uid) return;
+    Backend.chatReads().then(function (m) {
+      if (!m) return;
+      var ch = false; ST.reads = ST.reads || {};
+      Object.keys(m).forEach(function (k) { if ((ST.reads[k] || 0) < m[k]) { ST.reads[k] = m[k]; ch = true; } });
+      if (ch) { saveLocalReads(); softRender(); }
+    });
+  }
   function msgTime(ts) {
     var d = new Date(ts), t = ('0' + d.getHours()).slice(-2) + 'h' + ('0' + d.getMinutes()).slice(-2);
     return D.iso(d) === D.iso(new Date()) ? t : d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' · ' + t;
@@ -2706,7 +2753,7 @@ var Badges = (function () {
     if (ST.auth !== 'in') items = [];
     $('#nav').style.gridTemplateColumns = 'repeat(' + (items.length || 1) + ',1fr)';
     $('#nav').innerHTML = items.map(function (t) { return '<button data-go="' + t[0] + '" aria-current="' + (t[0] === navKey() ? 'page' : 'false') + '">' + ic(t[2], 18) + (t[0] === 'admin' && wdPendingCount() ? '<i class="nav-dot">' + wdPendingCount() + '</i>' : '') + '<span>' + t[1] + '</span></button>'; }).join('');
-    maybeReveal(); maybeBadges(); renderModal(); updateHeader(); updatePushLink(); ui.anim = false;
+    maybeReveal(); maybeBadges(); renderModal(); updateHeader(); updatePushLink(); touchRead(); ui.anim = false;
     if (!noKeep) window.scrollTo(0, y);
   }
   var raf = 0, pendingRender = false;
@@ -3393,6 +3440,9 @@ var Badges = (function () {
       render(); updatePushLink();
     });
     ST.auth = 'in'; ST.db = Backend.db(); ST.ready = false;
+    loadLocalReads(); loadReads();
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') loadReads(); });
+    setInterval(function () { if (document.visibilityState === 'visible') loadReads(); }, 30000);
     render(true);
     subscribe(ST.db); ST.db.watch();
     setTimeout(function () { if (!ST.ready) { ST.ready = true; render(true); } }, 9000);
