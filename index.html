@@ -972,9 +972,9 @@ html{overflow-x:hidden;max-width:100%}
 .gf-orig summary{cursor:pointer;font-weight:700;color:var(--muted)}
 .gf-orig p{white-space:pre-line;margin:10px 0;font-size:14px;color:var(--muted);max-height:260px;overflow:auto}
 .gf-fields textarea[readonly]{opacity:.65}
-.foot .bgg-pw{display:inline-flex;line-height:0;border-radius:8px;opacity:.92;transition:transform .15s,opacity .15s}
+.foot .bgg-pw{display:inline-flex;line-height:0;border-radius:10px;padding:4px 10px;background:#fff;border:1px solid rgba(21,19,46,.14);opacity:.95;transition:transform .15s,opacity .15s}
 .foot .bgg-pw:hover,.foot .bgg-pw:focus-visible{opacity:1;transform:translateY(-1px)}
-.bgg-pw svg{display:block;height:24px;width:auto}
+.bgg-pw img{display:block;height:22px;width:auto}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -996,8 +996,8 @@ html{overflow-x:hidden;max-width:100%}
   </div></div></header>
   <main class="wrap" id="view"></main>
   <footer class="wrap foot"><span>Jeux d'Oliv v1.12 - octobre 2026 - Olvrteil</span>
-    <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API. Badge provisoire : à remplacer par le logo officiel « Powered by BGG » (fichier fourni par BGG) en gardant le lien. -->
-    <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><svg viewBox="0 0 172 28" role="img" aria-hidden="true" focusable="false"><rect width="172" height="28" rx="8" fill="#2D2B4A"/><path d="M126 0h38a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8h-50z" fill="#FF5100"/><text x="12" y="18" font-family="Figtree,Segoe UI,system-ui,sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.6" fill="#fff">POWERED BY</text><text x="148" y="20" text-anchor="middle" font-family="Bricolage Grotesque,Trebuchet MS,Segoe UI,system-ui,sans-serif" font-size="17" font-weight="800" fill="#fff">BGG</text></svg></a>
+    <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API : logo officiel « Powered by BGG », qui renvoie vers BoardGameGeek. -->
+    <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><img src="powered-by-bgg.png" width="252" height="56" alt="Powered by BGG" decoding="async"></a>
     <button type="button" id="pushLink" hidden></button></footer>
 </div>
 <div id="modal-root"></div>
