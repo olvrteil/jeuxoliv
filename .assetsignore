@@ -2,3 +2,4 @@ wrangler.jsonc
 .assetsignore
 .git
 node_modules
+worker.js

@@ -953,6 +953,28 @@ html{overflow-x:hidden;max-width:100%}
 .sx-prow .chev{color:var(--muted);display:grid;place-items:center}
 @media (max-width:860px){.sx-kpis{grid-template-columns:1fr 1fr}.sx-grid{grid-template-columns:1fr}}
 @media (max-width:640px){.sx-kpi{padding:14px}.sx-ico{width:34px;height:34px}.sx-h{padding-top:18px}.sx-donut-w{justify-content:center}.sx-prow{grid-template-columns:32px 1fr 18px}.sx-prow .nums{grid-column:2/3;justify-content:flex-start}.sx-prow .chev{grid-row:1;grid-column:3}}
+
+/* ---------- Import BoardGameGeek par recherche (admin), traduction du résumé, mention « Powered by BGG » ---------- */
+.bg-t{gap:6px}
+.bg-t strong{font-size:14.5px;line-height:1.2}
+.bg-t small{color:var(--muted);font-weight:600;line-height:1.3}
+.bg-go{display:inline-flex;align-items:center;gap:5px;margin-top:4px;padding:6px 13px;border-radius:999px;border:2px solid var(--stroke);background:var(--sun);color:var(--on-sun);font:800 12.5px/1 var(--font-b);box-shadow:0 2px 0 var(--sun-edge);transition:transform .15s}
+.bg-t:hover .bg-go,.bg-t:focus-visible .bg-go{transform:translateY(-1px)}
+.bg-t.is-off .bg-go{display:none}
+.bg-back{align-self:flex-start;margin-bottom:-6px}
+.import-head .seg{max-width:100%}
+@media (max-width:640px){.import-head .seg{display:flex;flex-wrap:wrap;width:100%}.import-head .seg button{flex:1 1 auto;justify-content:center;white-space:nowrap;padding:10px 12px}}
+.gf-ideal{justify-content:flex-start}
+.gf-tr{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:10px}
+.tr-note{margin:0;flex:1 1 220px}
+.tr-note.bad{color:var(--bad);font-weight:700}
+.gf-orig{margin-top:12px;border:2px solid var(--hair);border-radius:16px;padding:10px 14px;background:var(--glass-2)}
+.gf-orig summary{cursor:pointer;font-weight:700;color:var(--muted)}
+.gf-orig p{white-space:pre-line;margin:10px 0;font-size:14px;color:var(--muted);max-height:260px;overflow:auto}
+.gf-fields textarea[readonly]{opacity:.65}
+.foot .bgg-pw{display:inline-flex;line-height:0;border-radius:8px;opacity:.92;transition:transform .15s,opacity .15s}
+.foot .bgg-pw:hover,.foot .bgg-pw:focus-visible{opacity:1;transform:translateY(-1px)}
+.bgg-pw svg{display:block;height:24px;width:auto}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -973,7 +995,10 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.11 - octobre 2026 - Olvrteil</span><button type="button" id="pushLink" hidden></button></footer>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.12 - octobre 2026 - Olvrteil</span>
+    <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API. Badge provisoire : à remplacer par le logo officiel « Powered by BGG » (fichier fourni par BGG) en gardant le lien. -->
+    <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><svg viewBox="0 0 172 28" role="img" aria-hidden="true" focusable="false"><rect width="172" height="28" rx="8" fill="#2D2B4A"/><path d="M126 0h38a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8h-50z" fill="#FF5100"/><text x="12" y="18" font-family="Figtree,Segoe UI,system-ui,sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.6" fill="#fff">POWERED BY</text><text x="148" y="20" text-anchor="middle" font-family="Bricolage Grotesque,Trebuchet MS,Segoe UI,system-ui,sans-serif" font-size="17" font-weight="800" fill="#fff">BGG</text></svg></a>
+    <button type="button" id="pushLink" hidden></button></footer>
 </div>
 <div id="modal-root"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1453,6 +1478,9 @@ html{overflow-x:hidden;max-width:100%}
       return { url: sb.storage.from('covers').getPublicUrl(path).data.publicUrl };
     } catch (e) { return { error: friendly(e) }; }
   };
+  B.token = async function () {
+    try { var r = await sb.auth.getSession(); return (r && r.data && r.data.session && r.data.session.access_token) || ''; } catch (e) { return ''; }
+  };
   B.removeCover = async function (url) {
     try { var m = /\/covers\/([\w.\/-]+)$/.exec(url || ''); if (m) await sb.storage.from('covers').remove([m[1]]); } catch (e) {}
   };
@@ -1765,8 +1793,8 @@ var Badges = (function () {
   try { NAME = localStorage.getItem(NAMEKEY) || ''; } catch (e) {}
   var tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
   var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'] }, route: 'home', grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
-    form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false }, gs: gsNew(),
-    auth: { mode: 'in', email: '', name: '', code: '', msg: '', ok: false, busy: false }, addMode: 'manual', gf: null };
+    form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false }, gs: gsNew(), bg: bgNew(),
+    auth: { mode: 'in', email: '', name: '', code: '', msg: '', ok: false, busy: false }, addMode: 'auto', gf: null };
   ui.stats = { days: 90, view: 'main', pid: null, sort: 'part' };
 
   var G = function (id) { return M.games.filter(function (g) { return g.id === id; })[0]; };
@@ -2479,19 +2507,33 @@ var Badges = (function () {
   var GFKEYS = { 'gf-name': 'name', 'gf-year': 'year', 'gf-min': 'min', 'gf-ideal': 'ideal', 'gf-max': 'max', 'gf-time': 'time', 'gf-age': 'age', 'gf-weight': 'weight', 'gf-tags': 'tags', 'gf-summary': 'summary' };
   function gfField(id, label, html, cls) { return '<div class="field ' + (cls || '') + '"><label for="' + id + '">' + label + '</label>' + html + '</div>'; }
   function gfInput(id, type, ph, extra) { return '<input class="input" id="' + id + '" type="' + type + '"' + (type === 'number' ? ' inputmode="decimal"' : '') + ' value="' + esc(ui.gf[GFKEYS[id]]) + '" placeholder="' + esc(ph || '') + '" autocomplete="off"' + (extra || '') + '>'; }
+  function gfBgInfo(f) {
+    if (!f.bgg || f.id) return '';
+    var h = '';
+    if (f.cands && f.cands.length > 1) h += '<div class="gs-ideal gf-ideal" role="group" aria-label="Nombre idéal de joueurs"><span>Idéal selon BGG</span>' + f.cands.map(function (n) { return '<button type="button" class="gs-n" aria-pressed="' + (+f.ideal === n) + '" data-act="gfIdeal" data-n="' + n + '">' + n + '</button>'; }).join('') + '</div>';
+    return h + (f.bgInfo ? '<p class="hint" style="margin:0">' + esc(f.bgInfo) + '</p>' : '');
+  }
+  /* traduction automatique du résumé (admin) : bouton, message d'état, texte original repliable */
+  function gfTrRow(f) {
+    if (!ST.admin) return '';
+    var h = '<div class="gf-tr"><button class="btn btn-sm btn-glass" type="button" data-act="gfTranslate"' + (f.trBusy || !String(f.summary || '').trim() ? ' disabled' : '') + '>' + ic('spark', 16) + ' ' + (f.trBusy ? 'Traduction en cours…' : 'Traduire en français') + '</button>' +
+      (f.trNote ? '<span class="hint tr-note' + (f.trBad ? ' bad' : '') + '" role="status">' + esc(f.trNote) + '</span>' : '') + '</div>';
+    if (f.summaryEn) h += '<details class="gf-orig"><summary>Texte original (anglais)</summary><p>' + esc(f.summaryEn) + '</p><button class="link" type="button" data-act="gfOriginal">Remettre l’original dans le résumé</button></details>';
+    return h;
+  }
   function gameForm() {
-    var f = ui.gf, edit = !!f.id, prev = f.preview || (f.img && IMGRE.test(f.img) ? f.img : '');
+    var f = ui.gf, edit = !!f.id, prev = f.preview || (f.img && IMGRE.test(f.img) ? f.img : '') || f.bggThumb || '', prevBgg = !!(prev && prev === f.bggThumb);
     return '<div class="gform">' +
-      '<div class="gf-photo"><div class="box gf-box">' + (prev ? '<img class="cover-img" src="' + esc(prev) + '" alt="Aperçu de la boîte">' : '<div class="gf-empty">' + ic('image', 30) + '<span>Photo de la boîte</span></div>') + '</div>' +
+      '<div class="gf-photo"><div class="box gf-box">' + (prev ? '<img class="cover-img" src="' + esc(prev) + '" alt="Aperçu de la boîte"' + (prevBgg ? ' referrerpolicy="no-referrer"' : '') + '>' : '<div class="gf-empty">' + ic('image', 30) + '<span>Photo de la boîte</span></div>') + '</div>' +
       '<div class="gf-photo-btns"><label class="btn btn-sm" for="gf-file">' + ic('camera', 17) + ' ' + (prev ? 'Changer la photo' : 'Ajouter la photo') + '</label><input type="file" id="gf-file" accept="image/*" hidden>' +
       (prev ? '<button class="link danger" type="button" data-act="gfClearPhoto">Retirer la photo</button>' : '') +
-      '<p class="hint" style="margin:0">Le dessus de la boîte, bien cadré. Elle est recadrée automatiquement.</p></div></div>' +
+      '<p class="hint" style="margin:0">' + (prevBgg ? 'Image de BoardGameGeek : elle est copiée dans l’appli à l’enregistrement. Vous pouvez la remplacer par votre photo.' : 'Le dessus de la boîte, bien cadré. Elle est recadrée automatiquement.') + '</p></div></div>' +
       '<div class="gf-fields">' + gfField('gf-name', 'Nom du jeu', gfInput('gf-name', 'text', 'Ex. Les Aventuriers du Rail', ' maxlength="60"')) +
-      '<div class="form-row3">' + gfField('gf-min', 'Joueurs min.', gfInput('gf-min', 'number', '2', ' min="2" max="30"')) + gfField('gf-ideal', 'Idéal', gfInput('gf-ideal', 'number', '4', ' min="2" max="30"')) + gfField('gf-max', 'Joueurs max.', gfInput('gf-max', 'number', '5', ' min="2" max="30"')) + '</div>' +
+      '<div class="form-row3">' + gfField('gf-min', 'Joueurs min.', gfInput('gf-min', 'number', '2', ' min="2" max="30"')) + gfField('gf-ideal', 'Idéal', gfInput('gf-ideal', 'number', '4', ' min="2" max="30"')) + gfField('gf-max', 'Joueurs max.', gfInput('gf-max', 'number', '5', ' min="2" max="30"')) + '</div>' + gfBgInfo(f) +
       '<div class="form-row3">' + gfField('gf-time', 'Durée (min)', gfInput('gf-time', 'number', '45', ' min="1" max="600"')) + gfField('gf-age', 'Âge dès', gfInput('gf-age', 'number', '8', ' min="1" max="99"')) + gfField('gf-year', 'Année', gfInput('gf-year', 'number', '2004', ' min="1800" max="2100"')) + '</div>' +
       gfField('gf-weight', 'Complexité BGG, de 1 (facile) à 5 (expert)', gfInput('gf-weight', 'number', '2.2', ' min="1" max="5" step="0.1"'), 'gf-narrow') +
       gfField('gf-tags', 'Catégories, séparées par des virgules', gfInput('gf-tags', 'text', 'Ex. Familial, Stratégie', ' maxlength="80"')) +
-      gfField('gf-summary', 'Résumé', '<textarea class="input" id="gf-summary" rows="8" placeholder="Décrivez le jeu : règles, déroulement, ambiance… (sans limite de longueur)">' + esc(f.summary) + '</textarea>') +
+      gfField('gf-summary', 'Résumé', '<textarea class="input" id="gf-summary" rows="8"' + (f.trBusy ? ' readonly' : '') + ' placeholder="Décrivez le jeu : règles, déroulement, ambiance… (sans limite de longueur)">' + esc(f.summary) + '</textarea>' + gfTrRow(f)) +
       (f.err ? '<p class="auth-msg bad" role="alert">' + esc(f.err) + '</p>' : '') +
       '<div class="gf-actions"><button class="btn btn-teal" type="button" data-act="gfSave"' + (f.busy ? ' disabled' : '') + '>' + ic(edit ? 'check' : 'plus', 18) + ' ' + (f.busy ? 'Enregistrement…' : edit ? 'Enregistrer les modifications' : 'Ajouter à la ludothèque') + '</button>' +
       (edit ? '<button class="btn btn-glass" type="button" data-act="gfCancel">Annuler</button>' : '') + '</div></div></div>';
@@ -2531,10 +2573,11 @@ var Badges = (function () {
   }
   /* Résumé : second point d'accès de GameShelf (getAdditionalInfo), texte anglais de l'éditeur ; échec = résumé laissé vide */
   var GS_INFO = GS_URL.replace('getUserCollection8', 'getAdditionalInfo');
-  function gsClean(t) {
+  function gsClean(t, max) {
+    max = max || 1400;
     var d = new DOMParser().parseFromString(String(t || '').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ' '), 'text/html');
     t = (d.documentElement.textContent || '').replace(/[ \t\u00a0]+/g, ' ').replace(/ ?\n ?/g, '\n').replace(/\n{3,}/g, '\n\n').replace(/\s*[—–-]+\s*description from the publisher\.?\s*$/i, '').trim();
-    if (t.length > 1400) { var cut = t.slice(0, 1400), k = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('.\n')); t = (k > 600 ? cut.slice(0, k + 1) : cut.replace(/\s+\S*$/, '') + '…'); }
+    if (t.length > max) { var cut = t.slice(0, max), k = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('.\n')); t = (k > Math.round(max * 0.43) ? cut.slice(0, k + 1) : cut.replace(/\s+\S*$/, '') + '…'); }
     return t;
   }
   function gsDesc(g) {
@@ -2582,7 +2625,92 @@ var Badges = (function () {
       (s.busy ? '<p class="hint gs-busy">' + ic('clock', 16) + ' Récupération de la collection… quelques secondes.</p>' : '') +
       (s.err ? '<p class="auth-msg bad" role="alert">' + esc(s.err) + '</p>' : '') +
       (s.list && !s.busy ? gsList() : '') +
-      '<p class="hint" style="margin:0">Données et images : BoardGameGeek, récupérées via GameShelf.io (service tiers, solution provisoire en attendant l’accès direct à l’API de BoardGameGeek).</p>';
+      '<p class="hint" style="margin:0">Données et images : BoardGameGeek, récupérées via GameShelf.io (service tiers).</p>';
+  }
+  /* ---------- Import BoardGameGeek par recherche (admin) ----------
+     Les appels passent par le Worker Cloudflare (/api/...) : lui seul connaît le jeton BGG, et il vérifie que le compte est admin. */
+  function bgNew() { return { q: '', busy: false, err: '', res: null, total: 0, last: '' }; }
+  var API_MSG = {
+    auth: 'Session expirée : reconnectez-vous.',
+    forbidden: 'Réservé à l’administrateur.',
+    no_token: 'Le jeton BoardGameGeek n’est pas encore configuré sur le Worker (secret BGG_TOKEN).',
+    bgg_auth: 'BoardGameGeek refuse le jeton : vérifiez qu’il est approuvé et bien enregistré.',
+    bgg_busy: 'BoardGameGeek est occupé. Réessayez dans une minute.',
+    bgg_http: 'BoardGameGeek ne répond pas correctement pour le moment.',
+    quota: 'Quota de traduction du jour atteint (il revient demain).',
+    no_ai: 'La traduction n’est pas activée sur le Worker.',
+    noworker: 'Cette fonction n’existe pas sur cette version du site (Worker absent).',
+    timeout: 'Le service met trop de temps à répondre.',
+    net: 'Connexion impossible : vérifiez votre réseau.',
+    too_long: 'Texte trop long pour la traduction automatique.',
+    short: 'Tapez au moins 2 caractères.',
+    bad_id: 'Numéro de jeu invalide.',
+    expansion: 'Ce numéro correspond à une extension, pas à un jeu de base.',
+    img_http: 'l’image est introuvable chez BoardGameGeek.',
+    img_type: 'format d’image inattendu.',
+    img_big: 'image trop lourde.'
+  };
+  function apiMsg(code) { return API_MSG[code] || 'Service momentanément indisponible. Réessayez dans un instant.'; }
+  function apiErr(code) { var e = new Error(code); e.code = code; return e; }
+  /* opt.raw : renvoie le fichier (image) au lieu du JSON */
+  function api(path, opt) {
+    return Backend.token().then(function (tk) {
+      if (!tk) throw apiErr('auth');
+      var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function () { if (ctl) ctl.abort(); }, 50000);
+      var o = Object.assign({}, opt || {}); delete o.raw;
+      o.headers = Object.assign({ Authorization: 'Bearer ' + tk }, (opt && opt.headers) || {});
+      if (ctl) o.signal = ctl.signal;
+      return fetch(path, o).then(function (r) {
+        if (opt && opt.raw && r.ok) return r.blob();
+        if (!/json/.test(r.headers.get('Content-Type') || '')) throw apiErr(r.ok || r.status === 404 ? 'noworker' : 'down');
+        return r.json().then(function (j) { if (!r.ok) throw apiErr((j && j.error) || 'down'); return j; });
+      }).then(function (v) { clearTimeout(to); return v; }, function (e) { clearTimeout(to); throw (e && e.code ? e : apiErr(e && e.name === 'AbortError' ? 'timeout' : 'net')); });
+    });
+  }
+  function trFr(text) {
+    return api('/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text }) }).then(function (j) {
+      var t = String((j && j.text) || '').trim(); if (!t) throw apiErr('down'); return t;
+    });
+  }
+  /* import GameShelf par l'admin : le résumé anglais est traduit ; au premier échec « définitif » on n'insiste pas pour les jeux suivants */
+  function gsTr(g, s) {
+    if (!ST.admin || s.noTr || !g.summary) return Promise.resolve();
+    return trFr(g.summary).then(function (fr) { if (fr) g.summary = fr; }, function (e) { if (/^(quota|noworker|forbidden|no_ai|no_token|auth)$/.test(e && e.code)) s.noTr = true; });
+  }
+  /* un jeu renvoyé par le Worker -> mêmes règles que l'import GameShelf (min ≥ 2, un seul idéal, solo écarté) + résumé nettoyé */
+  function bgPrep(r) {
+    var p = gsPrep(r);
+    if (p.solo) return p;
+    var num = function (a) { return (a || []).map(Number).filter(function (n) { return n >= 2 && n <= 30; }); }, best = num(r.playersBest), rec = num(r.playersRecommended), bits = [];
+    p.desc = gsClean(r.description, 3000);
+    if (best.length) bits.push('meilleur à ' + best.join(' ou '));
+    if (rec.length) bits.push('recommandé à ' + rec.join(', '));
+    p.info = (bits.length ? 'Selon la communauté BoardGameGeek : ' + bits.join(' · ') + '.' : 'Pas assez de votes sur BoardGameGeek pour le nombre de joueurs : l’idéal est estimé.') + (+r.minPlayers < 2 ? ' Minimum ramené à 2 (un jeu solo n’a pas besoin de l’appli).' : '');
+    return p;
+  }
+  var bgFind = function (id) { return ((ui.bg.res || []).filter(function (p) { return p.id === id; }))[0]; };
+  /* added : déjà importé | solo : inutilisable | dup : un jeu du même nom existe (autorisé, signalé) | new */
+  function bgState(p) {
+    if (G(p.id)) return 'added';
+    if (p.solo) return 'solo';
+    return M.games.some(function (g) { return key(g.name) === key(p.name); }) ? 'dup' : 'new';
+  }
+  function bgTile(p) {
+    var st = bgState(p), off = st === 'added' || st === 'solo', lab = p.solo ? '' : (p.min === p.max ? p.min : p.min + '–' + p.max) + ' joueurs' + (p.time ? ' · ' + p.time + ' min' : '');
+    return '<article class="gs-t bg-t' + (off ? ' is-off' : '') + '" role="button" tabindex="' + (off ? -1 : 0) + '" aria-disabled="' + off + '" data-act="bgPick" data-id="' + esc(p.id) + '">' + gsBox(p) + '<strong>' + esc(p.name) + '</strong>' +
+      '<small>' + (p.year ? p.year + (lab ? ' · ' : '') : '') + lab + '</small>' +
+      (st === 'added' ? '<em class="gs-flag">Déjà dans la ludothèque</em>' : st === 'solo' ? '<em class="gs-flag">Jeu solo ou joueurs inconnus</em>' : (st === 'dup' ? '<em class="gs-flag">Un jeu du même nom existe déjà</em>' : '') + '<span class="bg-go">' + ic('plus', 14) + ' Choisir</span>') + '</article>';
+  }
+  function bgBody() {
+    var s = ui.bg;
+    return '<p class="hint" style="margin:0">Cherchez un jeu par son nom, ou collez son lien ou son numéro BoardGameGeek. Joueurs, durée, boîte et résumé viennent de BoardGameGeek ; le résumé est traduit automatiquement en français et vous pouvez le corriger avant d’enregistrer.</p>' +
+      '<div class="import-row"><input class="input" id="bg-q" type="search" placeholder="Nom du jeu, lien ou numéro BoardGameGeek" value="' + esc(s.q) + '" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Rechercher un jeu sur BoardGameGeek"><button class="btn" data-act="bgSearch"' + (s.busy ? ' disabled' : '') + '>' + ic('search', 18) + ' ' + (s.busy ? 'Recherche…' : 'Rechercher') + '</button></div>' +
+      (s.busy ? '<p class="hint gs-busy">' + ic('clock', 16) + ' Recherche sur BoardGameGeek… quelques secondes.</p>' : '') +
+      (s.err ? '<p class="auth-msg bad" role="alert">' + esc(s.err) + '</p>' : '') +
+      (s.res && !s.busy ? (s.res.length
+        ? '<div class="gs-sum"><b>' + esc(s.last) + '</b><span>' + plural(s.res.length, 'résultat', 'résultats') + (s.total > s.res.length ? ' affichés sur ' + s.total + ' : précisez le nom pour affiner' : '') + '</span></div><div class="gs-grid" id="bg-grid">' + s.res.map(bgTile).join('') + '</div>'
+        : '<p class="hint" style="margin:0">Aucun jeu trouvé pour « ' + esc(s.last) + ' ». Essayez un autre nom (souvent le titre anglais) ou collez le lien BoardGameGeek.</p>') : '') +
+      '<p class="hint" style="margin:0">Données et images : BoardGameGeek.</p>';
   }
   /* filtre d'affichage, sans reconstruire la page */
   function gsFilter() {
@@ -2597,12 +2725,22 @@ var Badges = (function () {
     if (b) b.disabled = !n || !!ui.gs.adding;
   }
   function gsSetTile(id, on) { var t = document.querySelector('#gs-grid .gs-t[data-id="' + id + '"]'); if (t) t.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+  /* mode d'ajout : 'bggapi' (recherche BGG, admin), 'bggedit' (fiche issue de BGG), 'bgg' (collection GameShelf), 'manual' */
+  function addModeOf() {
+    var m = ui.addMode;
+    if (m === 'auto') m = ST.admin ? 'bggapi' : 'manual';
+    if ((m === 'bggapi' || m === 'bggedit') && !ST.admin) m = 'manual';
+    if (m === 'bggedit' && !(ui.gf && ui.gf.bgg && !ui.gf.id)) m = 'bggapi';
+    return m;
+  }
   function tabGames() {
-    var edit = ui.gf && ui.gf.id, manual = ui.addMode === 'manual' || edit;
+    var edit = ui.gf && ui.gf.id, mode = addModeOf(), manual = mode === 'manual' || edit;
     if (manual && !ui.gf) ui.gf = newGf();
-    var head = edit ? '<h2>Modifier « ' + esc(ui.gf.name) + ' »</h2>' : '<h2>Ajouter un jeu</h2>';
-    var seg = edit ? '' : '<div class="seg" role="group" aria-label="Mode d’ajout"><button type="button" aria-pressed="' + !manual + '" data-act="addMode" data-m="bgg">' + ic('search', 17) + ' BoardGameGeek</button><button type="button" aria-pressed="' + manual + '" data-act="addMode" data-m="manual">' + ic('edit', 17) + ' À la main</button></div>';
-    var imp = '<section class="import glass-2" id="gf-top"><div class="import-head"><div class="panel-head" style="margin:0">' + head + '</div>' + seg + '</div>' + (manual ? gameForm() : bggBody()) + '</section>';
+    var head = edit ? '<h2>Modifier « ' + esc(ui.gf.name) + ' »</h2>' : '<h2>' + (mode === 'bggedit' ? 'Ajouter depuis BoardGameGeek' : 'Ajouter un jeu') + '</h2>';
+    var modes = ST.admin ? [['bggapi', 'search', 'BoardGameGeek'], ['bgg', 'download', 'Ma collection'], ['manual', 'edit', 'À la main']] : [['bgg', 'search', 'BoardGameGeek'], ['manual', 'edit', 'À la main']];
+    var seg = edit ? '' : '<div class="seg" role="group" aria-label="Mode d’ajout">' + modes.map(function (x) { return '<button type="button" aria-pressed="' + (mode === x[0] || (x[0] === 'bggapi' && mode === 'bggedit')) + '" data-act="addMode" data-m="' + x[0] + '">' + ic(x[1], 17) + ' ' + x[2] + '</button>'; }).join('') + '</div>';
+    var body = (manual || mode === 'bggedit') ? (mode === 'bggedit' ? '<button class="link bg-back" type="button" data-act="bgBack">' + ic('back', 16) + ' Autres résultats</button>' : '') + gameForm() : mode === 'bggapi' ? bgBody() : bggBody();
+    var imp = '<section class="import glass-2" id="gf-top"><div class="import-head"><div class="panel-head" style="margin:0">' + head + '</div>' + seg + '</div>' + body + '</section>';
     return imp + '<div class="sec-head"><h2>Ludothèque (' + M.games.length + ')</h2><p>' + (ST.admin ? 'Ajustez les nombres de joueurs ici, ou ouvrez la fiche complète avec le crayon.' : 'Vous pouvez ajouter des jeux et modifier ou retirer uniquement ceux que vous avez ajoutés.') + '</p></div><div class="glist">' + M.games.map(function (g) {
       return '<div class="grow">' + box(g) + '<div><h3>' + esc(g.name) + '</h3>' + facts(g) + (g.bgg && !g.summary ? '<small class="gs-todo">' + ic('edit', 12) + ' Résumé à compléter</small>' : '') + '</div>' + (canEditGame(g) ? '<div class="stepper-wrap" style="display:flex;gap:14px">' + stepper(g, 'min', 'Mini') + stepper(g, 'ideal', 'Idéal') + stepper(g, 'max', 'Maxi') + '</div>' : '<div class="stepper-wrap ro"><small class="hint">' + (g.owner && g.ownerName ? 'Ajouté par ' + esc(g.ownerName) : 'Ajouté par l’admin') + '</small></div>') +
         (!canEditGame(g) ? '' : '<div class="grow-btns"><button class="icon-btn edit" title="Modifier la fiche" aria-label="Modifier ' + esc(g.name) + '" data-act="editGame" data-gid="' + g.id + '">' + ic('edit', 16) + '</button>' +
@@ -3432,7 +3570,12 @@ var Badges = (function () {
       var old = G(id) && G(id).img; if (ui.gf && ui.gf.id === id) ui.gf = null;
       wr(ST.db.doc('games/' + id).delete(), 'Jeu retiré de la ludothèque.').then(function (ok) { if (ok && old) Backend.removeCover(old); });
     },
-    addMode: function (el) { ui.addMode = el.dataset.m; if (ui.addMode === 'manual' && !ui.gf) ui.gf = newGf(); render(); },
+    addMode: function (el) {
+      var m = el.dataset.m; if (m === 'bggapi' && !ST.admin) return;
+      var g0 = ui.gf; if (g0 && g0.bgg && !g0.id) { if (g0.preview) URL.revokeObjectURL(g0.preview); ui.gf = null; }
+      if (m === 'manual' && !ui.gf) ui.gf = newGf();
+      ui.addMode = m; render();
+    },
     editGame: function (el) {
       var g = G(el.dataset.gid); if (!g || !canEditGame(g)) return;
       ui.gf = { id: g.id, name: g.name, year: g.year || '', min: g.min, ideal: g.ideal, max: g.max, time: g.time || '', age: g.age || '', weight: g.weight || '', tags: (g.tags || []).join(', '), summary: g.summary || '', img: g.img || '', blob: null, preview: '', busy: false, err: '' };
@@ -3440,7 +3583,7 @@ var Badges = (function () {
       var t = document.getElementById('gf-top'); if (t && t.scrollIntoView) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
     },
     gfCancel: function () { ui.gf = null; render(true); },
-    gfClearPhoto: function () { var f = ui.gf; if (!f) return; f.blob = null; f.preview = ''; f.img = ''; render(); },
+    gfClearPhoto: function () { var f = ui.gf; if (!f) return; f.blob = null; f.preview = ''; f.img = ''; f.bggImg = ''; f.bggThumb = ''; render(); },
     gfSave: async function () {
       var f = ui.gf; if (!f || f.busy) return;
       var name = norm(f.name), min = +f.min, max = +f.max, ideal = +f.ideal, bad = function (m) { f.err = m; render(); };
@@ -3451,14 +3594,26 @@ var Badges = (function () {
       if (max < min) return bad('Le maximum de joueurs doit être au moins égal au minimum.');
       if (ideal < min || ideal > max) return bad('Le nombre idéal doit se situer entre le minimum et le maximum.');
       var wt = num(f.weight); if (wt !== null && (wt < 1 || wt > 5)) return bad('La complexité va de 1 à 5.');
+      if (!f.id && f.bgg && G('bgg' + f.bgg)) return bad('Ce jeu est déjà dans la ludothèque.');
       f.busy = true; f.err = ''; render();
-      var id = f.id || slug(name), url = f.img, oldImg = f.id && G(f.id) ? G(f.id).img : '';
+      var id = f.id || (f.bgg ? 'bgg' + f.bgg : slug(name)), url = f.img, oldImg = f.id && G(f.id) ? G(f.id).img : '';
       if (f.blob) {
         var up = await Backend.uploadCover(f.blob, id, ST.admin ? '' : ST.uid + '/');
         if (up.error) { f.busy = false; f.err = up.error; return render(); }
         url = up.url;
       }
-      var g = f.id ? clone(G(f.id)) : Object.assign({ id: id, n: Date.now(), manual: true }, D.autoStyle(name));
+      if (!f.blob && !url && f.bggImg) {
+        /* l'image de BoardGameGeek est relayée par le Worker, recadrée comme les autres boîtes, puis copiée dans Supabase */
+        try {
+          var raw = await api('/api/bgg/image?u=' + encodeURIComponent(f.bggImg), { raw: true });
+          var cb = await cropCover(raw), up2 = await Backend.uploadCover(cb, id, ST.admin ? '' : ST.uid + '/');
+          if (up2.error) throw new Error(up2.error);
+          url = up2.url;
+        } catch (e) {
+          f.busy = false; f.err = 'Copie de l’image BoardGameGeek impossible : ' + (e && e.code ? apiMsg(e.code) : (e && e.message) || 'réessayez dans un instant.') + ' Réessayez, ou retirez la photo pour enregistrer sans image.'; return render();
+        }
+      }
+      var g = f.id ? clone(G(f.id)) : Object.assign(f.bgg ? { id: id, n: Date.now(), bgg: String(f.bgg) } : { id: id, n: Date.now(), manual: true }, D.autoStyle(name));
       if (!f.id && !ST.admin) { g.owner = ST.uid; g.ownerName = nameOf(ST.uid) || norm(NAME) || ST.profileName || 'Organisateur'; }
       if (f.id && !canEditGame(G(f.id))) { f.busy = false; return bad('Ce jeu a été ajouté par quelqu’un d’autre.'); }
       g.name = name; g.min = min; g.max = max; g.ideal = ideal; g.summary = f.summary.trim();
@@ -3469,7 +3624,8 @@ var Badges = (function () {
       try { await ST.db.doc('games/' + id).set(g); } catch (e) { f.busy = false; f.err = 'Enregistrement impossible : ' + ((e && e.message) || 'réessayez dans un instant.'); return render(); }
       if (oldImg && oldImg !== url) Backend.removeCover(oldImg);
       toast(f.id ? 'Fiche enregistrée.' : name + ' ajouté à la ludothèque.');
-      ui.gf = f.id ? null : newGf(); render(true);
+      if (f.bgg && !f.id) { ui.gf = null; ui.addMode = 'bggapi'; } else ui.gf = f.id ? null : newGf();
+      render(true);
     },
     gsLoad: function () {
       var s = ui.gs, name = norm(s.user).replace(/^@/, ''); if (s.busy) return;
@@ -3525,7 +3681,7 @@ var Badges = (function () {
       var step = function (i) {
         if (i >= rows.length) return Promise.resolve();
         return Promise.all(rows.slice(i, i + 6).map(function (g) {
-          return gsDesc(g).then(function () { return ST.db.doc('games/' + g.id).set(g); }).then(function () { ok.push(g.id); }, function (e) { fails.push(g.name); last = e; });
+          return gsDesc(g).then(function () { return gsTr(g, s); }).then(function () { return ST.db.doc('games/' + g.id).set(g); }).then(function () { ok.push(g.id); }, function (e) { fails.push(g.name); last = e; });
         })).then(function () { s.adding.done = Math.min(rows.length, i + 6); var pr = $('#gs-prog'); if (pr) pr.textContent = s.adding.done + ' / ' + s.adding.total; return step(i + 6); });
       };
       step(0).then(function () {
@@ -3535,6 +3691,44 @@ var Badges = (function () {
         render();
       });
     },
+    bgSearch: function () {
+      var s = ui.bg, q = norm(s.q); if (s.busy || !ST.admin) return;
+      if (q.length < 2) { s.err = apiMsg('short'); return render(); }
+      var m = /boardgamegeek\.com\/(?:boardgame|boardgameexpansion|thing)\/(\d{1,9})/i.exec(q) || /^#?(\d{1,9})$/.exec(q);
+      s.busy = true; s.err = ''; s.res = null; s.last = q; render();
+      (m ? api('/api/bgg/game?id=' + m[1]) : api('/api/bgg/search?q=' + encodeURIComponent(q))).then(function (j) {
+        var all = (j && j.games) || [];
+        if (m && all.length && all[0].type !== 'boardgame') throw apiErr('expansion');
+        s.res = all.filter(function (g) { return g.type === 'boardgame'; }).map(bgPrep);
+        s.total = m ? s.res.length : Math.max(+j.total || 0, s.res.length);
+      }).catch(function (e) { s.err = apiMsg(e && e.code); }).then(function () { s.busy = false; render(); });
+    },
+    bgPick: function (el) {
+      var p = bgFind(el.dataset.id), st = p && bgState(p); if (!p || !ST.admin || st === 'added' || st === 'solo') return;
+      var f = newGf(), en = p.desc || '';
+      f.bgg = p.bgg; f.name = p.name; f.min = p.min; f.max = p.max; f.ideal = p.ideal; f.year = p.year || ''; f.time = p.time || ''; f.age = p.age || ''; f.weight = p.weight || '';
+      f.tags = (p.tags || []).join(', '); f.cands = p.cands || []; f.bgInfo = p.info || ''; f.bggThumb = p.img || ''; f.bggImg = p.imgBig || p.img || '';
+      f.summary = en; f.summaryEn = en; f.trBusy = !!en;
+      if (!en) f.trNote = 'BoardGameGeek ne fournit pas de résumé pour ce jeu : à écrire à la main.';
+      ui.gf = f; ui.addMode = 'bggedit'; render(true);
+      var top = document.getElementById('gf-top'); if (top && top.scrollIntoView) top.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (!en) return;
+      trFr(en).then(function (fr) {
+        if (ui.gf !== f) return;
+        f.trBusy = false;
+        if (f.summary === en) { f.summary = fr; f.trBad = false; f.trNote = 'Traduit automatiquement : relisez, c’est une traduction automatique. Le texte original est juste en dessous.'; } else f.trNote = '';
+        softRender();
+      }, function (e) { if (ui.gf !== f) return; f.trBusy = false; f.trBad = true; f.trNote = apiMsg(e && e.code) + ' Le résumé reste en anglais.'; softRender(); });
+    },
+    bgBack: function () { var f = ui.gf; if (f && f.preview) URL.revokeObjectURL(f.preview); ui.gf = null; ui.addMode = 'bggapi'; render(true); },
+    gfIdeal: function (el) { var f = ui.gf, n = +el.dataset.n; if (!f || !f.cands || f.cands.indexOf(n) < 0) return; f.ideal = n; render(); },
+    gfTranslate: function () {
+      var f = ui.gf, src = f && String(f.summary || '').trim(); if (!f || !ST.admin || f.trBusy || !src) return;
+      f.trBusy = true; f.trNote = ''; f.trBad = false; render();
+      trFr(src).then(function (fr) { if (ui.gf !== f) return; f.trBusy = false; f.summaryEn = src; f.summary = fr; f.trNote = 'Traduit automatiquement : relisez avant d’enregistrer.'; softRender(); },
+        function (e) { if (ui.gf !== f) return; f.trBusy = false; f.trBad = true; f.trNote = apiMsg(e && e.code); softRender(); });
+    },
+    gfOriginal: function () { var f = ui.gf; if (!f || !f.summaryEn) return; f.summary = f.summaryEn; f.trNote = ''; render(); },
     impSearch: function () {
       var q = ui.imp.q.trim().toLowerCase(); ui.imp.hit = null; ui.imp.miss = false;
       var f = D.CATALOG.filter(function (c) { return !G(c.id) && q && c.name.toLowerCase().indexOf(q) >= 0; })[0];
@@ -3562,6 +3756,7 @@ var Badges = (function () {
     if ((e.key === 'Enter' || e.key === ' ') && t.getAttribute && t.getAttribute('role') === 'button' && t.dataset.act) { e.preventDefault(); ACT[t.dataset.act](t, e); return; }
     if (e.key === 'Enter' && t.id === 'imp-q') ACT.impSearch();
     if (e.key === 'Enter' && t.id === 'gs-user') { e.preventDefault(); ACT.gsLoad(); }
+    if (e.key === 'Enter' && t.id === 'bg-q') { e.preventDefault(); ACT.bgSearch(); }
   });
   /* met à jour le bouton « Programmer » sans reconstruire la page (sinon le champ perd le focus pendant la saisie) */
   function syncCreate() { var b = document.querySelector('[data-act="createSession"]'); if (b) b.disabled = !(ui.form.gameIds.length && ui.form.date && ui.form.time); }
@@ -3583,6 +3778,7 @@ var Badges = (function () {
     else if (t.id === 'f-q') { ui.form.q = t.value; filterPicker(); }
     else if (t.id === 'imp-q') ui.imp.q = t.value;
     else if (t.id === 'gs-user') ui.gs.user = t.value;
+    else if (t.id === 'bg-q') ui.bg.q = t.value;
     else if (t.id === 'gs-q') { ui.gs.q = t.value; gsFilter(); }
     else if (t.id === 'search') { ui.q = t.value; $('#ggrid').innerHTML = gamesGrid(); }
   });
