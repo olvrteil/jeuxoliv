@@ -195,8 +195,18 @@ async function search(env, q) {
 /* ---------- Images ---------- */
 async function image(u) {
   if (!IMG_RE.test(u)) return fail(400, 'bad_url', 'Adresse d’image non autorisée.');
-  const r = await fetch(u, { headers: { 'User-Agent': UA }, redirect: 'error', cf: { cacheTtl: 86400, cacheEverything: true } });
-  if (!r.ok) return fail(502, 'img_http', 'Image introuvable chez BGG.');
+  /* redirections suivies à la main, uniquement vers l'hôte d'images autorisé */
+  let r, cur = u;
+  try {
+    for (let i = 0; i < 4; i++) {
+      r = await fetch(cur, { headers: { 'User-Agent': UA, Accept: 'image/*' }, redirect: 'manual' });
+      const loc = r.status >= 300 && r.status < 400 ? r.headers.get('Location') : '';
+      if (!loc) break;
+      cur = new URL(loc, cur).href;
+      if (!IMG_RE.test(cur)) return fail(502, 'img_http', 'Redirection d’image refusée.');
+    }
+  } catch (e) { console.log('image: ' + String(e && e.message || e)); return fail(502, 'img_http', 'Image injoignable chez BGG.'); }
+  if (!r || !r.ok) { console.log('image: statut ' + (r && r.status)); return fail(502, 'img_http', 'Image introuvable chez BGG (statut ' + (r && r.status) + ').'); }
   const ct = (r.headers.get('Content-Type') || '').split(';')[0].trim().toLowerCase();
   if (!/^image\/(jpeg|png|webp|gif)$/.test(ct)) return fail(502, 'img_type', 'Format d’image inattendu.');
   const len = +r.headers.get('Content-Length') || 0;
