@@ -36,14 +36,16 @@ const fail = (status, error, message) => json({ error, message: message || '' },
 /* ---------- Droits : compte Supabase connecté ET admin ----------
    Renvoie null si tout va bien, sinon la réponse d'erreur à envoyer (avec la cause exacte, pour que l'écran puisse l'expliquer). */
 async function adminCheck(req, env) {
-  if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) { console.log('adminCheck: variables SUPABASE_URL / SUPABASE_ANON_KEY absentes'); return fail(500, 'cfg', 'Variables Supabase absentes sur le Worker.'); }
+  const SB_URL = env.SUPABASE_URL || 'https://pjsaghnexlsxkkxauibc.supabase.co'; // valeurs publiques (config.js), repli si les variables manquent
+  const SB_KEY = env.SUPABASE_ANON_KEY || 'sb_publishable_WRWRUmGY3efJTzY-7o3rnQ_0_DoGOa_';
+  if (!SB_URL || !SB_KEY) { console.log('adminCheck: variables SUPABASE_URL / SUPABASE_ANON_KEY absentes'); return fail(500, 'cfg', 'Variables Supabase absentes sur le Worker.'); }
   const auth = req.headers.get('Authorization') || '';
   if (!/^Bearer [\w-]+\.[\w-]+\.[\w-]+$/.test(auth)) return fail(401, 'session', 'Session absente ou illisible.');
   let r;
   try {
-    r = await fetch(env.SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/rpc/my_status', {
+    r = await fetch(SB_URL.replace(/\/+$/, '') + '/rest/v1/rpc/my_status', {
       method: 'POST',
-      headers: { apikey: env.SUPABASE_ANON_KEY, Authorization: auth, 'Content-Type': 'application/json' },
+      headers: { apikey: SB_KEY, Authorization: auth, 'Content-Type': 'application/json' },
       body: '{}',
     });
   } catch (e) { console.log('adminCheck: Supabase injoignable', String(e && e.message)); return fail(502, 'rpc', 'Supabase injoignable depuis le Worker.'); }
