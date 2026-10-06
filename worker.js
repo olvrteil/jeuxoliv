@@ -33,20 +33,27 @@ function json(obj, status, extra) {
 }
 const fail = (status, error, message) => json({ error, message: message || '' }, status);
 
-/* ---------- Droits : compte Supabase connecté ET admin ---------- */
-async function isAdmin(req, env) {
+/* ---------- Droits : compte Supabase connecté ET admin ----------
+   Renvoie null si tout va bien, sinon la réponse d'erreur à envoyer (avec la cause exacte, pour que l'écran puisse l'expliquer). */
+async function adminCheck(req, env) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) { console.log('adminCheck: variables SUPABASE_URL / SUPABASE_ANON_KEY absentes'); return fail(500, 'cfg', 'Variables Supabase absentes sur le Worker.'); }
   const auth = req.headers.get('Authorization') || '';
-  if (!/^Bearer [\w-]+\.[\w-]+\.[\w-]+$/.test(auth) || !env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return false;
+  if (!/^Bearer [\w-]+\.[\w-]+\.[\w-]+$/.test(auth)) return fail(401, 'session', 'Session absente ou illisible.');
+  let r;
   try {
-    const r = await fetch(env.SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/rpc/my_status', {
+    r = await fetch(env.SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/rpc/my_status', {
       method: 'POST',
       headers: { apikey: env.SUPABASE_ANON_KEY, Authorization: auth, 'Content-Type': 'application/json' },
       body: '{}',
     });
-    if (!r.ok) return false;
-    const j = await r.json();
-    return !!(j && j.admin === true);
-  } catch (e) { return false; }
+  } catch (e) { console.log('adminCheck: Supabase injoignable', String(e && e.message)); return fail(502, 'rpc', 'Supabase injoignable depuis le Worker.'); }
+  if (r.status === 401 || r.status === 403) return fail(401, 'session', 'Session refusée par Supabase (expirée ?).');
+  if (!r.ok) { console.log('adminCheck: Supabase a répondu', r.status); return fail(502, 'rpc', 'Supabase a répondu ' + r.status + '.'); }
+  let j = null; try { j = await r.json(); } catch (e) {}
+  if (Array.isArray(j)) j = j[0];
+  if (j && typeof j === 'object' && j.my_status && typeof j.my_status === 'object') j = j.my_status;
+  if (!(j && (j.admin === true || j.admin === 'true' || j.admin === 't'))) { console.log('adminCheck: compte non admin, réponse', JSON.stringify(j)); return fail(403, 'not_admin', 'Réservé à l’administrateur.'); }
+  return null;
 }
 
 /* ---------- BoardGameGeek (API XML 2, jeton obligatoire) ---------- */
@@ -260,7 +267,8 @@ export default {
     const known = { '/api/bgg/search': 'GET', '/api/bgg/game': 'GET', '/api/bgg/image': 'GET', '/api/translate': 'POST' };
     if (!known[route]) return fail(404, 'not_found');
     if (req.method !== known[route]) return fail(405, 'method');
-    if (!(await isAdmin(req, env))) return fail(403, 'forbidden', 'Réservé à l’administrateur.');
+    const denied = await adminCheck(req, env);
+    if (denied) return denied;
 
     try {
       if (route === '/api/bgg/search') {

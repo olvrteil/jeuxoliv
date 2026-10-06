@@ -2632,7 +2632,10 @@ var Badges = (function () {
   function bgNew() { return { q: '', busy: false, err: '', res: null, total: 0, last: '' }; }
   var API_MSG = {
     auth: 'Session expirée : reconnectez-vous.',
-    forbidden: 'Réservé à l’administrateur.',
+    not_admin: 'Réservé à l’administrateur : ce compte n’est pas admin.',
+    session: 'Session expirée ou refusée : déconnectez-vous puis reconnectez-vous.',
+    cfg: 'Le Worker n’est pas configuré : variables Supabase absentes (voir wrangler.jsonc).',
+    rpc: 'Le Worker n’arrive pas à vérifier votre compte auprès de Supabase.',
     no_token: 'Le jeton BoardGameGeek n’est pas encore configuré sur le Worker (secret BGG_TOKEN).',
     bgg_auth: 'BoardGameGeek refuse le jeton : vérifiez qu’il est approuvé et bien enregistré.',
     bgg_busy: 'BoardGameGeek est occupé. Réessayez dans une minute.',
@@ -2650,8 +2653,8 @@ var Badges = (function () {
     img_type: 'format d’image inattendu.',
     img_big: 'image trop lourde.'
   };
-  function apiMsg(code) { return API_MSG[code] || 'Service momentanément indisponible. Réessayez dans un instant.'; }
-  function apiErr(code) { var e = new Error(code); e.code = code; return e; }
+  function apiMsg(code, e) { return (API_MSG[code] || 'Service momentanément indisponible. Réessayez dans un instant.') + (code === 'rpc' && e && e.detail ? ' (' + e.detail + ')' : ''); }
+  function apiErr(code, detail) { var e = new Error(code); e.code = code; e.detail = detail || ''; return e; }
   /* opt.raw : renvoie le fichier (image) au lieu du JSON */
   function api(path, opt) {
     return Backend.token().then(function (tk) {
@@ -2663,7 +2666,7 @@ var Badges = (function () {
       return fetch(path, o).then(function (r) {
         if (opt && opt.raw && r.ok) return r.blob();
         if (!/json/.test(r.headers.get('Content-Type') || '')) throw apiErr(r.ok || r.status === 404 ? 'noworker' : 'down');
-        return r.json().then(function (j) { if (!r.ok) throw apiErr((j && j.error) || 'down'); return j; });
+        return r.json().then(function (j) { if (!r.ok) throw apiErr((j && j.error) || 'down', j && j.message); return j; });
       }).then(function (v) { clearTimeout(to); return v; }, function (e) { clearTimeout(to); throw (e && e.code ? e : apiErr(e && e.name === 'AbortError' ? 'timeout' : 'net')); });
     });
   }
@@ -2675,7 +2678,7 @@ var Badges = (function () {
   /* import GameShelf par l'admin : le résumé anglais est traduit ; au premier échec « définitif » on n'insiste pas pour les jeux suivants */
   function gsTr(g, s) {
     if (!ST.admin || s.noTr || !g.summary) return Promise.resolve();
-    return trFr(g.summary).then(function (fr) { if (fr) g.summary = fr; }, function (e) { if (/^(quota|noworker|forbidden|no_ai|no_token|auth)$/.test(e && e.code)) s.noTr = true; });
+    return trFr(g.summary).then(function (fr) { if (fr) g.summary = fr; }, function (e) { if (/^(quota|noworker|forbidden|no_ai|no_token|auth|not_admin|session|cfg)$/.test(e && e.code)) s.noTr = true; });
   }
   /* un jeu renvoyé par le Worker -> mêmes règles que l'import GameShelf (min ≥ 2, un seul idéal, solo écarté) + résumé nettoyé */
   function bgPrep(r) {
@@ -3610,7 +3613,7 @@ var Badges = (function () {
           if (up2.error) throw new Error(up2.error);
           url = up2.url;
         } catch (e) {
-          f.busy = false; f.err = 'Copie de l’image BoardGameGeek impossible : ' + (e && e.code ? apiMsg(e.code) : (e && e.message) || 'réessayez dans un instant.') + ' Réessayez, ou retirez la photo pour enregistrer sans image.'; return render();
+          f.busy = false; f.err = 'Copie de l’image BoardGameGeek impossible : ' + (e && e.code ? apiMsg(e.code, e) : (e && e.message) || 'réessayez dans un instant.') + ' Réessayez, ou retirez la photo pour enregistrer sans image.'; return render();
         }
       }
       var g = f.id ? clone(G(f.id)) : Object.assign(f.bgg ? { id: id, n: Date.now(), bgg: String(f.bgg) } : { id: id, n: Date.now(), manual: true }, D.autoStyle(name));
@@ -3701,7 +3704,7 @@ var Badges = (function () {
         if (m && all.length && all[0].type !== 'boardgame') throw apiErr('expansion');
         s.res = all.filter(function (g) { return g.type === 'boardgame'; }).map(bgPrep);
         s.total = m ? s.res.length : Math.max(+j.total || 0, s.res.length);
-      }).catch(function (e) { s.err = apiMsg(e && e.code); }).then(function () { s.busy = false; render(); });
+      }).catch(function (e) { s.err = apiMsg(e && e.code, e); }).then(function () { s.busy = false; render(); });
     },
     bgPick: function (el) {
       var p = bgFind(el.dataset.id), st = p && bgState(p); if (!p || !ST.admin || st === 'added' || st === 'solo') return;
@@ -3718,7 +3721,7 @@ var Badges = (function () {
         f.trBusy = false;
         if (f.summary === en) { f.summary = fr; f.trBad = false; f.trNote = 'Traduit automatiquement : relisez, c’est une traduction automatique. Le texte original est juste en dessous.'; } else f.trNote = '';
         softRender();
-      }, function (e) { if (ui.gf !== f) return; f.trBusy = false; f.trBad = true; f.trNote = apiMsg(e && e.code) + ' Le résumé reste en anglais.'; softRender(); });
+      }, function (e) { if (ui.gf !== f) return; f.trBusy = false; f.trBad = true; f.trNote = apiMsg(e && e.code, e) + ' Le résumé reste en anglais.'; softRender(); });
     },
     bgBack: function () { var f = ui.gf; if (f && f.preview) URL.revokeObjectURL(f.preview); ui.gf = null; ui.addMode = 'bggapi'; render(true); },
     gfIdeal: function (el) { var f = ui.gf, n = +el.dataset.n; if (!f || !f.cands || f.cands.indexOf(n) < 0) return; f.ideal = n; render(); },
@@ -3726,7 +3729,7 @@ var Badges = (function () {
       var f = ui.gf, src = f && String(f.summary || '').trim(); if (!f || !ST.admin || f.trBusy || !src) return;
       f.trBusy = true; f.trNote = ''; f.trBad = false; render();
       trFr(src).then(function (fr) { if (ui.gf !== f) return; f.trBusy = false; f.summaryEn = src; f.summary = fr; f.trNote = 'Traduit automatiquement : relisez avant d’enregistrer.'; softRender(); },
-        function (e) { if (ui.gf !== f) return; f.trBusy = false; f.trBad = true; f.trNote = apiMsg(e && e.code); softRender(); });
+        function (e) { if (ui.gf !== f) return; f.trBusy = false; f.trBad = true; f.trNote = apiMsg(e && e.code, e); softRender(); });
     },
     gfOriginal: function () { var f = ui.gf; if (!f || !f.summaryEn) return; f.summary = f.summaryEn; f.trNote = ''; render(); },
     impSearch: function () {
