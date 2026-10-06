@@ -206,9 +206,10 @@ h2{font:800 clamp(1.5rem,2.6vw,2rem)/1.05 var(--font-d);letter-spacing:-.025em}
 .scard::after,.gcard::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,transparent 20%,var(--glass) 78%)}
 .scard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .scard-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.fan{position:relative;height:150px;margin-top:2px}
-.fan-i{position:absolute;left:50%;bottom:0;width:98px;transform:translateX(calc(-50% + (var(--j) - (var(--n) - 1)/2)*70px)) rotate(calc((var(--j) - (var(--n) - 1)/2)*9deg));transform-origin:50% 120%;transition:transform .4s cubic-bezier(.2,.9,.3,1.3)}
-.scard:hover .fan-i{transform:translateX(calc(-50% + (var(--j) - (var(--n) - 1)/2)*88px)) rotate(calc((var(--j) - (var(--n) - 1)/2)*12deg)) translateY(-6px)}
+.fan{position:relative;height:150px;margin-top:2px;container-type:inline-size}
+.fan-i{--sp:min(70px,calc((100vw - 250px)/var(--d,1)));--sp2:min(88px,calc((100vw - 250px)/var(--d,1)));position:absolute;left:50%;bottom:0;width:98px;transform:translateX(calc(-50% + (var(--j) - (var(--n) - 1)/2)*var(--sp))) rotate(calc((var(--j) - (var(--n) - 1)/2)*9deg));transform-origin:50% 120%;transition:transform .4s cubic-bezier(.2,.9,.3,1.3)}
+@supports (width:1cqw){.fan-i{--sp:min(70px,calc((100cqw - 200px)/var(--d,1)));--sp2:min(88px,calc((100cqw - 200px)/var(--d,1)))}}
+.scard:hover .fan-i{transform:translateX(calc(-50% + (var(--j) - (var(--n) - 1)/2)*var(--sp2))) rotate(calc((var(--j) - (var(--n) - 1)/2)*12deg)) translateY(-6px)}
 .scard-games{font:700 15px/1.3 var(--font-d);text-align:center;text-wrap:balance}
 .seats-row{display:flex;flex-direction:column;gap:8px;align-items:center}
 .seat-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:3px}
@@ -365,7 +366,7 @@ button.pchip:hover{background:var(--sun-soft);transform:translateY(-1px)}
 .admin-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-bottom:24px}
 .arows{display:flex;flex-direction:column;gap:14px}
 .arow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:20px;align-items:center;padding:16px 18px;border-radius:24px}
-.arow .minis{display:flex;gap:8px;margin-top:10px}
+.arow .minis{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .arow .minis .box{width:38px}
 .arow h3{font-size:18px}
 .arow-side{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
@@ -401,7 +402,7 @@ button.pchip:hover{background:var(--sun-soft);transform:translateY(-1px)}
 .stepper output{min-width:22px;text-align:center;font:800 15px/1 var(--font-d)}
 .import{padding:24px;margin-bottom:26px;display:flex;flex-direction:column;gap:16px}
 .import-row{display:flex;flex-wrap:wrap;gap:12px}
-.import-row .input{flex:1 1 240px;width:auto}
+.import-row .input{flex:1 1 min(240px,100%);width:auto;min-width:0}
 .suggest{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
 .hit{display:grid;grid-template-columns:120px minmax(0,1fr);gap:22px;padding:18px;border-radius:22px;background:var(--glass-2);border:2px dashed var(--teal);animation:pop .35s both}
 .hit .tr{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px}
@@ -413,7 +414,7 @@ button.pchip:hover{background:var(--sun-soft);transform:translateY(-1px)}
 .reg{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:10px 12px 10px 10px;border-radius:18px;background:var(--glass-2);border:1px solid var(--hair)}
 .reg+.reg{margin-top:8px}
 .reg .who-n{display:flex;align-items:center;gap:10px;font-weight:700;min-width:0}
-.reg .minis{display:flex;gap:10px}
+.reg .minis{display:flex;flex-wrap:wrap;gap:10px}
 .reg .mini{position:relative;width:32px}
 .reg .mini .mini-badge{width:20px;height:20px;font-size:11px;top:-7px;left:-7px}
 
@@ -445,7 +446,7 @@ button.pchip:hover{background:var(--sun-soft);transform:translateY(-1px)}
   .grid-sessions{grid-template-columns:minmax(0,1fr)}
   .panel{padding:18px}
   .arow{grid-template-columns:auto minmax(0,1fr)}
-  .arow-side{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}
+  .arow-side{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 10px}
   .grow{grid-template-columns:48px minmax(0,1fr);}
   .grow .stepper-wrap{grid-column:1/-1;display:flex;gap:14px;justify-content:space-between}
   .sheet-grid,.hit{grid-template-columns:minmax(0,1fr)}
@@ -2079,7 +2080,7 @@ var Badges = (function () {
     else { label = 'Voir la session'; cls += ' btn-glass'; }
     return '<article class="scard glass' + (ph === 'cancelled' ? ' is-cancelled' : '') + '" style="--bgimg:url(' + bgOf(games[0]) + ')"><span class="scard-bg"></span>' + (ph === 'cancelled' ? '<div class="cancel-stamp" role="img" aria-label="Session annulée"><span>Annulée</span></div>' : '') +
       '<div class="scard-top">' + ticket(s) + '<div class="scard-meta">' + statusPill(s) + (s.single ? '<span class="pill pill-single">Un seul jeu</span>' : '') + (s.ownerName ? '<span class="pill pill-host">' + ic('users', 13) + ' Organisé par ' + esc(s.ownerName) + '</span>' : '') + (mine ? (waitPos(s, ST.uid) ? '<span class="pill pill-wait">' + ic('clock', 13) + ' En attente · n°' + waitPos(s, ST.uid) + '</span>' : '<span class="pill pill-me">' + ic('check', 13) + ' Inscrit·e</span>') : '') + '</div></div>' +
-      '<div class="fan">' + games.map(function (g, j) { return '<div class="fan-i" style="--j:' + j + ';--n:' + games.length + '">' + box(g) + '</div>'; }).join('') + '</div>' +
+      '<div class="fan" style="--d:' + Math.max(games.length - 1, 1) + '">' + games.map(function (g, j) { return '<div class="fan-i" style="--j:' + j + ';--n:' + games.length + '">' + box(g) + '</div>'; }).join('') + '</div>' +
       '<p class="scard-games">' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</p>' + (s.note && s.note.trim() ? '<p class="scard-note">' + esc(s.note.trim()) + '</p>' : '') +
       '<div class="seats-row">' + seatStrip(n, seats) + '<span class="seat-num"><span class="sn-main"><b>' + n + '</b> / ' + seats + ' places</span>' + (unreadOf(s).length ? '<span class="sn-msg sn-new" title="Messages non lus" aria-label="' + unreadOf(s).length + ' nouveau' + (unreadOf(s).length > 1 ? 'x' : '') + ' message' + (unreadOf(s).length > 1 ? 's' : '') + ' non lu' + (unreadOf(s).length > 1 ? 's' : '') + '">' + ic('chat', 15) + unreadOf(s).length + ' nouveau' + (unreadOf(s).length > 1 ? 'x' : '') + '</span>' : msgsOf(s).length ? '<span class="sn-sep">-</span><span class="sn-msg" title="Messages" aria-label="' + msgsOf(s).length + ' message' + (msgsOf(s).length > 1 ? 's' : '') + '">' + ic('chat', 15) + msgsOf(s).length + '</span>' : '') + (waitList(s).length ? '<span class="sn-sep">·</span><span class="sn-main">' + waitList(s).length + ' en attente</span>' : '') + '</span></div>' +
       '<button class="' + cls + '" data-act="open" data-sid="' + s.id + '">' + label + ' ' + ic('arrow', 17) + '</button></article>';
