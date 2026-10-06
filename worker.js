@@ -35,7 +35,7 @@ const fail = (status, error, message) => json({ error, message: message || '' },
 
 /* ---------- Droits : compte Supabase connecté ET admin ----------
    Renvoie null si tout va bien, sinon la réponse d'erreur à envoyer (avec la cause exacte, pour que l'écran puisse l'expliquer). */
-async function adminCheck(req, env) {
+async function adminCheck(req, env, orgaOk) {
   const SB_URL = env.SUPABASE_URL || 'https://pjsaghnexlsxkkxauibc.supabase.co'; // valeurs publiques (config.js), repli si les variables manquent
   const SB_KEY = env.SUPABASE_ANON_KEY || 'sb_publishable_WRWRUmGY3efJTzY-7o3rnQ_0_DoGOa_';
   if (!SB_URL || !SB_KEY) { console.log('adminCheck: variables SUPABASE_URL / SUPABASE_ANON_KEY absentes'); return fail(500, 'cfg', 'Variables Supabase absentes sur le Worker.'); }
@@ -54,7 +54,9 @@ async function adminCheck(req, env) {
   let j = null; try { j = await r.json(); } catch (e) {}
   if (Array.isArray(j)) j = j[0];
   if (j && typeof j === 'object' && j.my_status && typeof j.my_status === 'object') j = j.my_status;
-  if (!(j && (j.admin === true || j.admin === 'true' || j.admin === 't'))) { console.log('adminCheck: compte non admin, réponse', JSON.stringify(j)); return fail(403, 'not_admin', 'Réservé à l’administrateur.'); }
+  const yes = (v) => v === true || v === 'true' || v === 't';
+  /* la copie d'images de boîte sert aussi aux organisateurs (import GameShelf) ; tout le reste reste réservé à l'admin */
+  if (!(j && (yes(j.admin) || (orgaOk && yes(j.organizer))))) { console.log('adminCheck: compte non admin, réponse', JSON.stringify(j)); return fail(403, 'not_admin', 'Réservé à l’administrateur.'); }
   return null;
 }
 
@@ -279,7 +281,7 @@ export default {
     const known = { '/api/bgg/search': 'GET', '/api/bgg/game': 'GET', '/api/bgg/image': 'GET', '/api/translate': 'POST' };
     if (!known[route]) return fail(404, 'not_found');
     if (req.method !== known[route]) return fail(405, 'method');
-    const denied = await adminCheck(req, env);
+    const denied = await adminCheck(req, env, route === '/api/bgg/image');
     if (denied) return denied;
 
     try {
