@@ -2653,7 +2653,7 @@ var Badges = (function () {
     img_type: 'format d’image inattendu.',
     img_big: 'image trop lourde.'
   };
-  function apiMsg(code, e) { return (API_MSG[code] || 'Service momentanément indisponible. Réessayez dans un instant.') + (code === 'rpc' && e && e.detail ? ' (' + e.detail + ')' : ''); }
+  function apiMsg(code, e) { return (API_MSG[code] || 'Service momentanément indisponible. Réessayez dans un instant.') + ((code === 'rpc' || !API_MSG[code] || code === 'down') && e && e.detail ? ' (' + e.detail + ')' : '') + (!API_MSG[code] || code === 'down' ? ' [' + code + ']' : ''); }
   function apiErr(code, detail) { var e = new Error(code); e.code = code; e.detail = detail || ''; return e; }
   /* opt.raw : renvoie le fichier (image) au lieu du JSON */
   function api(path, opt) {

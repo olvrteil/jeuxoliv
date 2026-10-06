@@ -305,7 +305,7 @@ export default {
       if (e instanceof BggError) return fail(e.status, e.code);
       const m = String(e && e.message || '');
       if (/neuron|quota|limit|capacity|daily/i.test(m)) return fail(429, 'quota', 'Quota de traduction du jour atteint.');
-      return fail(502, 'upstream', 'Service momentanément indisponible.');
+      console.log('upstream: ' + m); return fail(502, 'upstream', 'Erreur du Worker : ' + m.slice(0, 160));
     }
   },
 };
