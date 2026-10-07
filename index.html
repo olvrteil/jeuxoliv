@@ -386,6 +386,17 @@ button.pchip:hover{background:var(--sun-soft);transform:translateY(-1px)}
 .eq{font-size:13.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 8px}
 .eq b{color:var(--ink)}
 .glist{display:flex;flex-direction:column;gap:12px}
+.flt{display:flex;flex-direction:column;gap:10px;margin:0 0 18px}
+.flt-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.flt-l{display:inline-flex;align-items:center;gap:6px;min-width:84px;font:800 12px/1 var(--font-b);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.flt-c{display:flex;gap:8px;flex-wrap:wrap}
+.flt-b{padding:8px 14px;border-radius:999px;border:2px solid var(--hair);background:var(--glass-2);font:700 14px/1 var(--font-b);color:var(--ink);cursor:pointer;transition:transform .15s}
+.flt-b:hover{transform:translateY(-1px)}
+.flt-b[aria-pressed="true"]{background:var(--sun);color:var(--on-sun);border-color:var(--stroke);box-shadow:0 2px 0 var(--sun-edge)}
+.flt-reset{align-self:flex-start}
+.flt-n{margin:-6px 0 14px;color:var(--muted);font-weight:700;font-size:13px;min-height:0}.flt-n:empty{display:none}
+.gl-tools+.flt{margin-top:-4px}
+@media (max-width:560px){.flt-row{gap:6px}.flt-l{min-width:100%}}
 .nt-seg{margin-bottom:0;display:flex;flex-wrap:nowrap}
 .nt-seg button{flex:1 1 0;justify-content:center;padding-left:10px;padding-right:10px;white-space:nowrap}
 .nt-ses-sel{width:100%}
@@ -1011,7 +1022,7 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.14 - octobre 2026 - Olvrteil</span>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.15 - octobre 2026 - Olvrteil</span>
     <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API : logo officiel « Powered by BGG », qui renvoie vers BoardGameGeek. -->
     <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><img src="powered-by-bgg.png" width="252" height="56" alt="Powered by BGG" decoding="async"></a>
     <button type="button" id="pushLink" hidden></button></footer>
@@ -1818,7 +1829,7 @@ var Badges = (function () {
   var NAMEKEY = 'jdo-name', NAME = '';
   try { NAME = localStorage.getItem(NAMEKEY) || ''; } catch (e) {}
   var tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
-  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'], target: 'all', sid: '' }, route: 'home', gl: { q: '', sort: 'dateAsc' }, grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
+  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'], target: 'all', sid: '' }, route: 'home', gl: { q: '', sort: 'dateAsc' }, flt: { p: 0, d: '' }, grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
     form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false }, gs: gsNew(), bg: bgNew(),
     auth: { mode: 'in', email: '', name: '', code: '', msg: '', ok: false, busy: false }, addMode: 'auto', gf: null };
   ui.stats = { days: 90, view: 'main', pid: null, sort: 'part' };
@@ -2362,14 +2373,39 @@ var Badges = (function () {
   }
 
   /* ---------- Ludothèque ---------- */
+  /* filtres de la ludothèque : nombre de joueurs et durée de partie (partagés entre l'écran des joueurs et la liste admin) */
+  var FLT_P = [[0, 'Tous'], [2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6 et +']];
+  var FLT_D = [['', 'Toutes'], ['30', '30 min max'], ['60', '30 min – 1 h'], ['120', '1 h – 2 h'], ['180', '+ de 2 h']];
+  function fltOn() { return !!(ui.flt.p || ui.flt.d); }
+  function fltMatch(g) {
+    var p = ui.flt.p, d = ui.flt.d;
+    if (p && !(p >= 6 ? +g.max >= 6 : (+g.min || 0) <= p && (+g.max || 0) >= p)) return false;
+    if (d) {
+      var t = +g.time; if (!(t > 0)) return false;
+      if (d === '30' ? t > 30 : d === '60' ? !(t > 30 && t <= 60) : d === '120' ? !(t > 60 && t <= 120) : t <= 120) return false;
+    }
+    return true;
+  }
+  function fltBar() {
+    var chip = function (act, key, val, label, on) { return '<button type="button" class="flt-b" aria-pressed="' + on + '" data-act="' + act + '" data-v="' + val + '">' + label + '</button>'; };
+    return '<div class="flt" role="group" aria-label="Filtrer les jeux">' +
+      '<div class="flt-row"><span class="flt-l">' + ic('users', 15) + ' Joueurs</span><div class="flt-c">' + FLT_P.map(function (x) { return chip('fltP', 'p', x[0], x[1], ui.flt.p === x[0]); }).join('') + '</div></div>' +
+      '<div class="flt-row"><span class="flt-l">' + ic('clock', 15) + ' Durée</span><div class="flt-c">' + FLT_D.map(function (x) { return chip('fltD', 'd', x[0], x[1], ui.flt.d === x[0]); }).join('') + '</div></div>' +
+      (fltOn() ? '<button type="button" class="link flt-reset" data-act="fltReset">Réinitialiser les filtres</button>' : '') + '</div>';
+  }
   function viewGames() {
     return '<div class="sec-head" style="margin-bottom:26px;flex-wrap:wrap"><div><p class="eyebrow">Ludothèque</p><h1 style="font-size:clamp(2rem,4vw,3rem)">Les jeux de la maison</h1></div>' +
-      '<label class="search">' + ic('search', 18) + '<input id="search" placeholder="Rechercher un jeu" value="' + esc(ui.q) + '" autocomplete="off"></label></div><div class="grid-games" id="ggrid">' + gamesGrid() + '</div>';
+      '<label class="search">' + ic('search', 18) + '<input id="search" placeholder="Rechercher un jeu" value="' + esc(ui.q) + '" autocomplete="off"></label></div>' + fltBar() + '<p class="flt-n" id="flt-n">' + fltCount() + '</p><div class="grid-games" id="ggrid">' + gamesGrid() + '</div>';
+  }
+  function fltCount() {
+    if (!fltOn() && !ui.q.trim()) return '';
+    var q = ui.q.trim().toLowerCase(), n = M.games.filter(function (g) { return fltMatch(g) && (!q || g.name.toLowerCase().indexOf(q) >= 0 || (g.tags || []).join(' ').toLowerCase().indexOf(q) >= 0); }).length;
+    return plural(n, 'jeu', 'jeux') + ' sur ' + M.games.length;
   }
   function gamesGrid() {
     var q = ui.q.trim().toLowerCase();
-    var list = M.games.filter(function (g) { return !q || g.name.toLowerCase().indexOf(q) >= 0 || (g.tags || []).join(' ').toLowerCase().indexOf(q) >= 0; });
-    if (!list.length) return '<div class="empty" style="grid-column:1/-1">' + ic('search', 30) + '<p>' + (M.games.length ? 'Aucun jeu ne correspond à « ' + esc(ui.q) + ' ».' : 'La ludothèque est vide pour l’instant.') + '</p></div>';
+    var list = M.games.filter(function (g) { return fltMatch(g) && (!q || g.name.toLowerCase().indexOf(q) >= 0 || (g.tags || []).join(' ').toLowerCase().indexOf(q) >= 0); });
+    if (!list.length) return '<div class="empty" style="grid-column:1/-1">' + ic('search', 30) + '<p>' + (!M.games.length ? 'La ludothèque est vide pour l’instant.' : q ? 'Aucun jeu ne correspond à « ' + esc(ui.q) + ' »' + (fltOn() ? ' avec ces filtres.' : '.') : 'Aucun jeu ne correspond à ces filtres.') + '</p>' + (fltOn() ? '<button class="btn btn-sm" data-act="fltReset">Réinitialiser les filtres</button>' : '') + '</div>';
     return list.map(function (g) {
       return '<article class="gcard glass" role="button" tabindex="0" data-act="gameInfo" data-gid="' + g.id + '" style="--bgimg:url(' + bgOf(g) + ')"><span class="gcard-bg"></span><div class="gcard-box">' + box(g) + '</div><h3>' + esc(g.name) + '</h3>' + facts(g) + '</article>';
     }).join('');
@@ -2805,18 +2841,18 @@ var Badges = (function () {
   function glFold(t) { return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
   function glView() {
     var q = glFold(ui.gl.q).trim(), k = ui.gl.sort, cmpN = function (a, b) { return String(a.name).localeCompare(String(b.name), 'fr', { sensitivity: 'base', numeric: true }); };
-    var l = M.games.filter(function (g) { return !q || glFold(g.name).indexOf(q) >= 0 || glFold((g.tags || []).join(' ')).indexOf(q) >= 0; });
+    var l = M.games.filter(function (g) { return fltMatch(g) && (!q || glFold(g.name).indexOf(q) >= 0 || glFold((g.tags || []).join(' ')).indexOf(q) >= 0); });
     l.sort(k === 'nameAsc' ? cmpN : k === 'nameDesc' ? function (a, b) { return cmpN(b, a); } : k === 'dateDesc' ? function (a, b) { return (b.n || 0) - (a.n || 0); } : function (a, b) { return (a.n || 0) - (b.n || 0); });
     return l;
   }
-  function glCount() { return ui.gl.q.trim() ? glView().length + ' / ' + M.games.length : ''; }
+  function glCount() { return ui.gl.q.trim() || fltOn() ? glView().length + ' / ' + M.games.length : ''; }
   function glTools() {
     return '<div class="gl-tools"><div class="gsearch">' + ic('search', 18) + '<input class="input" id="gl-q" type="search" placeholder="Rechercher dans la ludothèque (nom, catégorie…)" autocomplete="off" value="' + esc(ui.gl.q) + '" aria-label="Rechercher dans la ludothèque"><small id="gl-n">' + glCount() + '</small></div>' +
-      '<label class="gl-sort"><span>Trier</span><select class="input" id="gl-sort" aria-label="Trier la ludothèque">' + GL_SORTS.map(function (x) { return '<option value="' + x[0] + '"' + (ui.gl.sort === x[0] ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select></label></div>';
+      '<label class="gl-sort"><span>Trier</span><select class="input" id="gl-sort" aria-label="Trier la ludothèque">' + GL_SORTS.map(function (x) { return '<option value="' + x[0] + '"' + (ui.gl.sort === x[0] ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select></label></div>' + fltBar();
   }
   function glRows() {
     var l = glView();
-    if (!l.length) return '<div class="empty">' + ic('search', 30) + '<p>' + (M.games.length ? 'Aucun jeu ne correspond à « ' + esc(ui.gl.q.trim()) + ' ».' : 'La ludothèque est vide pour l’instant.') + '</p></div>';
+    if (!l.length) return '<div class="empty">' + ic('search', 30) + '<p>' + (!M.games.length ? 'La ludothèque est vide pour l’instant.' : ui.gl.q.trim() ? 'Aucun jeu ne correspond à « ' + esc(ui.gl.q.trim()) + ' »' + (fltOn() ? ' avec ces filtres.' : '.') : 'Aucun jeu ne correspond à ces filtres.') + '</p></div>';
     return l.map(function (g) {
       return '<div class="grow">' + box(g) + '<div><h3>' + esc(g.name) + '</h3>' + facts(g) + (g.bgg && !g.summary ? '<small class="gs-todo">' + ic('edit', 12) + ' Résumé à compléter</small>' : '') + '</div>' + (canEditGame(g) ? '<div class="stepper-wrap" style="display:flex;gap:14px">' + stepper(g, 'min', 'Mini') + stepper(g, 'ideal', 'Idéal') + stepper(g, 'max', 'Maxi') + '</div>' : '<div class="stepper-wrap ro"><small class="hint">' + (g.owner && g.ownerName ? 'Ajouté par ' + esc(g.ownerName) : 'Ajouté par l’admin') + '</small></div>') +
         (!canEditGame(g) ? '' : '<div class="grow-btns"><button class="icon-btn edit" title="Modifier la fiche" aria-label="Modifier ' + esc(g.name) + '" data-act="editGame" data-gid="' + g.id + '">' + ic('edit', 16) + '</button>' +
@@ -3562,6 +3598,9 @@ var Badges = (function () {
       var before = waitList(s).length, gain = Math.min(before, seatsFor(gamesOf(s).concat([g]), !!s.single) - seatsOf(s));
       wr(ST.db.doc('sessions/' + s.id).update({ gameIds: (s.gameIds || []).concat(g.id) }), g.name + ' ajouté : ' + gain + ' personne' + (gain > 1 ? 's quittent' : ' quitte') + ' la liste d’attente.');
     },
+    fltP: function (el) { ui.flt.p = +el.dataset.v || 0; render(); },
+    fltD: function (el) { ui.flt.d = el.dataset.v || ''; render(); },
+    fltReset: function () { ui.flt = { p: 0, d: '' }; render(); },
     ntTarget: function (el) {
       var n = ui.nt, t = el.dataset.t === 'session' ? 'session' : 'all'; if (n.target === t) return;
       n.target = t; n.confirm = false; n.aud = null;
@@ -3872,7 +3911,7 @@ var Badges = (function () {
     else if (t.id === 'gs-user') ui.gs.user = t.value;
     else if (t.id === 'bg-q') ui.bg.q = t.value;
     else if (t.id === 'gs-q') { ui.gs.q = t.value; gsFilter(); }
-    else if (t.id === 'search') { ui.q = t.value; $('#ggrid').innerHTML = gamesGrid(); }
+    else if (t.id === 'search') { ui.q = t.value; $('#ggrid').innerHTML = gamesGrid(); var fn = $('#flt-n'); if (fn) fn.textContent = fltCount(); }
     else if (t.id === 'gl-q') { ui.gl.q = t.value; var gl = $('#glist'), gn = $('#gl-n'); if (gl) gl.innerHTML = glRows(); if (gn) gn.textContent = glCount(); }
   });
   document.addEventListener('keydown', function (e) {
