@@ -1076,6 +1076,8 @@ html{overflow-x:hidden;max-width:100%}
 .fame-row .fpos{font:800 16px var(--font-d);color:var(--muted);text-align:center}
 .fame-row .nm{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis}.fame-row .nm i:not(.sc-me){display:block;font-style:normal;font-weight:600;font-size:12px;color:var(--muted)}
 .fame-row .pc{font:800 20px var(--font-d)}.fame-row .pc small{font-size:.55em;color:var(--muted)}
+.prov{display:inline-block;font-style:normal;font-weight:700;font-size:10.5px;padding:2px 8px;border-radius:999px;background:var(--hair);color:var(--muted);letter-spacing:.02em}
+.fp-sub .prov{display:block;margin:4px auto 0;width:max-content}
 .fame-me{margin:6px 0 10px}.fame-me>span{display:block;font:800 12px var(--font-b);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .fame-empty .fame-big{font-size:46px}.fame-empty h2{font-size:1.4rem;color:var(--ink)}.fame-empty p{max-width:420px;margin:0}
 .palm{margin:16px 0 4px;padding:14px;border-radius:20px;background:var(--hair)}
@@ -2688,8 +2690,10 @@ var Badges = (function () {
     return { top: top, last: last, tables: tabs.length };
   }
   /* Hall of fame : un trimestre civil (janv.-mars, avril-juin, juil.-sept., oct.-déc.), remis à zéro au changement de trimestre.
-     Classement au taux de victoire (jeux coopératifs exclus), à partir de FAME_MIN parties avec scores validés. */
-  var FAME_MIN = 4, MOIS_C = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+     Classement au « score » = taux de victoire lissé (jeux coopératifs exclus) : chaque joueur démarre avec FAME_K parties fictives
+     au taux moyen du groupe, auxquelles s'ajoutent ses vraies parties. Peu de parties : le résultat est ramené vers la moyenne ;
+     beaucoup de parties : il reflète le vrai niveau. Classé à partir de FAME_MIN parties ; « provisoire » sous FAME_PROV parties. */
+  var FAME_MIN = 3, FAME_K = 4, FAME_PROV = 6, MOIS_C = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
   function quarterAt(off) {
     var n = new Date(), idx = n.getFullYear() * 4 + Math.floor(n.getMonth() / 3) - (off || 0), y = Math.floor(idx / 4), q = idx % 4;
     return { y: y, q: q, lo: new Date(y, q * 3, 1).getTime(), hi: new Date(y, q * 3 + 3, 1).getTime(), label: 'T' + (q + 1) + ' ' + y, span: MOIS_C[q * 3] + ' – ' + MOIS_C[q * 3 + 2] };
@@ -2700,8 +2704,11 @@ var Badges = (function () {
       if (o.mode === 'coop') return;
       o.rows.forEach(function (x) { if (!M.regs[x.uid] || M.regs[x.uid].fake) return; var p = P[x.uid] || (P[x.uid] = { uid: x.uid, n: 0, w: 0 }); p.n++; if (x.rank === 1) p.w++; });
     });
-    var all = Object.keys(P).map(function (u) { var p = P[u]; p.pct = Math.round(p.w / p.n * 100); return p; });
-    var rk = all.filter(function (p) { return p.n >= FAME_MIN; }).sort(function (a, b) { return b.w / b.n - a.w / a.n || b.w - a.w || b.n - a.n || nameOf(a.uid).localeCompare(nameOf(b.uid), 'fr'); });
+    var all = Object.keys(P).map(function (u) { return P[u]; }), tw = 0, tn = 0;
+    all.forEach(function (p) { tw += p.w; tn += p.n; });
+    var base = tn ? tw / tn : 0.3;   /* taux moyen du groupe sur le trimestre */
+    all.forEach(function (p) { p.sc = (p.w + FAME_K * base) / (p.n + FAME_K); p.pct = Math.round(p.sc * 100); p.prov = p.n < FAME_PROV; });
+    var rk = all.filter(function (p) { return p.n >= FAME_MIN; }).sort(function (a, b) { return b.sc - a.sc || b.w - a.w || b.n - a.n || nameOf(a.uid).localeCompare(nameOf(b.uid), 'fr'); });
     rk.forEach(function (p, i) { p.pos = i + 1; });
     return { rk: rk, all: all, byUid: P };
   }
@@ -3536,7 +3543,7 @@ var Badges = (function () {
   }
   /* --- Hall of fame : classement du trimestre, par groupe --- */
   function fameRow(p, me) {
-    return '<div class="fame-row' + (me ? ' me' : '') + '"><span class="fpos">' + p.pos + '</span>' + avatar(nameOf(p.uid), 'sm') + '<span class="nm">' + esc(nameOf(p.uid)) + (me ? ' <i class="sc-me">vous</i>' : '') + '<i>' + plural(p.w, 'victoire', 'victoires') + ' sur ' + plural(p.n, 'partie', 'parties') + '</i></span><b class="pc">' + p.pct + '<small> %</small></b></div>';
+    return '<div class="fame-row' + (me ? ' me' : '') + '"><span class="fpos">' + p.pos + '</span>' + avatar(nameOf(p.uid), 'sm') + '<span class="nm">' + esc(nameOf(p.uid)) + (me ? ' <i class="sc-me">vous</i>' : '') + '<i>' + plural(p.w, 'victoire', 'victoires') + ' sur ' + plural(p.n, 'partie', 'parties') + (p.prov ? ' · <em class="prov">provisoire</em>' : '') + '</i></span><b class="pc">' + p.pct + '<small> /100</small></b></div>';
   }
   function viewFame() {
     var grp = ST.groups.indexOf(ui.grp) >= 0 ? ui.grp : (ST.groups[0] || 'pro'), off = ui.fameOff || 0, qt = quarterAt(off), d = fameData(grp, qt), rk = d.rk;
@@ -3550,7 +3557,7 @@ var Badges = (function () {
     var order = top3.length === 3 ? [1, 0, 2] : top3.length === 2 ? [1, 0] : [0];
     h += '<section class="fame-pod n' + top3.length + '">' + order.map(function (i) {
       var p = top3[i], mine = p.uid === ST.uid;
-      return '<div class="fp p' + (i + 1) + (mine ? ' me' : '') + '"><span class="fp-medal" aria-hidden="true">' + medals[i] + '</span><span class="fp-av">' + avatar(nameOf(p.uid)) + '</span><b class="fp-nm">' + esc(nameOf(p.uid)) + '</b><span class="fp-pc">' + p.pct + '<small> %</small></span><small class="fp-sub">' + p.w + ' / ' + p.n + ' victoires</small><div class="fp-step"><i>' + (i + 1) + '</i></div></div>';
+      return '<div class="fp p' + (i + 1) + (mine ? ' me' : '') + '"><span class="fp-medal" aria-hidden="true">' + medals[i] + '</span><span class="fp-av">' + avatar(nameOf(p.uid)) + '</span><b class="fp-nm">' + esc(nameOf(p.uid)) + '</b><span class="fp-pc">' + p.pct + '<small> /100</small></span><small class="fp-sub">' + p.w + ' victoire' + (p.w > 1 ? 's' : '') + ' sur ' + p.n + (p.prov ? '<em class="prov">provisoire</em>' : '') + '</small><div class="fp-step"><i>' + (i + 1) + '</i></div></div>';
     }).join('') + '</section>';
     if (rk.length > 3) h += '<div class="fame-rows">' + rk.slice(3, 5).map(function (p) { return fameRow(p, p.uid === ST.uid); }).join('') + '</div>';
     return profTabs() + groupSwitch() + h + fameMine(me, myPos) + fameRule();
@@ -3562,7 +3569,7 @@ var Badges = (function () {
     var left = FAME_MIN - me.n;
     return '<div class="fame-me"><span>Votre place</span><p class="hint" style="margin:0">' + plural(me.n, 'partie comptée', 'parties comptées') + ' : encore ' + plural(left, 'partie', 'parties') + ' avec scores validés pour entrer au classement.</p></div>';
   }
-  function fameRule() { return '<p class="sx-foot">Classement au taux de victoire, à partir de ' + FAME_MIN + ' parties avec scores validés dans le trimestre. Les jeux coopératifs ne sont pas comptés. Remise à zéro tous les trois mois (janvier, avril, juillet, octobre).</p>'; }
+  function fameRule() { return '<p class="sx-foot">Le score est un taux de victoire qui tient compte du nombre de parties : avec peu de parties, il compte moins ; avec beaucoup, il reflète le vrai niveau. Il faut ' + FAME_MIN + ' parties avec scores validés pour être classé·e, et le classement est « provisoire » en dessous de ' + FAME_PROV + '. Les jeux coopératifs ne sont pas comptés. Remise à zéro tous les trois mois (janvier, avril, juillet, octobre).</p>'; }
   function viewProfile(pu) {
     if (ST.auth !== 'in' || !ST.uid) return viewHome();
     if (!pu && ui.profTab === 'fame') return viewFame();
