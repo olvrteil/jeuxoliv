@@ -1032,6 +1032,25 @@ html{overflow-x:hidden;max-width:100%}
 .foot .bgg-pw:hover,.foot .bgg-pw:focus-visible{opacity:1;transform:translateY(-1px)}
 .bgg-pw img{display:block;height:22px;width:auto}
 
+/* ----- Fenêtre « Nouveautés » ----- */
+.news{align-items:center}
+.news-sheet{width:min(460px,100%);padding:0;display:flex;flex-direction:column;overflow:hidden;max-height:min(720px,calc(100% - 8px))}
+.news-hero{position:relative;padding:18px 22px 16px;text-align:center;color:#1B1530;background:radial-gradient(120% 90% at 20% 0%,#FFE27A 0%,transparent 60%),linear-gradient(135deg,#FFC93C 0%,#FF8A5B 55%,#F2557A 120%);overflow:hidden}
+.news-hero h2{margin:6px 0 4px;font-size:clamp(1.6rem,6vw,2rem);color:#1B1530}
+.news-hero p{margin:0;font-size:14.5px;font-weight:600;color:#3a2a3f}
+.news-chip{display:inline-block;padding:5px 12px;border-radius:999px;background:#1B1530;color:#FFE27A;font:800 11px/1 var(--font-b);letter-spacing:.14em;text-transform:uppercase}
+.news-cup{display:grid;place-items:center;width:70px;height:70px;margin:12px auto 0;border-radius:50%;font-size:38px;background:radial-gradient(circle at 35% 30%,#fff 0%,#FFF1B8 60%,#FFD25E 100%);box-shadow:0 0 0 6px rgba(255,255,255,.35),0 10px 26px -6px rgba(27,21,48,.5);animation:floaty 2.8s ease-in-out infinite alternate;--r:0deg}
+.news-sp i{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);background:#fff;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);opacity:.75;animation:newsTw 2.4s var(--d) ease-in-out infinite alternate}
+@keyframes newsTw{from{transform:scale(.4) rotate(0);opacity:.2}to{transform:scale(1.1) rotate(40deg);opacity:.9}}
+.news-list{list-style:none;margin:0;padding:14px 18px 8px;display:grid;gap:11px;overflow:auto}
+.news-list li{display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:start;animation:rise .45s calc(.15s + var(--i)*.09s) both}
+.news-ic{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;font-size:24px;background:var(--hair);border:2px solid var(--stroke)}
+.news-ic.c0{background:color-mix(in srgb,var(--sun) 55%,var(--glass-2))}.news-ic.c1{background:color-mix(in srgb,var(--teal) 35%,var(--glass-2))}.news-ic.c2{background:color-mix(in srgb,var(--pink) 35%,var(--glass-2))}.news-ic.c3{background:color-mix(in srgb,var(--cobalt) 30%,var(--glass-2))}
+.news-list b{display:block;font:800 16px/1.2 var(--font-d);margin-bottom:3px}
+.news-list li div span{display:block;font-size:13.5px;line-height:1.4;color:var(--muted)}
+.news-foot{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 18px 18px;border-top:1px solid var(--hair);background:var(--glass-2)}
+.news-foot .btn{justify-content:center;padding-inline:10px;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.news-cup,.news-sp i,.news-list li{animation:none}}
 /* ----- v1.20 : badges de victoire, hall of fame, palmarès ----- */
 .prof-tabs{display:flex;width:100%;margin:6px 0 16px}.prof-tabs button{flex:1;justify-content:center}
 .fm-row{display:flex;gap:6px;flex-wrap:nowrap}
@@ -2926,6 +2945,7 @@ var Badges = (function () {
         if (cur0 && nw) { var top0 = cur0.scrollTop; cur0.innerHTML = nw.innerHTML; cur0.scrollTop = top0; return; }
       }
     }
+    else if (m && m.type === 'news') { if ($('#modal-root .news-sheet')) return; h = modalNews(); }
     else if (m && m.type === 'filters') { if ($('#modal-root .fsheet')) return; h = modalFilters(); }
     else if (m && m.type === 'badges') { var cb = $('#modal-root').firstElementChild; if (cb && cb.classList.contains('bdcel')) return; h = modalBadges(m); if (!h) ui.modal = null; }
     else if (m && m.type === 'reveal') { var cur = $('#modal-root').firstElementChild; if (cur && cur.classList.contains('reveal') && cur.dataset.sid === m.sid) return; h = modalReveal(m); if (!h) { ui.modal = null; } }
@@ -3591,6 +3611,29 @@ var Badges = (function () {
       return '<section class="bd-sec"><h2 class="bd-h">' + c[1] + '</h2>' + (c[0] === 'neg' ? '<p class="hint" style="margin:-4px 0 12px">Des badges pour en rire : ils ne comptent que si l’organisateur vous a marqué·e absent·e.</p>' : '') + '<div class="bd-grid">' + l.map(badgeCard).join('') + '</div></section>';
     }).join('');
   }
+  /* --- « Nouveautés » : fenêtre à l'ouverture de l'accueil tant que la personne n'a pas cliqué sur OK ---
+     OK : mémorisé dans sa fiche (champ news), plus jamais affichée pour cette version.
+     « Revoir plus tard » (ou fermeture autrement) : réaffichée à la prochaine ouverture de l'appli. */
+  var NEWS_ID = 'v1.20';
+  function maybeNews() {
+    if (ui.route !== 'home' || ui.modal || ui.newsShown || ST.auth !== 'in' || !ST.uid || !ST.ready || !ST.loaded.results || !ST.loaded.auto) return;
+    if (navigator.webdriver && !window.__JDO_NEWS_TEST) return;   /* tests automatisés : pas de fenêtre, sauf test dédié */
+    var d = M.regs[ST.uid] || {}; if (d.news === NEWS_ID) return;   /* pas encore de fiche (jamais inscrit·e) : on l'affiche aussi */
+    ui.newsShown = true; ui.modal = { type: 'news' };
+  }
+  function modalNews() {
+    var rows = [
+      ['🏆', 'Notez les scores', 'Depuis « Ma table », bouton Scores : plus de points, moins de points ou coopératif. Tout le monde à la table peut saisir.'],
+      ['🔄', 'Changez de table', 'Au dernier moment : place libre ou échange avec un joueur, jusqu’à 3 h après le début.'],
+      ['🎖️', '12 nouveaux badges', 'Victoires, séries, bon perdant… à retrouver dans votre profil.'],
+      ['👑', 'Le Hall of fame du trimestre', 'Classement des meilleurs, remis à zéro tous les 3 mois, et palmarès dans la fiche de chaque jeu.']
+    ], sp = '';
+    for (var i = 0; i < 9; i++) sp += '<i style="--x:' + (i % 2 ? 86 + (i * 3) % 9 : 4 + (i * 3) % 9) + '%;--y:' + (14 + i * 9) + '%;--d:' + (i * .35).toFixed(2) + 's;--s:' + (8 + (i % 3) * 5) + 'px"></i>';
+    return '<div class="modal news" data-act="newsLater"><div class="sheet news-sheet glass-2" data-act="noop" role="dialog" aria-modal="true" aria-label="Nouveautés">' +
+      '<div class="news-hero"><span class="news-sp" aria-hidden="true">' + sp + '</span><span class="news-chip">Nouveauté · ' + NEWS_ID + '</span><span class="news-cup" aria-hidden="true">🏆</span><h2>Jouez, notez, gagnez !</h2><p>Les scores arrivent à la table, avec classement et badges.</p></div>' +
+      '<ul class="news-list">' + rows.map(function (r, i) { return '<li style="--i:' + i + '"><span class="news-ic c' + i + '" aria-hidden="true">' + r[0] + '</span><div><b>' + r[1] + '</b><span>' + r[2] + '</span></div></li>'; }).join('') + '</ul>' +
+      '<div class="news-foot"><button class="btn btn-glass" data-act="newsLater">Revoir plus tard</button><button class="btn btn-teal" data-act="newsOk">OK</button></div></div></div>';
+  }
   function maybeBadges() {
     if (ui.route !== 'home' || ui.modal || ui.badgeDone || ST.auth !== 'in' || !ST.uid || !ST.ready || !ST.loaded.results || !ST.loaded.auto) return;
     var d = M.regs[ST.uid]; if (!d) return;
@@ -3804,7 +3847,7 @@ var Badges = (function () {
     if (ST.auth !== 'in') items = [];
     $('#nav').style.gridTemplateColumns = 'repeat(' + (items.length || 1) + ',minmax(0,1fr))'; $('#nav').classList.toggle('n5', items.length >= 5);
     $('#nav').innerHTML = items.map(function (t) { return '<button data-go="' + t[0] + '" aria-current="' + (t[0] === navKey() ? 'page' : 'false') + '">' + ic(t[2], 18) + (t[0] === 'admin' && wdPendingCount() ? '<i class="nav-dot">' + wdPendingCount() + '</i>' : '') + '<span>' + t[1] + '</span></button>'; }).join('');
-    maybeReveal(); maybeBadges(); renderModal(); updateHeader(); updatePushLink(); touchRead(); ui.anim = false;
+    maybeReveal(); maybeNews(); maybeBadges(); renderModal(); updateHeader(); updatePushLink(); touchRead(); ui.anim = false;
     if (!noKeep) window.scrollTo(0, y);
   }
   var raf = 0, pendingRender = false;
@@ -4087,6 +4130,8 @@ var Badges = (function () {
     pushOff: function () { Backend.push.forget(ST.uid, true).then(function () { toast('Notifications désactivées sur cet appareil.'); refreshPush(); }); },
     pushLater: function () { try { localStorage.setItem('jdo-push-hide', String(Date.now())); } catch (e) {} ui.pushHide = true; render(); },
     pickGroup: function (el) { var a = ui.form.groups, g = el.dataset.g, i = a.indexOf(g); if (i >= 0) { if (a.length > 1) a.splice(i, 1); } else a.push(g); render(); },
+    newsLater: function () { ui.modal = null; renderModal(); },
+    newsOk: function () { ui.modal = null; renderModal(); saveMine(function (doc) { doc.news = NEWS_ID; return doc; }); },
     profTab: function (el) { ui.profTab = el.dataset.t; render(true); window.scrollTo(0, 0); },
     fameQ: function (el) { ui.fameOff = Math.max(0, (ui.fameOff || 0) + (+el.dataset.d)); render(true); },
     setGrp: function (el) { ui.grp = el.dataset.g; try { localStorage.setItem(GRPKEY, ui.grp); } catch (e) {} render(true); },
