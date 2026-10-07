@@ -386,17 +386,44 @@ button.pchip:hover{background:var(--sun-soft);transform:translateY(-1px)}
 .eq{font-size:13.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 8px}
 .eq b{color:var(--ink)}
 .glist{display:flex;flex-direction:column;gap:12px}
-.flt{display:flex;flex-direction:column;gap:10px;margin:0 0 18px}
-.flt-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.flt-l{display:inline-flex;align-items:center;gap:6px;min-width:84px;font:800 12px/1 var(--font-b);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.gtools{display:flex;gap:10px;align-items:center;flex-wrap:nowrap}
+.gtools .search{min-width:0;flex:1 1 260px}
+.flt-open{position:relative;gap:8px;white-space:nowrap}
+.flt-open.on{border-color:var(--stroke);background:var(--sun);color:var(--on-sun)}
+.flt-badge{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--ink);color:var(--bg);font:800 12px/1 var(--font-b);animation:pop .3s both}
+.flt-sum{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px}
+.flt-sum[hidden]{display:none}
+.flt-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px 6px 12px;border-radius:999px;border:2px solid var(--stroke);background:var(--sun);color:var(--on-sun);font:800 13px/1 var(--font-b);cursor:pointer;animation:pop .25s both}
+.flt-tag svg{opacity:.7}
+.flt-tag:hover svg{opacity:1}
+.flt-n{margin:-4px 0 14px;color:var(--muted);font-weight:700;font-size:13px}.flt-n:empty{display:none}
 .flt-c{display:flex;gap:8px;flex-wrap:wrap}
-.flt-b{padding:8px 14px;border-radius:999px;border:2px solid var(--hair);background:var(--glass-2);font:700 14px/1 var(--font-b);color:var(--ink);cursor:pointer;transition:transform .15s}
+.flt-b{display:inline-flex;flex-direction:column;align-items:center;gap:3px;padding:10px 16px;border-radius:16px;border:2px solid var(--hair);background:var(--glass-2);font:800 15px/1 var(--font-b);color:var(--ink);cursor:pointer;transition:transform .15s,background .2s,box-shadow .2s}
+.flt-b small{font:600 11px/1.2 var(--font-b);color:var(--muted)}
 .flt-b:hover{transform:translateY(-1px)}
-.flt-b[aria-pressed="true"]{background:var(--sun);color:var(--on-sun);border-color:var(--stroke);box-shadow:0 2px 0 var(--sun-edge)}
-.flt-reset{align-self:flex-start}
-.flt-n{margin:-6px 0 14px;color:var(--muted);font-weight:700;font-size:13px;min-height:0}.flt-n:empty{display:none}
-.gl-tools+.flt{margin-top:-4px}
-@media (max-width:560px){.flt-row{gap:6px}.flt-l{min-width:100%}}
+.flt-b:active{transform:scale(.96)}
+.flt-b[aria-pressed="true"]{background:var(--sun);color:var(--on-sun);border-color:var(--stroke);box-shadow:0 3px 0 var(--sun-edge)}
+.flt-b[aria-pressed="true"] small{color:var(--on-sun);opacity:.8}
+.flt-c-w .flt-b{flex:1 1 140px;align-items:flex-start;text-align:left}
+.fsheet{width:min(560px,100%);padding:0;display:flex;flex-direction:column;overflow:hidden;animation:fsIn .38s cubic-bezier(.2,.9,.3,1.1) both}
+@keyframes fsIn{from{opacity:0;transform:translateY(18px) scale(.94)}to{opacity:1;transform:none}}
+.fs-grip{display:none;width:44px;height:5px;border-radius:3px;background:var(--hair);margin:10px auto 0}
+.fs-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px 6px}
+.fs-head h2{margin:0;font-size:clamp(1.4rem,3vw,1.8rem)}
+.fs-body{overflow:auto;padding:6px 22px 14px;display:flex;flex-direction:column;gap:20px}
+.fs-sec{animation:rise .45s both}.fs-sec:nth-child(2){animation-delay:.07s}.fs-sec:nth-child(3){animation-delay:.14s}
+.fs-t{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px;font:800 13px/1.2 var(--font-b);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.fs-t small{font:600 12px/1.2 var(--font-b);letter-spacing:0;text-transform:none;opacity:.8}
+.fs-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px 18px;border-top:1px solid var(--hair)}
+.fs-foot .link:disabled{opacity:.4;pointer-events:none}
+@media (max-width:640px){
+  .fm{place-items:end center;padding:0}
+  .fsheet{width:100%;max-height:86%;border-radius:28px 28px 0 0;animation:fsUp .42s cubic-bezier(.2,.9,.3,1) both;padding-bottom:env(safe-area-inset-bottom)}
+  .fs-grip{display:block}
+  .gtools{width:100%}.gtools .search{flex:1 1 0;min-width:0}
+}
+@keyframes fsUp{from{transform:translateY(100%)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.fsheet,.fs-sec,.flt-tag,.flt-badge{animation:none}}
 .nt-seg{margin-bottom:0;display:flex;flex-wrap:nowrap}
 .nt-seg button{flex:1 1 0;justify-content:center;padding-left:10px;padding-right:10px;white-space:nowrap}
 .nt-ses-sel{width:100%}
@@ -1022,7 +1049,7 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.16 - octobre 2026 - Olvrteil</span>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.17 - octobre 2026 - Olvrteil</span>
     <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API : logo officiel « Powered by BGG », qui renvoie vers BoardGameGeek. -->
     <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><img src="powered-by-bgg.png" width="252" height="56" alt="Powered by BGG" decoding="async"></a>
     <button type="button" id="pushLink" hidden></button></footer>
@@ -1788,6 +1815,7 @@ var Badges = (function () {
   /* ---------- Icônes ---------- */
   var ICONS = {
     users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+    sliders: '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     ghost: '<path d="M5 21V10a7 7 0 0114 0v11l-2.5-2-2 2-2.5-2-2.5 2-2-2z"/><path d="M10 10h.01M14 10h.01"/>',
     trophy: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3"/>',
@@ -1829,7 +1857,7 @@ var Badges = (function () {
   var NAMEKEY = 'jdo-name', NAME = '';
   try { NAME = localStorage.getItem(NAMEKEY) || ''; } catch (e) {}
   var tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
-  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'], target: 'all', sid: '' }, route: 'home', gl: { q: '', sort: 'dateAsc' }, flt: { p: [], d: '' }, grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
+  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'], target: 'all', sid: '' }, route: 'home', gl: { q: '', sort: 'dateAsc' }, flt: { p: [], d: [], w: [] }, grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
     form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false }, gs: gsNew(), bg: bgNew(),
     auth: { mode: 'in', email: '', name: '', code: '', msg: '', ok: false, busy: false }, addMode: 'auto', gf: null };
   ui.stats = { days: 90, view: 'main', pid: null, sort: 'part' };
@@ -2374,38 +2402,92 @@ var Badges = (function () {
 
   /* ---------- Ludothèque ---------- */
   /* filtres de la ludothèque : nombre de joueurs et durée de partie (partagés entre l'écran des joueurs et la liste admin) */
-  var FLT_P = [[0, 'Tous'], [2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6 et +']];
-  var FLT_D = [['', 'Toutes'], ['30', '30 min max'], ['60', '30 min – 1 h'], ['120', '1 h – 2 h'], ['180', '+ de 2 h']];
-  function fltOn() { return !!(ui.flt.p.length || ui.flt.d); }
+  var FLT_P = [[2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6 et +']];
+  var FLT_D = [['30', '30 min max', 'Express'], ['60', '30 min – 1 h', 'Rapide'], ['120', '1 h – 2 h', 'Soirée'], ['180', '+ de 2 h', 'Long']];
+  var FLT_W = [['e', 'Facile', 'Règles simples, on joue vite'], ['m', 'Moyen', 'Un peu de réflexion'], ['h', 'Expert', 'Pour joueurs aguerris']];
+  function fltOn() { return !!(ui.flt.p.length || ui.flt.d.length || ui.flt.w.length); }
+  function fltN() { return ui.flt.p.length + ui.flt.d.length + ui.flt.w.length; }
+  /* plusieurs choix dans un même critère : le jeu convient s'il correspond à au moins l'un d'eux ; critères différents : tous requis */
   function fltMatch(g) {
-    var p = ui.flt.p, d = ui.flt.d;
-    /* plusieurs nombres de joueurs possibles : le jeu convient s'il se joue à au moins l'un d'eux */
-    if (p.length && !p.some(function (n) { return n >= 6 ? +g.max >= 6 : (+g.min || 0) <= n && (+g.max || 0) >= n; })) return false;
-    if (d) {
+    var f = ui.flt;
+    if (f.p.length && !f.p.some(function (n) { return n >= 6 ? +g.max >= 6 : (+g.min || 0) <= n && (+g.max || 0) >= n; })) return false;
+    if (f.d.length) {
       var t = +g.time; if (!(t > 0)) return false;
-      if (d === '30' ? t > 30 : d === '60' ? !(t > 30 && t <= 60) : d === '120' ? !(t > 60 && t <= 120) : t <= 120) return false;
+      if (!f.d.some(function (d) { return d === '30' ? t <= 30 : d === '60' ? t > 30 && t <= 60 : d === '120' ? t > 60 && t <= 120 : t > 120; })) return false;
+    }
+    if (f.w.length) {
+      var w = +g.weight; if (!(w > 0)) return false;
+      if (!f.w.some(function (k) { return k === 'e' ? w < 2 : k === 'm' ? w >= 2 && w <= 3 : w > 3; })) return false;
     }
     return true;
   }
-  function fltBar() {
-    var chip = function (act, key, val, label, on) { return '<button type="button" class="flt-b" aria-pressed="' + on + '" data-act="' + act + '" data-v="' + val + '">' + label + '</button>'; };
-    return '<div class="flt" role="group" aria-label="Filtrer les jeux">' +
-      '<div class="flt-row"><span class="flt-l">' + ic('users', 15) + ' Joueurs</span><div class="flt-c">' + FLT_P.map(function (x) { return chip('fltP', 'p', x[0], x[1], x[0] ? ui.flt.p.indexOf(x[0]) >= 0 : !ui.flt.p.length); }).join('') + '</div></div>' +
-      '<div class="flt-row"><span class="flt-l">' + ic('clock', 15) + ' Durée</span><div class="flt-c">' + FLT_D.map(function (x) { return chip('fltD', 'd', x[0], x[1], ui.flt.d === x[0]); }).join('') + '</div></div>' +
-      (fltOn() ? '<button type="button" class="link flt-reset" data-act="fltReset">Réinitialiser les filtres</button>' : '') + '</div>';
+  function fltLabels() {
+    var out = [];
+    ui.flt.p.forEach(function (n) { out.push(['p', n, n >= 6 ? '6 joueurs et +' : n + ' joueurs']); });
+    ui.flt.d.forEach(function (k) { out.push(['d', k, FLT_D.filter(function (x) { return x[0] === k; })[0][1]]); });
+    ui.flt.w.forEach(function (k) { out.push(['w', k, FLT_W.filter(function (x) { return x[0] === k; })[0][1]]); });
+    return out;
+  }
+  /* bouton « Filtres » + pastilles des filtres actifs (barre au-dessus de la liste) */
+  function fltBtn() {
+    var n = fltN();
+    return '<button type="button" class="btn btn-glass flt-open' + (n ? ' on' : '') + '" id="flt-btn" data-act="fltOpen" aria-haspopup="dialog">' + ic('sliders', 18) + ' Filtres' + (n ? '<span class="flt-badge">' + n + '</span>' : '') + '</button>';
+  }
+  function fltSum() {
+    return fltLabels().map(function (x) { return '<button type="button" class="flt-tag" data-act="fltDrop" data-k="' + x[0] + '" data-v="' + x[1] + '" aria-label="Retirer le filtre ' + esc(x[2]) + '">' + esc(x[2]) + ic('x', 12) + '</button>'; }).join('') +
+      (fltOn() ? '<button type="button" class="link flt-reset" data-act="fltReset">Tout effacer</button>' : '');
+  }
+  function fltChips(key, list, act) {
+    return list.map(function (x) {
+      var on = ui.flt[key].indexOf(x[0]) >= 0;
+      return '<button type="button" class="flt-b' + (x[2] && key === 'w' ? ' flt-b-w' : '') + '" aria-pressed="' + on + '" data-act="' + act + '" data-v="' + x[0] + '">' + x[1] + (x[2] && key !== 'p' ? '<small>' + x[2] + '</small>' : '') + '</button>';
+    }).join('');
+  }
+  /* fenêtre des filtres : feuille qui monte du bas sur téléphone, carte centrée sur ordinateur */
+  function fltViewCount() { return ui.route === 'games' ? gamesFiltered().length : glView().length; }
+  function fltFootLabel() { var n = fltViewCount(); return n ? 'Voir ' + plural(n, 'jeu', 'jeux') : 'Aucun jeu'; }
+  function modalFilters() {
+    return '<div class="modal fm" data-act="closeModal"><div class="sheet fsheet glass-2" data-act="noop" role="dialog" aria-modal="true" aria-label="Filtrer les jeux">' +
+      '<span class="fs-grip" aria-hidden="true"></span><div class="fs-head"><h2>Filtrer les jeux</h2><button class="icon-btn" data-act="closeModal" aria-label="Fermer">' + ic('x', 18) + '</button></div>' +
+      '<div class="fs-body">' +
+      '<section class="fs-sec"><div class="fs-t">' + ic('users', 16) + ' Nombre de joueurs <small>plusieurs choix possibles</small></div><div class="flt-c">' + fltChips('p', FLT_P, 'fltP') + '</div></section>' +
+      '<section class="fs-sec"><div class="fs-t">' + ic('clock', 16) + ' Durée de la partie <small>plusieurs choix possibles</small></div><div class="flt-c">' + fltChips('d', FLT_D, 'fltD') + '</div></section>' +
+      '<section class="fs-sec"><div class="fs-t">' + ic('spark', 16) + ' Difficulté <small>d’après la complexité BoardGameGeek</small></div><div class="flt-c flt-c-w">' + fltChips('w', FLT_W, 'fltW') + '</div></section></div>' +
+      '<div class="fs-foot"><button type="button" class="link" data-act="fltReset" id="fs-reset"' + (fltOn() ? '' : ' disabled') + '>Réinitialiser</button><button type="button" class="btn btn-teal btn-lg" id="fs-go" data-act="closeModal">' + fltFootLabel() + '</button></div></div></div>';
+  }
+  /* après un changement de filtre : on met à jour la fenêtre (sans la rejouer), la barre et la liste, sans tout redessiner */
+  function fltRefresh() {
+    var fm = $('.fsheet');
+    if (fm) {
+      [['p', 'fltP'], ['d', 'fltD'], ['w', 'fltW']].forEach(function (k) {
+        fm.querySelectorAll('[data-act="' + k[1] + '"]').forEach(function (b) { var v = k[0] === 'p' ? +b.dataset.v : b.dataset.v; b.setAttribute('aria-pressed', ui.flt[k[0]].indexOf(v) >= 0); });
+      });
+      var go = $('#fs-go'), rs = $('#fs-reset'); if (go) go.textContent = fltFootLabel(); if (rs) rs.disabled = !fltOn();
+    }
+    var bt = $('#flt-btn'); if (bt) { bt.outerHTML = fltBtn(); }
+    var sm = $('#flt-sum'); if (sm) { sm.innerHTML = fltSum(); sm.hidden = !fltOn(); }
+    var g = $('#ggrid'); if (g) { g.innerHTML = gamesGrid(); var fn = $('#flt-n'); if (fn) fn.textContent = fltCount(); }
+    var gl = $('#glist'); if (gl) { gl.innerHTML = glRows(); var gn = $('#gl-n'); if (gn) gn.textContent = glCount(); }
   }
   function viewGames() {
-    return '<div class="sec-head" style="margin-bottom:26px;flex-wrap:wrap"><div><p class="eyebrow">Ludothèque</p><h1 style="font-size:clamp(2rem,4vw,3rem)">Les jeux de la maison</h1></div>' +
-      '<label class="search">' + ic('search', 18) + '<input id="search" placeholder="Rechercher un jeu" value="' + esc(ui.q) + '" autocomplete="off"></label></div>' + fltBar() + '<p class="flt-n" id="flt-n">' + fltCount() + '</p><div class="grid-games" id="ggrid">' + gamesGrid() + '</div>';
+    return '<div class="sec-head" style="margin-bottom:18px;flex-wrap:wrap"><div><p class="eyebrow">Ludothèque</p><h1 style="font-size:clamp(2rem,4vw,3rem)">Les jeux de la maison</h1></div>' +
+      '<div class="gtools"><label class="search">' + ic('search', 18) + '<input id="search" placeholder="Rechercher" value="' + esc(ui.q) + '" autocomplete="off"></label>' + fltBtn() + '</div></div>' +
+      '<div class="flt-sum" id="flt-sum"' + (fltOn() ? '' : ' hidden') + '>' + fltSum() + '</div><p class="flt-n" id="flt-n">' + fltCount() + '</p><div class="grid-games" id="ggrid">' + gamesGrid() + '</div>';
+  }
+  function gamesFiltered() {
+    var q = ui.q.trim().toLowerCase();
+    return M.games.filter(function (g) { return fltMatch(g) && (!q || g.name.toLowerCase().indexOf(q) >= 0 || (g.tags || []).join(' ').toLowerCase().indexOf(q) >= 0); });
+  }
+  function fltToggle(k, v) {
+    var a = ui.flt[k], i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else { a.push(v); if (k === 'p') a.sort(function (x, y) { return x - y; }); }
+    fltRefresh();
   }
   function fltCount() {
     if (!fltOn() && !ui.q.trim()) return '';
-    var q = ui.q.trim().toLowerCase(), n = M.games.filter(function (g) { return fltMatch(g) && (!q || g.name.toLowerCase().indexOf(q) >= 0 || (g.tags || []).join(' ').toLowerCase().indexOf(q) >= 0); }).length;
-    return plural(n, 'jeu', 'jeux') + ' sur ' + M.games.length;
+    return plural(gamesFiltered().length, 'jeu', 'jeux') + ' sur ' + M.games.length;
   }
   function gamesGrid() {
-    var q = ui.q.trim().toLowerCase();
-    var list = M.games.filter(function (g) { return fltMatch(g) && (!q || g.name.toLowerCase().indexOf(q) >= 0 || (g.tags || []).join(' ').toLowerCase().indexOf(q) >= 0); });
+    var q = ui.q.trim(), list = gamesFiltered();
     if (!list.length) return '<div class="empty" style="grid-column:1/-1">' + ic('search', 30) + '<p>' + (!M.games.length ? 'La ludothèque est vide pour l’instant.' : q ? 'Aucun jeu ne correspond à « ' + esc(ui.q) + ' »' + (fltOn() ? ' avec ces filtres.' : '.') : 'Aucun jeu ne correspond à ces filtres.') + '</p>' + (fltOn() ? '<button class="btn btn-sm" data-act="fltReset">Réinitialiser les filtres</button>' : '') + '</div>';
     return list.map(function (g) {
       return '<article class="gcard glass" role="button" tabindex="0" data-act="gameInfo" data-gid="' + g.id + '" style="--bgimg:url(' + bgOf(g) + ')"><span class="gcard-bg"></span><div class="gcard-box">' + box(g) + '</div><h3>' + esc(g.name) + '</h3>' + facts(g) + '</article>';
@@ -2431,6 +2513,7 @@ var Badges = (function () {
     var h = '', m = ui.modal;
     if (m && m.type === 'game' && G(m.gid)) h = modalGame(G(m.gid));
     else if (m && m.type === 'move') h = modalMove(m);
+    else if (m && m.type === 'filters') { if ($('#modal-root .fsheet')) return; h = modalFilters(); }
     else if (m && m.type === 'badges') { var cb = $('#modal-root').firstElementChild; if (cb && cb.classList.contains('bdcel')) return; h = modalBadges(m); if (!h) ui.modal = null; }
     else if (m && m.type === 'reveal') { var cur = $('#modal-root').firstElementChild; if (cur && cur.classList.contains('reveal') && cur.dataset.sid === m.sid) return; h = modalReveal(m); if (!h) { ui.modal = null; } }
     $('#modal-root').innerHTML = h;
@@ -2849,7 +2932,7 @@ var Badges = (function () {
   function glCount() { return ui.gl.q.trim() || fltOn() ? glView().length + ' / ' + M.games.length : ''; }
   function glTools() {
     return '<div class="gl-tools"><div class="gsearch">' + ic('search', 18) + '<input class="input" id="gl-q" type="search" placeholder="Rechercher dans la ludothèque (nom, catégorie…)" autocomplete="off" value="' + esc(ui.gl.q) + '" aria-label="Rechercher dans la ludothèque"><small id="gl-n">' + glCount() + '</small></div>' +
-      '<label class="gl-sort"><span>Trier</span><select class="input" id="gl-sort" aria-label="Trier la ludothèque">' + GL_SORTS.map(function (x) { return '<option value="' + x[0] + '"' + (ui.gl.sort === x[0] ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select></label></div>' + fltBar();
+      '<label class="gl-sort"><span>Trier</span><select class="input" id="gl-sort" aria-label="Trier la ludothèque">' + GL_SORTS.map(function (x) { return '<option value="' + x[0] + '"' + (ui.gl.sort === x[0] ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select></label>' + fltBtn() + '</div><div class="flt-sum" id="flt-sum"' + (fltOn() ? '' : ' hidden') + '>' + fltSum() + '</div>';
   }
   function glRows() {
     var l = glView();
@@ -3599,13 +3682,12 @@ var Badges = (function () {
       var before = waitList(s).length, gain = Math.min(before, seatsFor(gamesOf(s).concat([g]), !!s.single) - seatsOf(s));
       wr(ST.db.doc('sessions/' + s.id).update({ gameIds: (s.gameIds || []).concat(g.id) }), g.name + ' ajouté : ' + gain + ' personne' + (gain > 1 ? 's quittent' : ' quitte') + ' la liste d’attente.');
     },
-    fltP: function (el) {
-      var v = +el.dataset.v || 0, a = ui.flt.p, i = a.indexOf(v);
-      if (!v) a.length = 0; else if (i >= 0) a.splice(i, 1); else { a.push(v); a.sort(function (x, y) { return x - y; }); }
-      render();
-    },
-    fltD: function (el) { ui.flt.d = el.dataset.v || ''; render(); },
-    fltReset: function () { ui.flt = { p: [], d: '' }; render(); },
+    fltOpen: function () { ui.modal = { type: 'filters' }; renderModal(); },
+    fltP: function (el) { fltToggle('p', +el.dataset.v); },
+    fltD: function (el) { fltToggle('d', el.dataset.v); },
+    fltW: function (el) { fltToggle('w', el.dataset.v); },
+    fltDrop: function (el) { fltToggle(el.dataset.k, el.dataset.k === 'p' ? +el.dataset.v : el.dataset.v); },
+    fltReset: function () { ui.flt = { p: [], d: [], w: [] }; fltRefresh(); },
     ntTarget: function (el) {
       var n = ui.nt, t = el.dataset.t === 'session' ? 'session' : 'all'; if (n.target === t) return;
       n.target = t; n.confirm = false; n.aud = null;
