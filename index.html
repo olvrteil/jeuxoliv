@@ -1032,6 +1032,58 @@ html{overflow-x:hidden;max-width:100%}
 .foot .bgg-pw:hover,.foot .bgg-pw:focus-visible{opacity:1;transform:translateY(-1px)}
 .bgg-pw img{display:block;height:22px;width:auto}
 
+/* ----- v1.20 : badges de victoire, hall of fame, palmarès ----- */
+.prof-tabs{display:flex;width:100%;margin:6px 0 16px}.prof-tabs button{flex:1;justify-content:center}
+.fm-row{display:flex;gap:8px;flex-wrap:wrap}
+.fm{min-width:52px;text-align:center;padding:8px 12px;border-radius:14px;font:800 13.5px/1 var(--font-d);background:var(--hair);color:var(--muted);border:2px solid transparent}
+.fm.r1{background:var(--sun);color:var(--on-sun);border-color:var(--sun-edge)}
+.fm.r2{background:color-mix(in srgb,#94A3B8 38%,var(--glass-2));color:var(--ink)}
+.fm.r3{background:color-mix(in srgb,#C2410C 28%,var(--glass-2));color:var(--ink)}
+.fm.cw{background:var(--teal);color:var(--on-teal)}.fm.cl{background:color-mix(in srgb,var(--tomato) 24%,var(--glass-2));color:var(--ink)}
+.scg-list{display:grid;gap:8px}
+.scg{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 12px 8px 8px;border-radius:16px;background:var(--hair)}
+.scg-art{width:44px;height:44px;border-radius:12px;overflow:hidden;border:2px solid var(--stroke);display:block;flex:none}.scg-art svg,.scg-art img{width:100%;height:100%;object-fit:cover;display:block}
+.scg b{display:block;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scg div span{display:block;font-size:12.5px;color:var(--muted)}
+.scg em{font-style:normal;font-weight:800;font-size:13px;display:inline-flex;gap:5px;align-items:center;color:var(--ink)}
+.scg em svg{color:var(--warn)}
+@media (max-width:520px){.scg{grid-template-columns:44px minmax(0,1fr)}.scg em{grid-column:2}}
+.fame-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:4px 0 6px}
+.fame-head h1{font-size:clamp(1.8rem,5vw,2.8rem)}
+.fame-q{display:inline-flex;align-items:center;gap:10px;padding:6px;border-radius:999px;background:var(--hair)}
+.fame-q div{text-align:center;min-width:92px;line-height:1.15}.fame-q b{display:block;font:800 15px var(--font-d)}.fame-q span{font-size:12px;color:var(--muted)}
+.fame-q .icon-btn.fwd svg{transform:rotate(180deg)}.fame-q .icon-btn[disabled]{opacity:.3;cursor:default}
+.fame-sub{margin:0 0 18px;color:var(--muted);font-size:14px}
+.fame-pod{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:end;margin:8px 0 14px;padding:22px 12px 0;border-radius:28px;background:var(--glass-2);border:1px solid var(--hair);overflow:hidden}
+.fame-pod.n1{grid-template-columns:minmax(0,260px);justify-content:center}.fame-pod.n2{grid-template-columns:repeat(2,minmax(0,200px));justify-content:center}
+.fp{--c:var(--sun);display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;min-width:0}
+.fp.p2{--c:#94A3B8}.fp.p3{--c:#C2410C}
+.fp-medal{font-size:30px;line-height:1;animation:floaty 3.2s ease-in-out infinite alternate;--r:0deg}
+.fp.p1 .fp-medal{font-size:38px}
+.fp-av .av{width:58px;height:58px;font-size:25px;border:3px solid var(--c)}
+.fp.p1 .fp-av .av{width:72px;height:72px;font-size:31px;box-shadow:0 0 0 5px color-mix(in srgb,var(--c) 28%,transparent)}
+.fp-nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
+.fp-pc{font:800 clamp(1.5rem,5vw,2rem)/1 var(--font-d)}.fp-pc small{font-size:.5em;color:var(--muted)}
+.fp-sub{font-size:12px;color:var(--muted);margin-bottom:6px}
+.fp-step{width:100%;display:grid;place-items:center;border-radius:16px 16px 0 0;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 55%,var(--glass-2)),color-mix(in srgb,var(--c) 22%,var(--glass-2)));font:800 28px var(--font-d);color:var(--ink);opacity:.95}
+.fp.p1 .fp-step{height:92px}.fp.p2 .fp-step{height:66px}.fp.p3 .fp-step{height:46px}
+.fp.me .fp-nm::after{content:" (vous)";font-weight:600;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.fp-medal{animation:none}}
+.fame-rows{display:grid;gap:8px;margin-bottom:14px}
+.fame-row{display:grid;grid-template-columns:28px 30px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 14px;border-radius:18px;background:var(--hair)}
+.fame-row.me{background:color-mix(in srgb,var(--sun) 26%,var(--glass-2));box-shadow:0 0 0 2px var(--sun-edge)}
+.fame-row .fpos{font:800 16px var(--font-d);color:var(--muted);text-align:center}
+.fame-row .nm{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis}.fame-row .nm i:not(.sc-me){display:block;font-style:normal;font-weight:600;font-size:12px;color:var(--muted)}
+.fame-row .pc{font:800 20px var(--font-d)}.fame-row .pc small{font-size:.55em;color:var(--muted)}
+.fame-me{margin:6px 0 10px}.fame-me>span{display:block;font:800 12px var(--font-b);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.fame-empty .fame-big{font-size:46px}.fame-empty h2{font-size:1.4rem;color:var(--ink)}.fame-empty p{max-width:420px;margin:0}
+.palm{margin:16px 0 4px;padding:14px;border-radius:20px;background:var(--hair)}
+.palm-r{display:grid;grid-template-columns:26px 26px minmax(0,1fr) auto;gap:10px;align-items:center;padding:5px 0;font-size:14.5px}
+.palm-r .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.palm-r b{font-size:13px;color:var(--muted)}
+.palm-r.me .nm{color:var(--ink);text-decoration:underline;text-decoration-color:var(--sun);text-decoration-thickness:3px}
+.palm-m{font-size:18px;text-align:center}
+.palm-last{margin:8px 0 0;font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}.palm-last b{color:var(--ink)}
+.sx-rnk.rec{grid-template-columns:22px 40px 1fr auto}.sx-rnk.rec .pos{color:var(--warn)}
 /* ----- v1.19 : scores et changement de table ----- */
 .sess-act{margin-left:auto;align-self:flex-start}
 .new-top{margin-bottom:18px}
@@ -1109,7 +1161,7 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.19 - octobre 2026 - Olvrteil</span>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.20 - octobre 2026 - Olvrteil</span>
     <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API : logo officiel « Powered by BGG », qui renvoie vers BoardGameGeek. -->
     <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><img src="powered-by-bgg.png" width="252" height="56" alt="Powered by BGG" decoding="async"></a>
     <button type="button" id="pushLink" hidden></button></footer>
@@ -1762,6 +1814,18 @@ var Badges = (function () {
     { id: 'p25', cat: 'part', emoji: '🥇', name: 'Ludopathe', desc: 'Jouer 25 sessions', goal: 25, tier: 3 },
     { id: 'p50', cat: 'part', emoji: '👑', name: 'Légende du midi', desc: 'Jouer 50 sessions', goal: 50, tier: 4 },
     { id: 'p100', cat: 'part', emoji: '🐉', name: 'Dragon du plateau', desc: 'Jouer 100 sessions : le sommet', goal: 100, tier: 5 },
+    { id: 'w1', cat: 'win', emoji: '🏆', name: 'Première victoire', desc: 'Gagner une partie (scores validés)', goal: 1, tier: 1 },
+    { id: 'w5', cat: 'win', emoji: '🎯', name: 'Sur la lancée', desc: 'Gagner 5 parties', goal: 5, tier: 2 },
+    { id: 'w10', cat: 'win', emoji: '🥊', name: 'Champion·ne de table', desc: 'Gagner 10 parties', goal: 10, tier: 3 },
+    { id: 'w25', cat: 'win', emoji: '🐺', name: 'Terreur du plateau', desc: 'Gagner 25 parties', goal: 25, tier: 4 },
+    { id: 'ws2', cat: 'win', emoji: '✌️', name: 'Doublé', desc: 'Gagner 2 parties de suite', goal: 2, tier: 1 },
+    { id: 'ws3', cat: 'win', emoji: '🎩', name: 'Hat-trick', desc: 'Gagner 3 parties de suite', goal: 3, tier: 3 },
+    { id: 'spec', cat: 'win', emoji: '🔬', name: 'Spécialiste', desc: 'Gagner 3 fois au même jeu', goal: 3, tier: 2 },
+    { id: 'poly', cat: 'win', emoji: '🌈', name: 'Polyvalent·e', desc: 'Gagner à 3 jeux différents', goal: 3, tier: 2 },
+    { id: 'pod', cat: 'win', emoji: '🎖️', name: 'Habitué·e du podium', desc: 'Finir 10 fois dans les 3 premiers (tables de 4 joueurs ou plus)', goal: 10, tier: 3 },
+    { id: 'coopw', cat: 'win', emoji: '🛡️', name: 'Esprit d’équipe', desc: 'Gagner 3 parties coopératives', goal: 3, tier: 2 },
+    { id: 'clerk', cat: 'win', emoji: '📝', name: 'Greffier·ère', desc: 'Valider les scores de 5 tables', goal: 5, tier: 1 },
+    { id: 'good', cat: 'win', emoji: '🤗', name: 'Bon perdant', desc: 'Finir dernier·ère, puis revenir jouer à la session suivante', goal: 1, tier: 1 },
     { id: 'fan', cat: 'game', emoji: '❤️', name: 'Fan de…', desc: 'Jouer 10 fois au même jeu', goal: 10, tier: 2 },
     { id: 'g5', cat: 'game', emoji: '🧭', name: 'Touche-à-tout', desc: 'Jouer à 5 jeux différents', goal: 5, tier: 1 },
     { id: 'g10', cat: 'game', emoji: '🗺️', name: 'Globe-trotter ludique', desc: 'Jouer à 10 jeux différents', goal: 10, tier: 3 },
@@ -1779,7 +1843,7 @@ var Badges = (function () {
     { id: 'm2', cat: 'neg', neg: true, emoji: '💤', name: 'Aux abonnés absents', desc: '2 absences d’affilée', goal: 2, tier: 1 },
     { id: 'm5', cat: 'neg', neg: true, emoji: '👻', name: 'Fantôme', desc: 'Inscrit·e, mais jamais là : 5 sessions manquées', goal: 5, tier: 1 }
   ];
-  var CATS = [['part', 'Participation'], ['game', 'Fidélité aux jeux'], ['reg', 'Régularité'], ['soc', 'Table et esprit d’équipe'], ['neg', 'Hall of shame (pour rire)']];
+  var CATS = [['part', 'Participation'], ['win', 'Victoires et scores'], ['game', 'Fidélité aux jeux'], ['reg', 'Régularité'], ['soc', 'Table et esprit d’équipe'], ['neg', 'Hall of shame (pour rire)']];
 
   function weekKey(date) {
     var p = date.split('-').map(Number), d = new Date(Date.UTC(p[0], p[1] - 1, p[2])), dow = (d.getUTCDay() + 6) % 7;
@@ -1810,8 +1874,19 @@ var Badges = (function () {
     var firstN = played.filter(function (e) { return e.entry && e.entry.order && e.entry.order[0] === e.gid; }).length;
     var waited = played.some(function (e) { return e.entry && e.entry.w; });
     var absRun = longestRun(mine, function (e) { return e.absent; });
+    /* scores : seules les tables validées comptent (ev.sc = mon résultat à la table, null sinon) */
+    var scp = played.filter(function (e) { return e.sc; }), winsN = 0, perWin = {}, winGames = 0, topWin = 0, coopWins = 0, pods = 0, clerkN = 0, goodSport = 0;
+    scp.forEach(function (e) {
+      if (e.sc.win) { winsN++; perWin[e.gid] = (perWin[e.gid] || 0) + 1; if (e.sc.mode === 'coop') coopWins++; }
+      if (e.sc.mode !== 'coop' && e.sc.n >= 4 && e.sc.rank <= 3) pods++;
+    });
+    Object.keys(perWin).forEach(function (g) { winGames++; if (perWin[g] > topWin) topWin = perWin[g]; });
+    ev.forEach(function (e) { clerkN += e.scVal || 0; });
+    ev.forEach(function (e, i) { if (e.mine && !e.absent && e.sc && e.sc.last && !goodSport) { for (var j = i + 1; j < ev.length; j++) { if (ev[j].mine && !ev[j].absent) { goodSport = 1; break; } } } });
+    var winRun = longestRun(scp, function (e) { return e.sc.win; });
     var P = played.length, M = missed.length, nm = Object.keys(mates).length;
     var val = { p1: P, p5: P, p10: P, p25: P, p50: P, p100: P, fan: topN, g5: nGames, g10: nGames, club: bestMonth, week: weekFull ? 1 : 0, s3: run, s5: run,
+      w1: winsN, w5: winsN, w10: winsN, w25: winsN, ws2: winRun, ws3: winRun, spec: topWin, poly: winGames, pod: pods, coopw: coopWins, clerk: clerkN, good: goodSport,
       early: early ? 1 : 0, late: late ? 1 : 0, open: openRun, first: firstN, mates: nm, wait: waited ? 1 : 0, m1: M, m2: absRun, m5: M };
     var list = DEFS.map(function (d) {
       var v = val[d.id] || 0, o = {}, k;
@@ -2577,6 +2652,58 @@ var Badges = (function () {
     scPut(s, scKey(s, gid, uid), { sid: s.id, gid: gid, uid: uid, v: n, by: ST.uid, ts: Date.now() });
     scRefresh();
   }
+  /* résultat d'une table VALIDÉE (null sinon, ou si moins de 2 joueurs ont un score) :
+     { mode, coop, rows:[{uid, v, rank}], n, max, ids } ; les absents et les retraits ne comptent pas */
+  function scOutcome(s, t) {
+    var m = scMeta(s, t.gid); if (!m || !m.done) return null;
+    var mode = m.mode || 'high', ab = s.absent || {}, ids = t.ids.filter(function (u) { return !isLeft(s, u) && !ab[u]; });
+    if (mode === 'coop') return (m.coop === 'win' || m.coop === 'lose') && ids.length >= 2 ? { mode: 'coop', coop: m.coop, rows: [], n: ids.length, max: 1, ids: ids, by: m.by } : null;
+    var rows = ids.map(function (u) { return { uid: u, v: scVal(s, t.gid, u) }; }).filter(function (x) { return x.v !== null; });
+    if (rows.length < 2) return null;
+    rows.sort(function (a, b) { return mode === 'low' ? a.v - b.v : b.v - a.v; });
+    var rank = 0, prev = null; rows.forEach(function (x, i) { if (prev === null || x.v !== prev) { rank = i + 1; prev = x.v; } x.rank = rank; });
+    return { mode: mode, coop: '', rows: rows, n: rows.length, max: rows[rows.length - 1].rank, ids: ids, by: m.by };
+  }
+  /* toutes les tables validées d'un groupe (un groupe ne voit que ses propres sessions : pro et perso ne se mélangent jamais) */
+  function scTablesOf(grp, lo, hi) {
+    var out = [], now = Date.now(), reset = M.settings.badgesReset || 0;
+    sorted().forEach(function (s) {
+      var ph = phase(s), st = startMs(s); if ((ph !== 'published' && ph !== 'auto') || st > now || st < reset || st < lo || st >= hi || (grp && !inGroup(s, grp))) return;
+      var r = resultOf(s); if (!r) return;
+      r.tables.forEach(function (t) { var g = G(t.gid); if (!g) return; var o = scOutcome(s, t); if (o) { o.sid = s.id; o.date = s.date; o.start = st; o.gid = t.gid; o.sess = s; out.push(o); } });
+    });
+    return out;
+  }
+  /* palmarès d'un jeu, sans remise à zéro : top 3 des vainqueurs et dernier vainqueur */
+  function gamePalm(gid, grp) {
+    var tabs = scTablesOf(grp, 0, Infinity).filter(function (o) { return o.gid === gid; }), P = {}, last = null;
+    tabs.forEach(function (o) {
+      var winners = o.mode === 'coop' ? (o.coop === 'win' ? o.ids : []) : o.rows.filter(function (x) { return x.rank === 1; }).map(function (x) { return x.uid; });
+      (o.mode === 'coop' ? o.ids : o.rows.map(function (x) { return x.uid; })).forEach(function (u) { var p = P[u] || (P[u] = { uid: u, n: 0, w: 0 }); p.n++; if (winners.indexOf(u) >= 0) p.w++; });
+      if (winners.length && (!last || o.start >= last.start)) last = { start: o.start, date: o.date, coop: o.mode === 'coop', uids: winners };
+    });
+    var top = Object.keys(P).map(function (u) { return P[u]; }).filter(function (x) { return x.w > 0 && M.regs[x.uid] && !M.regs[x.uid].fake; })
+      .sort(function (a, b) { return b.w - a.w || a.n - b.n || nameOf(a.uid).localeCompare(nameOf(b.uid), 'fr'); }).slice(0, 3);
+    return { top: top, last: last, tables: tabs.length };
+  }
+  /* Hall of fame : un trimestre civil (janv.-mars, avril-juin, juil.-sept., oct.-déc.), remis à zéro au changement de trimestre.
+     Classement au taux de victoire (jeux coopératifs exclus), à partir de FAME_MIN parties avec scores validés. */
+  var FAME_MIN = 4, MOIS_C = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+  function quarterAt(off) {
+    var n = new Date(), idx = n.getFullYear() * 4 + Math.floor(n.getMonth() / 3) - (off || 0), y = Math.floor(idx / 4), q = idx % 4;
+    return { y: y, q: q, lo: new Date(y, q * 3, 1).getTime(), hi: new Date(y, q * 3 + 3, 1).getTime(), label: 'T' + (q + 1) + ' ' + y, span: MOIS_C[q * 3] + ' – ' + MOIS_C[q * 3 + 2] };
+  }
+  function fameData(grp, qt) {
+    var P = {};
+    scTablesOf(grp, qt.lo, qt.hi).forEach(function (o) {
+      if (o.mode === 'coop') return;
+      o.rows.forEach(function (x) { if (!M.regs[x.uid] || M.regs[x.uid].fake) return; var p = P[x.uid] || (P[x.uid] = { uid: x.uid, n: 0, w: 0 }); p.n++; if (x.rank === 1) p.w++; });
+    });
+    var all = Object.keys(P).map(function (u) { var p = P[u]; p.pct = Math.round(p.w / p.n * 100); return p; });
+    var rk = all.filter(function (p) { return p.n >= FAME_MIN; }).sort(function (a, b) { return b.w / b.n - a.w / a.n || b.w - a.w || b.n - a.n || nameOf(a.uid).localeCompare(nameOf(b.uid), 'fr'); });
+    rk.forEach(function (p, i) { p.pos = i + 1; });
+    return { rk: rk, all: all, byUid: P };
+  }
   /* place libérée par un retrait : la 1re personne éligible (liste d’attente, puis « sans table ») prend la place */
   function pickPromo(s, r, tb, left) {
     var g = G(tb.gid); if (!g) return null;
@@ -2751,9 +2878,19 @@ var Badges = (function () {
       return '<article class="gcard glass" role="button" tabindex="0" data-act="gameInfo" data-gid="' + g.id + '" style="--bgimg:url(' + bgOf(g) + ')"><span class="gcard-bg"></span><div class="gcard-box">' + box(g) + '</div><h3>' + esc(g.name) + '</h3>' + facts(g) + '</article>';
     }).join('');
   }
+  /* palmarès d'un jeu : top 3 des vainqueurs (sans remise à zéro) et dernier vainqueur, pour le groupe en cours */
+  function palmHtml(g) {
+    if (ST.auth !== 'in' || !ST.uid) return '';
+    var grp = ST.groups.indexOf(ui.grp) >= 0 ? ui.grp : (ST.groups[0] || 'pro'), pm = gamePalm(g.id, grp);
+    if (!pm.top.length) return '';
+    var medals = ['🥇', '🥈', '🥉'];
+    return '<div class="palm"><div class="small-h">Palmarès' + (ST.groups.length > 1 ? ' · ' + grpName(grp) : '') + '</div>' + pm.top.map(function (x, i) {
+      return '<div class="palm-r' + (x.uid === ST.uid ? ' me' : '') + '"><span class="palm-m" aria-hidden="true">' + medals[i] + '</span>' + avatar(nameOf(x.uid), 'sm') + '<span class="nm">' + esc(nameOf(x.uid)) + '</span><b>' + plural(x.w, 'victoire', 'victoires') + '</b></div>';
+    }).join('') + (pm.last ? '<p class="palm-last">' + ic('trophy', 14) + ' Dernier succès : <b>' + (pm.last.coop ? 'victoire collective' : pm.last.uids.map(function (u) { return esc(nameOf(u)); }).join(' et ')) + '</b> · ' + fr(pm.last.date, { day: 'numeric', month: 'short', year: 'numeric' }).replace('.', '') + '</p>' : '') + '</div>';
+  }
   function modalGame(g) {
     return '<div class="modal" data-act="closeModal"><div class="sheet glass-2" data-act="noop" role="dialog" aria-modal="true" aria-label="' + esc(g.name) + '"><button class="icon-btn sheet-x" data-act="closeModal" aria-label="Fermer">' + ic('x', 18) + '</button>' +
-      '<div class="sheet-grid">' + bigBox(g) + '<div><p class="eyebrow">Fiche du jeu</p><h2>' + esc(g.name) + '</h2>' + facts(g, true) + '<p class="full">' + (g.summary ? esc(g.summary) : '<span class="hint">Pas encore de résumé pour ce jeu.</span>') + '</p><div class="tags">' + (g.tags || []).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</div>' +
+      '<div class="sheet-grid">' + bigBox(g) + '<div><p class="eyebrow">Fiche du jeu</p><h2>' + esc(g.name) + '</h2>' + facts(g, true) + '<p class="full">' + (g.summary ? esc(g.summary) : '<span class="hint">Pas encore de résumé pour ce jeu.</span>') + '</p><div class="tags">' + (g.tags || []).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</div>' + palmHtml(g) +
       '<p class="credit">' + (g.bgg ? 'Données et image : BoardGameGeek.' : g.manual ? 'Fiche saisie par l’organisateur.' : 'Données : BoardGameGeek, résumé traduit. Affiche d’exemple dans cette version.') + '</p></div></div></div></div>';
   }
   function modalMove(m) {
@@ -3348,8 +3485,17 @@ var Badges = (function () {
       if (now < startMs(s) || startMs(s) < reset) return;   /* avant la dernière remise à zéro : ignorée */
       var r = resultOf(s); if (!r) return;
       var tb = r.tables.filter(function (t) { return t.ids.indexOf(uid) >= 0; })[0], ab = s.absent || {}, g = tb && G(tb.gid);
+      var sc = null, scVal2 = 0;
+      r.tables.forEach(function (t2) {
+        var o = scOutcome(s, t2); if (!o) return;
+        if (o.by === uid) scVal2++;
+        if (t2 !== tb) return;
+        if (o.mode === 'coop') { if (o.ids.indexOf(uid) >= 0) sc = { mode: 'coop', win: o.coop === 'win', gid: t2.gid }; return; }
+        var row = o.rows.filter(function (x) { return x.uid === uid; })[0];
+        if (row) sc = { mode: o.mode, rank: row.rank, n: o.n, v: row.v, win: row.rank === 1, last: o.max > 1 && row.rank === o.max, gid: t2.gid };
+      });
       out.push({ sid: s.id, start: startMs(s), date: s.date, created: s.created || 0, mine: !!tb && !isLeft(s, uid), absent: !!ab[uid], gid: tb ? tb.gid : null, gname: g ? g.name : '',
-        mates: tb ? tb.ids.filter(function (u) { return u !== uid && !ab[u] && !isLeft(s, u); }) : [], entry: entryOf(uid, s.id) });
+        mates: tb ? tb.ids.filter(function (u) { return u !== uid && !ab[u] && !isLeft(s, u); }) : [], entry: entryOf(uid, s.id), sc: sc, scVal: scVal2 });
     });
     return out;
   }
@@ -3360,12 +3506,69 @@ var Badges = (function () {
       '<div class="bd-txt"><b>' + esc(b.name) + '</b><span>' + esc(b.desc) + '</span>' +
       (!b.got && b.goal > 1 ? '<div class="bd-bar" role="progressbar" aria-valuemin="0" aria-valuemax="' + b.goal + '" aria-valuenow="' + b.prog + '"><i style="width:' + pct + '%"></i></div><small>' + b.prog + ' / ' + b.goal + '</small>' : '') + '</div></div>';
   }
+  /* --- Mes scores (profil) --- */
+  function formChip(e) {
+    var c = e.sc, g = G(c.gid), tip = (g ? g.name + ' · ' : '') + fr(e.date, { day: 'numeric', month: 'short' }).replace('.', '');
+    if (c.mode === 'coop') return '<span class="fm ' + (c.win ? 'cw' : 'cl') + '" title="' + esc(tip) + '">' + (c.win ? 'Gagné' : 'Perdu') + '</span>';
+    return '<span class="fm r' + Math.min(c.rank, 4) + '" title="' + esc(tip) + '">' + (c.rank === 1 ? '1er' : c.rank + 'e') + '</span>';
+  }
+  function scoreProfile(uid, evs) {
+    var scp = evs.filter(function (e) { return e.mine && !e.absent && e.sc; }), who = uid === ST.uid;
+    if (!scp.length) return '<section class="bd-sec"><h2 class="bd-h">Scores</h2><p class="hint" style="margin:0">Aucune partie avec scores validés pour l’instant. ' + (who ? 'Les scores se saisissent depuis le bouton « Scores » de votre table, puis on valide.' : '') + '</p></section>';
+    var wins = scp.filter(function (e) { return e.sc.win; }).length, comp = scp.filter(function (e) { return e.sc.mode !== 'coop'; }), cw = comp.filter(function (e) { return e.sc.win; }).length, G2 = {};
+    scp.forEach(function (e) {
+      var g = G2[e.sc.gid] || (G2[e.sc.gid] = { gid: e.sc.gid, n: 0, w: 0, hi: null, lo: null });
+      g.n++; if (e.sc.win) g.w++;
+      if (e.sc.mode === 'high') g.hi = g.hi === null ? e.sc.v : Math.max(g.hi, e.sc.v);
+      if (e.sc.mode === 'low') g.lo = g.lo === null ? e.sc.v : Math.min(g.lo, e.sc.v);
+    });
+    var rows = Object.keys(G2).map(function (k) { return G2[k]; }).filter(function (x) { return G(x.gid); }).sort(function (a, b) { return b.n - a.n || b.w - a.w; }).slice(0, 8);
+    return '<section class="bd-sec"><h2 class="bd-h">Scores</h2><div class="prof-stats"><div class="pstat"><b>' + wins + '</b><span>victoire' + (wins > 1 ? 's' : '') + '</span></div><div class="pstat"><b>' + (comp.length ? pctOf(cw, comp.length) + '<small> %</small>' : '–') + '</b><span>taux de victoire</span></div><div class="pstat"><b>' + scp.length + '</b><span>partie' + (scp.length > 1 ? 's' : '') + ' avec score</span></div></div>' +
+      '<div class="small-h">Forme récente</div><div class="fm-row">' + scp.slice(-6).reverse().map(formChip).join('') + '</div>' +
+      '<div class="small-h" style="margin-top:18px">Par jeu</div><div class="scg-list">' + rows.map(function (x) {
+        var g = G(x.gid), rec = x.hi !== null ? scFmt(x.hi) + ' pts' : x.lo !== null ? scFmt(x.lo) + ' pts (le plus bas)' : '';
+        return '<div class="scg"><span class="scg-art">' + art(g) + '</span><div><b>' + esc(g.name) + '</b><span>' + plural(x.n, 'partie', 'parties') + ' · ' + plural(x.w, 'victoire', 'victoires') + '</span></div>' + (rec ? '<em title="Meilleur score">' + ic('trophy', 14) + ' ' + rec + '</em>' : '') + '</div>';
+      }).join('') + '</div></section>';
+  }
+  function profTabs() {
+    return '<div class="seg prof-tabs" role="group" aria-label="Section">' + [['me', 'Mes badges', 'trophy'], ['fame', 'Hall of fame', 'chart']].map(function (t) { return '<button aria-pressed="' + ((ui.profTab || 'me') === t[0]) + '" data-act="profTab" data-t="' + t[0] + '">' + ic(t[2], 16) + ' ' + t[1] + '</button>'; }).join('') + '</div>';
+  }
+  /* --- Hall of fame : classement du trimestre, par groupe --- */
+  function fameRow(p, me) {
+    return '<div class="fame-row' + (me ? ' me' : '') + '"><span class="fpos">' + p.pos + '</span>' + avatar(nameOf(p.uid), 'sm') + '<span class="nm">' + esc(nameOf(p.uid)) + (me ? ' <i class="sc-me">vous</i>' : '') + '<i>' + plural(p.w, 'victoire', 'victoires') + ' sur ' + plural(p.n, 'partie', 'parties') + '</i></span><b class="pc">' + p.pct + '<small> %</small></b></div>';
+  }
+  function viewFame() {
+    var grp = ST.groups.indexOf(ui.grp) >= 0 ? ui.grp : (ST.groups[0] || 'pro'), off = ui.fameOff || 0, qt = quarterAt(off), d = fameData(grp, qt), rk = d.rk;
+    var days = Math.max(0, Math.ceil((qt.hi - Date.now()) / 864e5)), medals = ['🥇', '🥈', '🥉'], top3 = rk.slice(0, 3), me = d.byUid[ST.uid], myPos = rk.filter(function (p) { return p.uid === ST.uid; })[0];
+    var h = '<section class="fame-head"><div><p class="eyebrow">Hall of fame' + (ST.groups.length > 1 ? ' · ' + grpName(grp) : '') + '</p><h1>Les meilleurs du trimestre</h1></div>' +
+      '<div class="fame-q" role="group" aria-label="Trimestre"><button class="icon-btn" data-act="fameQ" data-d="1" aria-label="Trimestre précédent">' + ic('back', 18) + '</button><div><b>' + qt.label + '</b><span>' + qt.span + '</span></div><button class="icon-btn fwd" data-act="fameQ" data-d="-1" aria-label="Trimestre suivant"' + (off ? '' : ' disabled') + '>' + ic('back', 18) + '</button></div></section>' +
+      '<p class="fame-sub">' + (off ? 'Trimestre terminé.' : 'Remise à zéro ' + (days > 1 ? 'dans ' + days + ' jours' : days === 1 ? 'demain' : 'ce soir') + '.') + '</p>';
+    if (!rk.length) {
+      return profTabs() + groupSwitch() + h + '<div class="empty glass fame-empty"><span class="fame-big">🏆</span><h2>Personne n’est encore classé·e</h2><p>Il faut au moins ' + FAME_MIN + ' parties avec scores validés dans le trimestre. Saisissez les scores à votre table (bouton « Scores ») puis validez-les.</p></div>' + fameMine(me, null) + fameRule();
+    }
+    var order = top3.length === 3 ? [1, 0, 2] : top3.length === 2 ? [1, 0] : [0];
+    h += '<section class="fame-pod n' + top3.length + '">' + order.map(function (i) {
+      var p = top3[i], mine = p.uid === ST.uid;
+      return '<div class="fp p' + (i + 1) + (mine ? ' me' : '') + '"><span class="fp-medal" aria-hidden="true">' + medals[i] + '</span><span class="fp-av">' + avatar(nameOf(p.uid)) + '</span><b class="fp-nm">' + esc(nameOf(p.uid)) + '</b><span class="fp-pc">' + p.pct + '<small> %</small></span><small class="fp-sub">' + p.w + ' / ' + p.n + ' victoires</small><div class="fp-step"><i>' + (i + 1) + '</i></div></div>';
+    }).join('') + '</section>';
+    if (rk.length > 3) h += '<div class="fame-rows">' + rk.slice(3, 5).map(function (p) { return fameRow(p, p.uid === ST.uid); }).join('') + '</div>';
+    return profTabs() + groupSwitch() + h + fameMine(me, myPos) + fameRule();
+  }
+  function fameMine(me, pos) {
+    if (!me && !pos) return '';
+    if (pos && pos.pos <= 5) return '';
+    if (pos) return '<div class="fame-me"><span>Votre place</span>' + fameRow(pos, true) + '</div>';
+    var left = FAME_MIN - me.n;
+    return '<div class="fame-me"><span>Votre place</span><p class="hint" style="margin:0">' + plural(me.n, 'partie comptée', 'parties comptées') + ' : encore ' + plural(left, 'partie', 'parties') + ' avec scores validés pour entrer au classement.</p></div>';
+  }
+  function fameRule() { return '<p class="sx-foot">Classement au taux de victoire, à partir de ' + FAME_MIN + ' parties avec scores validés dans le trimestre. Les jeux coopératifs ne sont pas comptés. Remise à zéro tous les trois mois (janvier, avril, juillet, octobre).</p>'; }
   function viewProfile(pu) {
     if (ST.auth !== 'in' || !ST.uid) return viewHome();
+    if (!pu && ui.profTab === 'fame') return viewFame();
     var other = !!pu && pu !== ST.uid, uid = other ? pu : ST.uid;
     var res = Badges.compute(badgeEvents(uid)), nm = other ? nameOf(uid) : (norm(NAME) || ST.profileName || 'Vous'), got = res.list.filter(function (b) { return b.got && !b.neg; }).length, tot = res.list.filter(function (b) { return !b.neg; }).length;
     var nxt = res.list.filter(function (b) { return b.cat === 'part' && !b.got; })[0];
-    var head = '<section class="prof-hero glass-2"><div class="prof-av">' + avatar(nm) + '</div><div class="prof-id"><p class="eyebrow">' + (other ? 'Profil joueur' : 'Mon profil') + '</p><h1>' + esc(nm) + '</h1>' +
+    var head = (other ? '' : profTabs()) + '<section class="prof-hero glass-2"><div class="prof-av">' + avatar(nm) + '</div><div class="prof-id"><p class="eyebrow">' + (other ? 'Profil joueur' : 'Mon profil') + '</p><h1>' + esc(nm) + '</h1>' +
       (nxt ? '<p class="prof-next">Prochain palier : <b>' + esc(nxt.name) + '</b> · ' + nxt.prog + ' / ' + nxt.goal + '</p><div class="bd-bar big"><i style="width:' + Math.round(nxt.prog / nxt.goal * 100) + '%"></i></div>' : '<p class="prof-next">Tous les paliers de participation sont atteints. Respect.</p>') + '</div></section>' +
       '<div class="prof-stats"><div class="pstat"><b>' + res.played + '</b><span>session' + (res.played > 1 ? 's' : '') + ' jouée' + (res.played > 1 ? 's' : '') + '</span></div><div class="pstat miss"><b>' + res.missed + '</b><span>session' + (res.missed > 1 ? 's' : '') + ' manquée' + (res.missed > 1 ? 's' : '') + '</span></div><div class="pstat"><b>' + got + '<small>/' + tot + '</small></b><span>badges obtenus</span></div></div>';
     var ml = Badges.malus(badgeEvents(uid), D.iso(new Date())), mend = Badges.malusEnd(ml), mnote = '';
@@ -3375,7 +3578,7 @@ var Badges = (function () {
     var eq = Badges.equity(badgeEvents(uid), D.iso(new Date()));
     if (eq.boost >= 0.1) mnote += '<div class="malus-note eqty"><span>🤝</span><div><b>Coup de pouce d’équité.</b> ' + (other ? 'Les dernières sessions ne lui ont pas toujours donné ses premiers choix : en cas de conflit pour un jeu, elle passe avant les personnes qui ont été bien servies. Il disparaît dès que ses premiers choix reviennent.' : 'Vos dernières sessions ne vous ont pas toujours donné vos premiers choix : en cas de conflit pour un jeu, vous passez avant les personnes qui ont été bien servies. Il disparaît dès que vos premiers choix reviennent.') + '</div></div>';
     head += mnote;
-    return head + Badges.CATS.map(function (c) {
+    return head + scoreProfile(uid, badgeEvents(uid)) + Badges.CATS.map(function (c) {
       var l = res.list.filter(function (b) { return b.cat === c[0]; });
       return '<section class="bd-sec"><h2 class="bd-h">' + c[1] + '</h2>' + (c[0] === 'neg' ? '<p class="hint" style="margin:-4px 0 12px">Des badges pour en rire : ils ne comptent que si l’organisateur vous a marqué·e absent·e.</p>' : '') + '<div class="bd-grid">' + l.map(badgeCard).join('') + '</div></section>';
     }).join('');
@@ -3411,7 +3614,7 @@ var Badges = (function () {
   /* ---------- Statistiques (admin : tout ; organisateur : ses sessions) ---------- */
   function wkKey(iso) { var d = toDate(iso), k = (d.getDay() + 6) % 7; d.setDate(d.getDate() - k); return D.iso(d); }
   function statsAgg(scope, lo, hi) {
-    var o = { ses: 0, cx: { auto: 0, man: 0 }, regs: 0, seats: 0, rank: [0, 0, 0], uns: 0, weeks: {}, games: {}, pl: {} };
+    var o = { ses: 0, cx: { auto: 0, man: 0 }, regs: 0, seats: 0, rank: [0, 0, 0], uns: 0, weeks: {}, games: {}, pl: {}, tabs: 0, tabsDone: 0, played: {}, rec: {} };
     function P(u) { return o.pl[u] || (o.pl[u] = { n: 0, abs: 0 }); }
     function W(k) { return o.weeks[k] || (o.weeks[k] = { n: 0, cx: 0, ses: 0 }); }
     function GM(g) { return o.games[g] || (o.games[g] = { ask: 0, got: 0 }); }
@@ -3423,6 +3626,14 @@ var Badges = (function () {
       var r = resultOf(s); if (!r) return;
       o.ses++; w.ses++; o.seats += seatsOf(s);
       r.tables.forEach(function (tb) {
+        if (G(tb.gid) && tb.ids.some(function (u) { return !isLeft(s, u); })) {
+          o.tabs++; o.played[tb.gid] = (o.played[tb.gid] || 0) + 1;
+          var oc = scOutcome(s, tb);
+          if (oc) {
+            o.tabsDone++;
+            if (oc.mode === 'high') { var bestRow = oc.rows[0], rc = o.rec[tb.gid] || (o.rec[tb.gid] = {}); if (!rc.hi || bestRow.v > rc.hi.v) rc.hi = { v: bestRow.v, uids: oc.rows.filter(function (x) { return x.v === bestRow.v; }).map(function (x) { return x.uid; }), date: s.date }; }
+          }
+        }
         tb.ids.forEach(function (u) {
           if (isLeft(s, u)) return;
           o.regs++; w.n++;
@@ -3484,6 +3695,22 @@ var Badges = (function () {
       return '<div class="sx-hb"><span class="sx-gm">' + art(g) + '</span><div><div class="nm">' + esc(g.name) + '<i>' + plural(d.ask, 'demande', 'demandes') + ' en 1er vœu · ' + plural(d.got, 'obtenu', 'obtenus') + '</i></div><div class="tr" style="--c:var(--p' + hue(g.name) + ')"><b style="width:' + Math.round(d.ask / mx * 100) + '%;opacity:.3"></b><b style="width:' + Math.round(d.got / mx * 100) + '%"></b></div></div><span class="n">' + pctOf(d.got, d.ask) + '%</span></div>';
     }).join('') + '<div class="sx-legend"><span><i style="background:var(--ink);opacity:.3"></i>demandé en 1er vœu</span><span><i style="background:var(--ink)"></i>obtenu</span></div>';
   }
+  function sxPlayed(o) {
+    var rows = Object.keys(o.played).filter(function (id) { return G(id); }).sort(function (a, b) { return o.played[b] - o.played[a]; }).slice(0, 6), mx = rows.length ? o.played[rows[0]] : 1;
+    if (!rows.length) return '<p class="hint">Pas encore de données.</p>';
+    return rows.map(function (id) {
+      var g = G(id);
+      return '<div class="sx-hb"><span class="sx-gm">' + art(g) + '</span><div><div class="nm">' + esc(g.name) + '</div><div class="tr" style="--c:var(--p' + hue(g.name) + ')"><b style="width:' + Math.round(o.played[id] / mx * 100) + '%"></b></div></div><span class="n">' + o.played[id] + '</span></div>';
+    }).join('');
+  }
+  function sxRecords(o) {
+    var rows = Object.keys(o.rec).filter(function (id) { return G(id) && o.rec[id].hi; }).sort(function (a, b) { return o.rec[b].hi.date < o.rec[a].hi.date ? -1 : 1; }).slice(0, 6);
+    if (!rows.length) return '<p class="hint">Les records apparaîtront dès que des scores seront validés.</p>';
+    return '<div class="sx-rnklist">' + rows.map(function (id) {
+      var g = G(id), r = o.rec[id].hi;
+      return '<div class="sx-rnk rec"><span class="pos">' + ic('trophy', 16) + '</span><span class="scg-art">' + art(g) + '</span><span class="nm">' + esc(g.name) + '<i>' + r.uids.map(function (u) { return esc(nameOf(u)); }).join(' et ') + ' · ' + fr(r.date, { day: 'numeric', month: 'short' }).replace('.', '') + '</i></span><span class="sc">' + scFmt(r.v) + '</span></div>';
+    }).join('') + '</div>';
+  }
   function sxRank(o) {
     var rows = Object.keys(o.pl).filter(function (u) { return o.pl[u].n && M.regs[u] && !M.regs[u].fake; }).sort(function (a, b) { return o.pl[b].n - o.pl[a].n || nameOf(a).localeCompare(nameOf(b), 'fr'); }).slice(0, 5);
     if (!rows.length) return '<p class="hint">Pas encore de données.</p>';
@@ -3499,8 +3726,8 @@ var Badges = (function () {
   function statsMain() {
     var d = statsData(), c = d.cur, p = d.prev, b = d.before, members = Object.keys(M.regs).filter(function (u) { return M.regs[u].name && !M.regs[u].fake; }).length;
     if (!c.ses && !c.cx.auto && !c.cx.man) return '<div class="empty glass"><h2>Pas encore de statistiques</h2><p>Elles apparaîtront dès qu’une session terminée aura ses tables.</p></div>';
-    var act = Object.keys(c.pl).filter(function (u) { return c.pl[u].n; }), fill = pctOf(c.regs, c.seats), first = pctOf(c.rank[0], c.rank[0] + c.rank[1] + c.rank[2] + c.uns);
-    var pFill = p && p.seats ? pctOf(p.regs, p.seats) : null, pFirst = p ? pctOf(p.rank[0], p.rank[0] + p.rank[1] + p.rank[2] + p.uns) : null;
+    var act = Object.keys(c.pl).filter(function (u) { return c.pl[u].n; }), fill = pctOf(c.tabsDone, c.tabs), first = pctOf(c.rank[0], c.rank[0] + c.rank[1] + c.rank[2] + c.uns);
+    var pFill = p && p.tabs ? pctOf(p.tabsDone, p.tabs) : null, pFirst = p ? pctOf(p.rank[0], p.rank[0] + p.rank[1] + p.rank[2] + p.uns) : null;
     var news = b ? act.filter(function (u) { return !b.pl[u]; }).length : null, cx = c.cx.auto + c.cx.man;
     var die = '<rect x="6" y="6" width="52" height="52" rx="13" fill="var(--glass-2)" stroke="var(--stroke)" stroke-width="3"/><g fill="var(--tomato)"><circle cx="21" cy="21" r="4.6"/><circle cx="43" cy="21" r="4.6"/><circle cx="32" cy="32" r="4.6"/><circle cx="21" cy="43" r="4.6"/><circle cx="43" cy="43" r="4.6"/></g>';
     var hex = '<polygon points="32,4 56.2,18 56.2,46 32,60 7.8,46 7.8,18" fill="var(--sun)" stroke="var(--stroke)" stroke-width="3" stroke-linejoin="round"/>';
@@ -3508,7 +3735,7 @@ var Badges = (function () {
     var mee = '<circle cx="32" cy="32" r="26" fill="var(--glass-2)" stroke="var(--stroke)" stroke-width="3"/><g transform="translate(14 14) scale(.36)" style="color:var(--cobalt)"><use href="#meeple"/></g>';
     var kp = '<section class="sx-kpis">' +
       '<div class="sx-kpi glass"><div class="k-l">Inscriptions</div><div class="k-v">' + c.regs + '</div>' + (p && p.regs ? trendChip(Math.round((c.regs - p.regs) / p.regs * 100), ' %') : '') + sxIco(die) + '</div>' +
-      '<div class="sx-kpi glass"><div class="k-l">Remplissage</div><div class="k-v">' + fill + '<small> %</small></div>' + (pFill !== null ? trendChip(fill - pFill, ' pts') : '') + sxIco(hex) + '</div>' +
+      '<div class="sx-kpi glass"><div class="k-l">Tables avec scores</div><div class="k-v">' + fill + '<small> %</small></div>' + (pFill !== null ? trendChip(fill - pFill, ' pts') : '') + sxIco(hex) + '</div>' +
       '<div class="sx-kpi glass"><div class="k-l">1er vœu obtenu</div><div class="k-v">' + first + '<small> %</small></div>' + (pFirst !== null && p && (p.rank[0] + p.rank[1] + p.rank[2] + p.uns) ? trendChip(first - pFirst, ' pts') : '') + sxIco(star) + '</div>' +
       '<div class="sx-kpi glass"><div class="k-l">Joueurs actifs</div><div class="k-v">' + act.length + '<small> / ' + members + '</small></div>' + (news ? '<span class="sx-trend up">▲ ' + news + ' nouveau' + (news > 1 ? 'x' : '') + '</span>' : '') + sxIco(mee) + '</div></section>';
     var cxl = cx ? '<div class="sx-cxl"><b>' + cx + '</b><span><strong>session' + (cx > 1 ? 's annulées' : ' annulée') + '</strong> sur la période' + (c.cx.auto ? ' (' + c.cx.auto + ' automatiquement, moins de 2 inscrits' + (c.cx.man ? ', ' + c.cx.man + ' manuellement' : '') + ')' : ' (manuellement)') + '</span></div>' : '';
@@ -3516,6 +3743,8 @@ var Badges = (function () {
       '<div class="panel glass"><div class="sx-t">Participation par semaine</div><div class="sx-s">Inscrits par semaine, sessions terminées</div>' + sxWeekChart(c) + cxl + '</div>' +
       '<div class="panel glass"><div class="sx-t">Satisfaction</div><div class="sx-s">Rang du vœu obtenu après affectation</div>' + sxDonut(c) + '</div>' +
       '<div class="panel glass"><div class="sx-t">Jeux les plus demandés</div><div class="sx-s">Demandes en 1er vœu, et part obtenue</div>' + sxGames(c) + '</div>' +
+      '<div class="panel glass"><div class="sx-t">Jeux les plus joués</div><div class="sx-s">Nombre de tables sur la période</div>' + sxPlayed(c) + '</div>' +
+      '<div class="panel glass"><div class="sx-t">Records</div><div class="sx-s">Meilleur score par jeu (jeux « plus de points gagne »)</div>' + sxRecords(c) + '</div>' +
       '<div class="panel glass"><div class="sx-t">Les plus assidus</div><div class="sx-s">Part des sessions jouées sur la période</div>' + sxRank(c) + '</div></section>' +
       '<p class="sx-foot">Calculé à partir des inscriptions existantes. Aucun suivi individuel ni traceur externe.</p>';
   }
@@ -3581,7 +3810,7 @@ var Badges = (function () {
     });
   }
   document.addEventListener('focusout', function () { if (pendingRender) { pendingRender = false; setTimeout(function () { var a = document.activeElement; if (!(a && /^(INPUT|TEXTAREA)$/.test(a.tagName))) render(); }, 0); } });
-  function go(route) { if (ui.modal && ui.modal.type === 'badges') { var bm = ui.modal; ui.modal = null; saveBadgesSeen(bm.all); } if (route === 'home') ui.fanSeed = Math.random().toString(36).slice(2); if (route === 'stats') ui.stats.pid = null; ui.route = route; ui.sid = null; ui.msid = null; ui.confirm = null; ui.draft = null; render(true); window.scrollTo(0, 0); }
+  function go(route) { if (route === 'profile') { ui.profTab = 'me'; } if (ui.modal && ui.modal.type === 'badges') { var bm = ui.modal; ui.modal = null; saveBadgesSeen(bm.all); } if (route === 'home') ui.fanSeed = Math.random().toString(36).slice(2); if (route === 'stats') ui.stats.pid = null; ui.route = route; ui.sid = null; ui.msid = null; ui.confirm = null; ui.draft = null; render(true); window.scrollTo(0, 0); }
   var tt;
   function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('on'); }, 3200); }
   function bump(id) {
@@ -3850,6 +4079,8 @@ var Badges = (function () {
     pushOff: function () { Backend.push.forget(ST.uid, true).then(function () { toast('Notifications désactivées sur cet appareil.'); refreshPush(); }); },
     pushLater: function () { try { localStorage.setItem('jdo-push-hide', String(Date.now())); } catch (e) {} ui.pushHide = true; render(); },
     pickGroup: function (el) { var a = ui.form.groups, g = el.dataset.g, i = a.indexOf(g); if (i >= 0) { if (a.length > 1) a.splice(i, 1); } else a.push(g); render(); },
+    profTab: function (el) { ui.profTab = el.dataset.t; render(true); window.scrollTo(0, 0); },
+    fameQ: function (el) { ui.fameOff = Math.max(0, (ui.fameOff || 0) + (+el.dataset.d)); render(true); },
     setGrp: function (el) { ui.grp = el.dataset.g; try { localStorage.setItem(GRPKEY, ui.grp); } catch (e) {} render(true); },
     sessGroup: function (el) {
       var s = sessionById(el.dataset.sid); if (!s || !canManage(s)) return;
