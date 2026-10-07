@@ -386,6 +386,15 @@ button.pchip:hover{background:var(--sun-soft);transform:translateY(-1px)}
 .eq{font-size:13.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 8px}
 .eq b{color:var(--ink)}
 .glist{display:flex;flex-direction:column;gap:12px}
+.nt-seg{margin-bottom:0;display:flex;flex-wrap:nowrap}
+.nt-seg button{flex:1 1 0;justify-content:center;padding-left:10px;padding-right:10px;white-space:nowrap}
+.nt-ses-sel{width:100%}
+.nt-ses{margin-top:10px;padding:12px 14px;border-radius:16px;border:2px solid var(--hair);background:var(--glass-2)}
+.nt-ses-d{display:flex;flex-direction:column;gap:2px}
+.nt-ses-d b{font:800 16px/1.2 var(--font-d)}
+.nt-ses-d small{color:var(--muted);font-size:13px}
+.nt-ses-d em{align-self:flex-start;font:800 11px/1 var(--font-b);font-style:normal;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--sun);color:var(--on-sun);border:2px solid var(--stroke);margin-bottom:4px}
+.nt-ses.is-today{border-color:var(--sun);box-shadow:0 0 0 3px color-mix(in srgb,var(--sun) 35%,transparent)}
 .gl-tools{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:-6px 0 16px}
 .gl-tools .gsearch{flex:1 1 280px;margin-top:0}
 .gl-sort{display:flex;align-items:center;gap:8px;flex:0 1 auto}
@@ -1002,7 +1011,7 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.13 - octobre 2026 - Olvrteil</span>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.14 - octobre 2026 - Olvrteil</span>
     <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API : logo officiel « Powered by BGG », qui renvoie vers BoardGameGeek. -->
     <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><img src="powered-by-bgg.png" width="252" height="56" alt="Powered by BGG" decoding="async"></a>
     <button type="button" id="pushLink" hidden></button></footer>
@@ -1467,6 +1476,16 @@ html{overflow-x:hidden;max-width:100%}
   B.pushAudience = async function (groups) {
     try { var r = await sb.rpc('jdo_push_audience', { p_groups: groups && groups.length ? groups : null }); return r.error ? null : r.data; } catch (e) { return null; }
   };
+  B.pushAudienceSession = async function (sid) {
+    try { var r = await sb.rpc('jdo_push_audience_session', { p_sid: sid }); return r.error ? (/does not exist|schema cache|could not find/i.test(String(r.error.message || '')) ? -1 : null) : r.data; } catch (e) { return null; }
+  };
+  B.broadcastSession = async function (sid, title, body, image) {
+    try {
+      var r = await sb.rpc('jdo_push_broadcast_session', { p_sid: sid, p_title: title, p_body: body, p_image: image || null });
+      if (r.error) { var m = String(r.error.message || ''); return { error: /does not exist|schema cache|could not find/i.test(m) ? 'Fonction absente : exécutez le script SQL « annonce par session » dans Supabase.' : /réservé/.test(m) ? 'Réservé à l’administrateur.' : /introuvable/.test(m) ? 'Cette session n’existe plus.' : m }; }
+      return { n: r.data };
+    } catch (e) { return { error: friendly(e) }; }
+  };
   B.broadcast = async function (title, body, image, groups) {
     try {
       var r = await sb.rpc('jdo_push_broadcast', { p_title: title, p_body: body, p_image: image || null, p_groups: groups && groups.length ? groups : null });
@@ -1799,7 +1818,7 @@ var Badges = (function () {
   var NAMEKEY = 'jdo-name', NAME = '';
   try { NAME = localStorage.getItem(NAMEKEY) || ''; } catch (e) {}
   var tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
-  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'] }, route: 'home', gl: { q: '', sort: 'dateAsc' }, grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
+  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'], target: 'all', sid: '' }, route: 'home', gl: { q: '', sort: 'dateAsc' }, grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
     form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false }, gs: gsNew(), bg: bgNew(),
     auth: { mode: 'in', email: '', name: '', code: '', msg: '', ok: false, busy: false }, addMode: 'auto', gf: null };
   ui.stats = { days: 90, view: 'main', pid: null, sort: 'part' };
@@ -2392,22 +2411,52 @@ var Badges = (function () {
     return '<div class="admin-top"><div><p class="eyebrow">' + (ST.admin ? 'Espace admin' : 'Espace organisateur') + '</p><h1 style="font-size:clamp(2rem,4vw,3rem)">' + (ST.admin ? 'Organiser les parties' : 'Mes parties') + '</h1></div>' +
       '<div class="seg" role="group" aria-label="Sections">' + tabs.map(function (t) { return '<button aria-pressed="' + (ui.adminTab === t[0]) + '" data-act="tab" data-tab="' + t[0] + '">' + ic(t[2], 17) + ' ' + t[1] + '</button>'; }).join('') + '</div></div>' + body;
   }
+  /* annonce ciblée : sessions du jour d'abord (mises en évidence), puis de la plus récente à la plus ancienne */
+  function ntSessions() {
+    var today = D.iso(new Date()), all = M.sessions.slice().sort(function (a, b) { return startMs(b) - startMs(a); });
+    return { today: all.filter(function (x) { return x.date === today; }).sort(function (a, b) { return startMs(a) - startMs(b); }), rest: all.filter(function (x) { return x.date !== today; }) };
+  }
+  function ntLabel(x) {
+    var g = (x.groups || []).map(function (k) { var f = GROUPS.filter(function (y) { return y[0] === k; })[0]; return f ? f[1] : k; }).join(' + ');
+    return cap(fr(x.date, { weekday: 'short', day: 'numeric', month: 'short' })) + ' · ' + hm(x.time || '12:00') + (g ? ' · ' + g : '') + ' · ' + plural(allRegs(x).length, 'inscrit', 'inscrits') + (cancelInfo(x) ? ' · annulée' : '');
+  }
+  function ntLoadAud() {
+    var n = ui.nt;
+    if (n.target === 'session') {
+      if (!n.sid) { n.aud = null; return; }
+      var sid = n.sid; Backend.pushAudienceSession(sid).then(function (c) { if (ui.nt.sid === sid && ui.nt.target === 'session') { ui.nt.aud = c; if (ui.adminTab === 'notif') render(); } });
+    } else Backend.pushAudience(n.groups).then(function (c) { ui.nt.aud = c; if (ui.adminTab === 'notif') render(); });
+  }
+  function ntTargetBlock(n) {
+    var seg = '<div class="seg nt-seg" role="group" aria-label="Destinataires">' + [['all', 'users', 'Tout le monde'], ['session', 'pin', 'Une session']].map(function (x) { return '<button type="button" aria-pressed="' + (n.target === x[0]) + '" data-act="ntTarget" data-t="' + x[0] + '">' + ic(x[1], 17) + ' ' + x[2] + '</button>'; }).join('') + '</div>';
+    if (n.target !== 'session') return '<div class="label">Destinataires</div>' + seg + '<div style="margin-top:12px">' + groupPicker(n.groups, 'ntGroup') + '</div>';
+    var L = ntSessions(), opt = function (x) { return '<option value="' + esc(x.id) + '"' + (n.sid === x.id ? ' selected' : '') + '>' + (x.date === D.iso(new Date()) ? '★ ' : '') + esc(ntLabel(x)) + '</option>'; };
+    var cur = n.sid && sessionById(n.sid), isT = cur && cur.date === D.iso(new Date());
+    var sel = !M.sessions.length ? '<p class="hint" style="margin:10px 0 0">Aucune session pour l’instant.</p>' :
+      '<select class="input nt-ses-sel" id="nt-sid" aria-label="Session destinataire"><option value=""' + (n.sid ? '' : ' selected') + '>Choisir une session…</option>' +
+      (L.today.length ? '<optgroup label="★ Aujourd’hui">' + L.today.map(opt).join('') + '</optgroup>' : '') +
+      (L.rest.length ? '<optgroup label="Autres sessions (de la plus récente à la plus ancienne)">' + L.rest.map(opt).join('') + '</optgroup>' : '') + '</select>';
+    var info = cur ? '<div class="nt-ses' + (isT ? ' is-today' : '') + '"><span class="nt-ses-d">' + (isT ? '<em>Aujourd’hui</em>' : '') + '<b>' + esc(longDate(cur.date)) + '</b><small>' + hm(cur.time || '12:00') + ' · ' + plural(allRegs(cur).length, 'inscrit·e', 'inscrit·e·s') + (waitList(cur).length ? ' dont ' + waitList(cur).length + ' en attente' : '') + '</small></span></div>' : '';
+    return '<div class="label">Destinataires</div>' + seg + '<div style="margin-top:12px">' + sel + '</div>' + info;
+  }
   function tabNotif() {
-    var n = ui.nt, ok = n.title.trim() && n.text.trim() && !n.busy, aud = n.aud;
-    return '<div class="cols"><div class="panel glass-2 nt-form"><div class="panel-head"><h2>Envoyer une annonce</h2><p>Une notification arrive sur le téléphone de chaque personne qui a activé les notifications. Utile pour prévenir d’un changement de salle, d’une soirée jeux, d’un nouveau jeu…</p></div>' +
-      '<div class="label">Destinataires</div>' + groupPicker(n.groups, 'ntGroup') + '<div class="field" style="margin-top:14px"><label for="nt-title">Titre</label><input class="input" id="nt-title" maxlength="80" autocomplete="off" placeholder="Ex. Nouveau jeu en salle Cèdre" value="' + esc(n.title) + '"></div>' +
+    var n = ui.nt, sess = n.target === 'session', ok = n.title.trim() && n.text.trim() && !n.busy && (!sess || !!n.sid), aud = n.aud;
+    var audTxt = sess && !n.sid ? 'Choisissez d’abord une session.' : aud === null ? 'Calcul du nombre de destinataires…' : aud === -1 ? 'Fonction absente : lancez le script SQL « annonce par session » dans Supabase.' : aud === 0 ? (sess ? 'Aucun·e inscrit·e de cette session n’a activé les notifications.' : 'Personne n’a encore activé les notifications.') : '<b>' + aud + '</b> personne' + (aud > 1 ? 's' : '') + ' recevront ' + (sess ? 'ce message.' : 'cette annonce.');
+    var blocked = sess ? (!(aud > 0)) : aud === 0;
+    return '<div class="cols"><div class="panel glass-2 nt-form"><div class="panel-head"><h2>Envoyer une annonce</h2><p>Une notification arrive sur le téléphone de chaque personne qui a activé les notifications : tout le monde, ou seulement les inscrit·e·s d’une session. Utile pour prévenir d’un changement de salle, d’un retard, d’un nouveau jeu…</p></div>' +
+      ntTargetBlock(n) + '<div class="field" style="margin-top:14px"><label for="nt-title">Titre</label><input class="input" id="nt-title" maxlength="80" autocomplete="off" placeholder="Ex. Nouveau jeu en salle Cèdre" value="' + esc(n.title) + '"></div>' +
       '<div class="field" style="margin-top:14px"><label for="nt-text">Texte</label><textarea class="input" id="nt-text" rows="4" maxlength="300" placeholder="Votre message (300 caractères max.)">' + esc(n.text) + '</textarea></div>' +
       '<div class="gf-photo-btns" style="margin-top:14px"><label class="btn btn-sm btn-glass" for="nt-file">' + ic('camera', 17) + ' ' + (n.preview ? 'Changer l’image' : 'Ajouter une image (facultatif)') + '</label><input type="file" id="nt-file" accept="image/*" hidden>' + (n.preview ? '<button class="link danger" type="button" data-act="ntClearImg">Retirer l’image</button>' : '') + '</div>' +
       (n.err ? '<p class="auth-msg bad" role="alert">' + esc(n.err) + '</p>' : '') + '</div>' +
       '<aside class="aside"><div class="panel glass"><div class="small-h">Aperçu</div><div class="nt-prev"><div class="nt-bar"><img src="icon-me.png" alt=""><span>Jeux d’Oliv · maintenant</span></div><b id="nt-pt">' + esc(n.title.trim() || 'Titre de l’annonce') + '</b><p id="nt-px">' + esc(n.text.trim() || 'Le texte de votre annonce apparaîtra ici.') + '</p>' + (n.preview ? '<img class="nt-img" src="' + esc(n.preview) + '" alt="Image de l’annonce">' : '') + '</div></div>' +
-      '<div class="panel glass-2" style="margin-top:16px"><p class="small" style="margin:0 0 12px">' + (aud === null ? 'Calcul du nombre de destinataires…' : aud === 0 ? 'Personne n’a encore activé les notifications.' : '<b>' + aud + '</b> personne' + (aud > 1 ? 's' : '') + ' recevront cette annonce.') + '</p>' +
+      '<div class="panel glass-2" style="margin-top:16px"><p class="small" style="margin:0 0 12px">' + audTxt + '</p>' +
       (n.confirm ? '<div class="tools"><button class="btn btn-red btn-lg" data-act="ntSend"' + (n.busy ? ' disabled' : '') + '>' + ic('bell', 19) + ' Confirmer l’envoi</button><button class="link" data-act="ntCancel">Annuler</button></div>'
-        : '<button class="btn btn-lg btn-block" id="nt-go" data-act="ntAsk"' + (ok && aud !== 0 ? '' : ' disabled') + '>' + ic('bell', 19) + ' Envoyer à tout le monde</button>') + '</div></aside></div>';
+        : '<button class="btn btn-lg btn-block" id="nt-go" data-act="ntAsk"' + (ok && !blocked ? '' : ' disabled') + '>' + ic('bell', 19) + ' ' + (sess ? 'Envoyer aux inscrit·e·s' : 'Envoyer à tout le monde') + '</button>') + '</div></aside></div>';
   }
   function syncNotif() {
     var n = ui.nt, a = $('#nt-pt'), b = $('#nt-px'), g = $('#nt-go');
     if (a) a.textContent = n.title.trim() || 'Titre de l’annonce'; if (b) b.textContent = n.text.trim() || 'Le texte de votre annonce apparaîtra ici.';
-    if (g) g.disabled = !(n.title.trim() && n.text.trim() && !n.busy && n.aud !== 0);
+    if (g) g.disabled = !(n.title.trim() && n.text.trim() && !n.busy && (n.target === 'session' ? n.sid && n.aud > 0 : n.aud !== 0));
   }
   function cropWide(file) {
     return new Promise(function (res, rej) {
@@ -3357,7 +3406,7 @@ var Badges = (function () {
     },
     tab: function (el) {
       ui.adminTab = el.dataset.tab; ui.confirm = null; render();
-      if (ui.adminTab === 'notif' && ui.nt.aud === null) Backend.pushAudience(ui.nt.groups).then(function (n) { ui.nt.aud = n; if (ui.adminTab === 'notif') render(); });
+      if (ui.adminTab === 'notif' && ui.nt.aud === null) ntLoadAud();
       if (ui.adminTab === 'team') {
         if (ST.codes === null) Backend.groupCodes().then(function (c) { ST.codes = c || {}; render(); });
         Backend.adminMembers().then(function (l) { ST.members = l || []; if (ui.adminTab === 'team') render(); });
@@ -3513,6 +3562,12 @@ var Badges = (function () {
       var before = waitList(s).length, gain = Math.min(before, seatsFor(gamesOf(s).concat([g]), !!s.single) - seatsOf(s));
       wr(ST.db.doc('sessions/' + s.id).update({ gameIds: (s.gameIds || []).concat(g.id) }), g.name + ' ajouté : ' + gain + ' personne' + (gain > 1 ? 's quittent' : ' quitte') + ' la liste d’attente.');
     },
+    ntTarget: function (el) {
+      var n = ui.nt, t = el.dataset.t === 'session' ? 'session' : 'all'; if (n.target === t) return;
+      n.target = t; n.confirm = false; n.aud = null;
+      if (t === 'session' && (!n.sid || !sessionById(n.sid))) { var L = ntSessions(); n.sid = L.today.length ? L.today[0].id : ''; }
+      render(); ntLoadAud();
+    },
     ntAsk: function () { if (!ui.nt.title.trim() || !ui.nt.text.trim()) return; ui.nt.confirm = true; render(); },
     ntCancel: function () { ui.nt.confirm = false; render(); },
     ntClearImg: function () { if (ui.nt.preview) URL.revokeObjectURL(ui.nt.preview); ui.nt.blob = null; ui.nt.preview = ''; render(); },
@@ -3521,13 +3576,13 @@ var Badges = (function () {
       var up = n.blob ? Backend.uploadCover(n.blob, 'annonce') : Promise.resolve({ url: null });
       up.then(function (u) {
         if (u.error) return { error: u.error };
-        return Backend.broadcast(n.title.trim(), n.text.trim(), u.url, n.groups);
+        return n.target === 'session' ? Backend.broadcastSession(n.sid, n.title.trim(), n.text.trim(), u.url) : Backend.broadcast(n.title.trim(), n.text.trim(), u.url, n.groups);
       }).then(function (r) {
         n.busy = false; n.confirm = false;
         if (r.error) { n.err = r.error; return render(); }
         if (n.preview) URL.revokeObjectURL(n.preview);
         n.title = ''; n.text = ''; n.blob = null; n.preview = ''; render();
-        toast('Annonce envoyée à ' + r.n + ' personne' + (r.n > 1 ? 's' : '') + '.');
+        toast((n.target === 'session' ? 'Message envoyé à ' : 'Annonce envoyée à ') + r.n + ' personne' + (r.n > 1 ? 's' : '') + '.');
       });
     },
     removeReg: function (el) {
@@ -3825,6 +3880,7 @@ var Badges = (function () {
   });
   document.addEventListener('change', function (e) {
     var t = e.target;
+    if (t.id === 'nt-sid') { ui.nt.sid = t.value; ui.nt.confirm = false; ui.nt.aud = null; render(); ntLoadAud(); return; }
     if (t.id === 'gl-sort') { ui.gl.sort = t.value; var gl = $('#glist'); if (gl) gl.innerHTML = glRows(); return; }
     if ((t.id === 'gf-min' || t.id === 'gf-ideal' || t.id === 'gf-max') && ui.gf) {   /* jamais moins de 1 joueur */
       var nv = Math.round(+t.value); if (t.value !== '' && !(nv >= 2)) { t.value = '2'; ui.gf[GFKEYS[t.id]] = '2'; toast('Un jeu se joue à 2 joueurs minimum.'); }
