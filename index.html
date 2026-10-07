@@ -1034,8 +1034,9 @@ html{overflow-x:hidden;max-width:100%}
 
 /* ----- v1.20 : badges de victoire, hall of fame, palmarès ----- */
 .prof-tabs{display:flex;width:100%;margin:6px 0 16px}.prof-tabs button{flex:1;justify-content:center}
-.fm-row{display:flex;gap:8px;flex-wrap:wrap}
-.fm{min-width:52px;text-align:center;padding:8px 12px;border-radius:14px;font:800 13.5px/1 var(--font-d);background:var(--hair);color:var(--muted);border:2px solid transparent}
+.fm-row{display:flex;gap:6px;flex-wrap:nowrap}
+.fm-row .fm{flex:1 1 0;min-width:0;padding:8px 4px;white-space:nowrap}
+.fm{text-align:center;padding:8px 12px;border-radius:14px;font:800 13.5px/1 var(--font-d);background:var(--hair);color:var(--muted);border:2px solid transparent}
 .fm.r1{background:var(--sun);color:var(--on-sun);border-color:var(--sun-edge)}
 .fm.r2{background:color-mix(in srgb,#94A3B8 38%,var(--glass-2));color:var(--ink)}
 .fm.r3{background:color-mix(in srgb,#C2410C 28%,var(--glass-2));color:var(--ink)}
@@ -3524,7 +3525,7 @@ var Badges = (function () {
     });
     var rows = Object.keys(G2).map(function (k) { return G2[k]; }).filter(function (x) { return G(x.gid); }).sort(function (a, b) { return b.n - a.n || b.w - a.w; }).slice(0, 8);
     return '<section class="bd-sec"><h2 class="bd-h">Scores</h2><div class="prof-stats"><div class="pstat"><b>' + wins + '</b><span>victoire' + (wins > 1 ? 's' : '') + '</span></div><div class="pstat"><b>' + (comp.length ? pctOf(cw, comp.length) + '<small> %</small>' : '–') + '</b><span>taux de victoire</span></div><div class="pstat"><b>' + scp.length + '</b><span>partie' + (scp.length > 1 ? 's' : '') + ' avec score</span></div></div>' +
-      '<div class="small-h">Forme récente</div><div class="fm-row">' + scp.slice(-6).reverse().map(formChip).join('') + '</div>' +
+      '<div class="small-h">Derniers résultats</div><div class="fm-row">' + scp.slice(-5).reverse().map(formChip).join('') + '</div>' +
       '<div class="small-h" style="margin-top:18px">Par jeu</div><div class="scg-list">' + rows.map(function (x) {
         var g = G(x.gid), rec = x.hi !== null ? scFmt(x.hi) + ' pts' : x.lo !== null ? scFmt(x.lo) + ' pts (le plus bas)' : '';
         return '<div class="scg"><span class="scg-art">' + art(g) + '</span><div><b>' + esc(g.name) + '</b><span>' + plural(x.n, 'partie', 'parties') + ' · ' + plural(x.w, 'victoire', 'victoires') + '</span></div>' + (rec ? '<em title="Meilleur score">' + ic('trophy', 14) + ' ' + rec + '</em>' : '') + '</div>';
