@@ -1049,7 +1049,7 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.17 - octobre 2026 - Olvrteil</span>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.18 - octobre 2026 - Olvrteil</span>
     <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API : logo officiel « Powered by BGG », qui renvoie vers BoardGameGeek. -->
     <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><img src="powered-by-bgg.png" width="252" height="56" alt="Powered by BGG" decoding="async"></a>
     <button type="button" id="pushLink" hidden></button></footer>
@@ -2073,10 +2073,14 @@ var Badges = (function () {
     return '<section class="notify glass-2 ' + (st === 'off' ? 'notify-off' : '') + '"><span class="notify-ico">' + ic('bell', 22) + '</span><div class="notify-txt"><b>' + (st === 'off' ? 'Être prévenu·e quand votre table est prête' : 'Être prévenu·e') + '</b><span>' + (st === 'off' ? 'Recevez une notification quand votre table est prête ou qu’une place se libère.' : 'Pour recevoir les notifications sur iPhone, installez d’abord l’appli : Partager, puis Sur l’écran d’accueil.') + '</span></div><div class="notify-btns">' +
       (st === 'off' ? '<button class="btn" data-act="pushOn">Activer</button>' : '') + '<button class="link" data-act="pushLater" aria-label="Plus tard"><span class="lt">Plus tard</span><span class="lx">' + ic('x', 16) + '</span></button></div></section>';
   }
+  /* la carte « Ma table aujourd'hui » disparaît 3 h après l'heure de la session */
+  var DAY_CARD_MS = 3 * 3600 * 1000;
+  function dayCardLive(s) { return Date.now() < startMs(s) + DAY_CARD_MS; }
+  var lastDay = {};
   function myDayCard() {
     if (!ST.uid) return '';
     var today = D.iso(new Date()), cards = [];
-    sorted().filter(function (s) { return s.date === today && gamesOf(s).length; }).forEach(function (s) {
+    sorted().filter(function (s) { return s.date === today && gamesOf(s).length && dayCardLive(s); }).forEach(function (s) {
       var ph = phase(s), mine = myReg(s), when = 'Aujourd’hui · ' + hm(s.time), note = s.note && s.note.trim() ? '<span class="td-note">' + ic('pin', 14) + ' ' + esc(s.note.trim()) + '</span>' : '', go = function (cls, txt) { return '<button class="btn ' + cls + '" data-act="open" data-sid="' + s.id + '">' + txt + ' ' + ic('arrow', 17) + '</button>'; };
       if (ph === 'published' || ph === 'auto') {
         var mt = myTableOf(s), g = mt && G(mt.gid);
@@ -3397,6 +3401,7 @@ var Badges = (function () {
       var ph = phase(s);
       if (lastPhase[s.id] !== undefined && lastPhase[s.id] !== ph) changed = true;
       lastPhase[s.id] = ph;
+      var dl = dayCardLive(s); if (lastDay[s.id] !== undefined && lastDay[s.id] !== dl && ui.route === 'home') changed = true; lastDay[s.id] = dl;
       if (ph === 'pending') claimAuto(s);
     });
     if (changed) {
