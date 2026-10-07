@@ -1022,7 +1022,7 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.15 - octobre 2026 - Olvrteil</span>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.16 - octobre 2026 - Olvrteil</span>
     <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API : logo officiel « Powered by BGG », qui renvoie vers BoardGameGeek. -->
     <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><img src="powered-by-bgg.png" width="252" height="56" alt="Powered by BGG" decoding="async"></a>
     <button type="button" id="pushLink" hidden></button></footer>
@@ -1829,7 +1829,7 @@ var Badges = (function () {
   var NAMEKEY = 'jdo-name', NAME = '';
   try { NAME = localStorage.getItem(NAMEKEY) || ''; } catch (e) {}
   var tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
-  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'], target: 'all', sid: '' }, route: 'home', gl: { q: '', sort: 'dateAsc' }, flt: { p: 0, d: '' }, grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
+  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'], target: 'all', sid: '' }, route: 'home', gl: { q: '', sort: 'dateAsc' }, flt: { p: [], d: '' }, grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
     form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false }, gs: gsNew(), bg: bgNew(),
     auth: { mode: 'in', email: '', name: '', code: '', msg: '', ok: false, busy: false }, addMode: 'auto', gf: null };
   ui.stats = { days: 90, view: 'main', pid: null, sort: 'part' };
@@ -2376,10 +2376,11 @@ var Badges = (function () {
   /* filtres de la ludothèque : nombre de joueurs et durée de partie (partagés entre l'écran des joueurs et la liste admin) */
   var FLT_P = [[0, 'Tous'], [2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6 et +']];
   var FLT_D = [['', 'Toutes'], ['30', '30 min max'], ['60', '30 min – 1 h'], ['120', '1 h – 2 h'], ['180', '+ de 2 h']];
-  function fltOn() { return !!(ui.flt.p || ui.flt.d); }
+  function fltOn() { return !!(ui.flt.p.length || ui.flt.d); }
   function fltMatch(g) {
     var p = ui.flt.p, d = ui.flt.d;
-    if (p && !(p >= 6 ? +g.max >= 6 : (+g.min || 0) <= p && (+g.max || 0) >= p)) return false;
+    /* plusieurs nombres de joueurs possibles : le jeu convient s'il se joue à au moins l'un d'eux */
+    if (p.length && !p.some(function (n) { return n >= 6 ? +g.max >= 6 : (+g.min || 0) <= n && (+g.max || 0) >= n; })) return false;
     if (d) {
       var t = +g.time; if (!(t > 0)) return false;
       if (d === '30' ? t > 30 : d === '60' ? !(t > 30 && t <= 60) : d === '120' ? !(t > 60 && t <= 120) : t <= 120) return false;
@@ -2389,7 +2390,7 @@ var Badges = (function () {
   function fltBar() {
     var chip = function (act, key, val, label, on) { return '<button type="button" class="flt-b" aria-pressed="' + on + '" data-act="' + act + '" data-v="' + val + '">' + label + '</button>'; };
     return '<div class="flt" role="group" aria-label="Filtrer les jeux">' +
-      '<div class="flt-row"><span class="flt-l">' + ic('users', 15) + ' Joueurs</span><div class="flt-c">' + FLT_P.map(function (x) { return chip('fltP', 'p', x[0], x[1], ui.flt.p === x[0]); }).join('') + '</div></div>' +
+      '<div class="flt-row"><span class="flt-l">' + ic('users', 15) + ' Joueurs</span><div class="flt-c">' + FLT_P.map(function (x) { return chip('fltP', 'p', x[0], x[1], x[0] ? ui.flt.p.indexOf(x[0]) >= 0 : !ui.flt.p.length); }).join('') + '</div></div>' +
       '<div class="flt-row"><span class="flt-l">' + ic('clock', 15) + ' Durée</span><div class="flt-c">' + FLT_D.map(function (x) { return chip('fltD', 'd', x[0], x[1], ui.flt.d === x[0]); }).join('') + '</div></div>' +
       (fltOn() ? '<button type="button" class="link flt-reset" data-act="fltReset">Réinitialiser les filtres</button>' : '') + '</div>';
   }
@@ -3598,9 +3599,13 @@ var Badges = (function () {
       var before = waitList(s).length, gain = Math.min(before, seatsFor(gamesOf(s).concat([g]), !!s.single) - seatsOf(s));
       wr(ST.db.doc('sessions/' + s.id).update({ gameIds: (s.gameIds || []).concat(g.id) }), g.name + ' ajouté : ' + gain + ' personne' + (gain > 1 ? 's quittent' : ' quitte') + ' la liste d’attente.');
     },
-    fltP: function (el) { ui.flt.p = +el.dataset.v || 0; render(); },
+    fltP: function (el) {
+      var v = +el.dataset.v || 0, a = ui.flt.p, i = a.indexOf(v);
+      if (!v) a.length = 0; else if (i >= 0) a.splice(i, 1); else { a.push(v); a.sort(function (x, y) { return x - y; }); }
+      render();
+    },
     fltD: function (el) { ui.flt.d = el.dataset.v || ''; render(); },
-    fltReset: function () { ui.flt = { p: 0, d: '' }; render(); },
+    fltReset: function () { ui.flt = { p: [], d: '' }; render(); },
     ntTarget: function (el) {
       var n = ui.nt, t = el.dataset.t === 'session' ? 'session' : 'all'; if (n.target === t) return;
       n.target = t; n.confirm = false; n.aud = null;
