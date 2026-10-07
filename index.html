@@ -652,6 +652,7 @@ html{overflow-x:hidden;max-width:100%}
 .today{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;padding:18px 20px;border-radius:26px;margin-bottom:26px;border:2px solid var(--teal);box-shadow:0 0 0 5px rgba(10,154,137,.14)}
 .today:not(:has(.today-box)){grid-template-columns:minmax(0,1fr) auto;border-color:var(--hair);box-shadow:none}
 .today-box{width:84px}
+.today-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 .today-body{min-width:0}
 .today-body .eyebrow{margin-bottom:6px}
 .today-body h2{font-size:clamp(1.25rem,2.4vw,1.6rem);line-height:1.15;margin:0 0 10px}
@@ -661,7 +662,8 @@ html{overflow-x:hidden;max-width:100%}
   .today{grid-template-columns:72px minmax(0,1fr);gap:12px 14px;padding:14px;margin-bottom:18px}
   .today:not(:has(.today-box)){grid-template-columns:minmax(0,1fr)}
   .today-box{width:72px}
-  .today>.btn{grid-column:1/-1}
+  .today>.btn,.today>.today-btns{grid-column:1/-1}
+  .today-btns .btn{flex:1}
 }
 
 /* Révélation des tables */
@@ -1032,6 +1034,7 @@ html{overflow-x:hidden;max-width:100%}
 
 /* ----- v1.19 : scores et changement de table ----- */
 .sess-act{margin-left:auto;align-self:flex-start}
+.new-top{margin-bottom:18px}
 .sc-sheet,.mv-sheet{width:min(560px,100%)}
 .sc-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:2px 44px 14px 0}
 .sc-tabs button{padding:8px 14px;border-radius:999px;background:var(--hair);font-weight:700;font-size:13.5px;color:var(--muted);display:inline-flex;gap:6px;align-items:center}
@@ -2150,7 +2153,7 @@ var Badges = (function () {
         if (mt && g) {
           var others = mt.ids.filter(function (x) { return !isMe(x); });
           cards.push('<section class="today glass-2 ' + (ui.anim ? 'pop-in' : '') + '"><div class="today-box">' + box(g) + '</div><div class="today-body"><p class="eyebrow">Ma table · ' + when + '</p><h2>Vous jouez à ' + esc(g.name) + '</h2>' +
-            '<div class="players">' + (others.length ? others.slice(0, 6).map(function (u) { return '<span class="pchip">' + avatar(nameOf(u), 'sm') + esc(nameOf(u)) + '</span>'; }).join('') + (others.length > 6 ? '<span class="pchip">+' + (others.length - 6) + '</span>' : '') : '<span class="hint" style="margin:0">Vous êtes seul·e à cette table pour l’instant.</span>') + '</div>' + note + '</div>' + go('btn-teal', 'Ma table') + '</section>');
+            '<div class="players">' + (others.length ? others.slice(0, 6).map(function (u) { return '<span class="pchip">' + avatar(nameOf(u), 'sm') + esc(nameOf(u)) + '</span>'; }).join('') + (others.length > 6 ? '<span class="pchip">+' + (others.length - 6) + '</span>' : '') : '<span class="hint" style="margin:0">Vous êtes seul·e à cette table pour l’instant.</span>') + '</div>' + note + '</div><div class="today-btns">' + (scOn(s) ? '<button class="btn btn-glass" data-act="scOpen" data-sid="' + s.id + '">' + ic('trophy', 17) + ' Scores</button>' : '') + go('btn-teal', 'Ma table') + '</div></section>');
         } else if (mine) cards.push('<section class="today glass-2"><div class="today-body"><p class="eyebrow">' + when + '</p><h2>' + (waitPos(s, ST.uid) ? 'Pas de place cette fois' : 'Pas de table cette fois') + '</h2><p class="hint" style="margin:0">' + (waitPos(s, ST.uid) ? 'Vous étiez sur la liste d’attente.' : 'Aucune table ne correspondait à vos choix.') + '</p></div>' + go('btn-glass', 'Voir les tables') + '</section>');
       } else if (mine) {
         var wp = waitPos(s, ST.uid);
@@ -2495,7 +2498,8 @@ var Badges = (function () {
   }
   function scVal(s, gid, uid) { var d = M.sc[scKey(s, gid, uid)]; return d && !d.meta && typeof d.v === 'number' ? d.v : null; }
   function scOn(s) { var ph = phase(s), r = resultOf(s); return !!(ST.uid && ST.auth === 'in' && (ph === 'published' || ph === 'auto') && r && r.tables.some(function (t) { return G(t.gid); })); }
-  function scCanEdit(s, t) { return !!(ST.uid && (t.ids.indexOf(ST.uid) >= 0 || canManage(s))); }
+  /* admin : toujours ; joueur de la table : seulement pendant les 3 h qui suivent l'heure de la session */
+  function scCanEdit(s, t) { return !!(ST.uid && (ST.admin || (t.ids.indexOf(ST.uid) >= 0 && dayCardLive(s)))); }
   function scLocked(s, t) { var m = scMeta(s, t.gid); return !!(m && m.done); }
   function scFmt(v) { return (Math.round(v * 100) / 100).toLocaleString('fr-FR'); }
   function scRanking(s, t) {
@@ -2768,7 +2772,15 @@ var Badges = (function () {
     if (m && m.type === 'game' && G(m.gid)) h = modalGame(G(m.gid));
     else if (m && m.type === 'move') h = modalMove(m);
     else if (m && m.type === 'swap') h = modalSwap(m);
-    else if (m && m.type === 'scores') { if ($('#modal-root .sc-in:focus')) { scRefresh(); return; } h = modalScores(m); if (!h) ui.modal = null; }
+    else if (m && m.type === 'scores') {
+      if ($('#modal-root .sc-in:focus')) { scRefresh(); return; }
+      h = modalScores(m); if (!h) ui.modal = null;
+      else { /* fenêtre déjà ouverte : on remplace seulement le contenu (pas de réanimation, pas de clignotement) */
+        var cur0 = $('#modal-root .sc-sheet'), tmp = document.createElement('div'); tmp.innerHTML = h;
+        var nw = tmp.querySelector('.sc-sheet');
+        if (cur0 && nw) { var top0 = cur0.scrollTop; cur0.innerHTML = nw.innerHTML; cur0.scrollTop = top0; return; }
+      }
+    }
     else if (m && m.type === 'filters') { if ($('#modal-root .fsheet')) return; h = modalFilters(); }
     else if (m && m.type === 'badges') { var cb = $('#modal-root').firstElementChild; if (cb && cb.classList.contains('bdcel')) return; h = modalBadges(m); if (!h) ui.modal = null; }
     else if (m && m.type === 'reveal') { var cur = $('#modal-root').firstElementChild; if (cur && cur.classList.contains('reveal') && cur.dataset.sid === m.sid) return; h = modalReveal(m); if (!h) { ui.modal = null; } }
@@ -2916,7 +2928,7 @@ var Badges = (function () {
   function tabNew() {
     var f = ui.form, sel = f.gameIds.map(G).filter(Boolean), total = seatsFor(sel, !!f.single);
     if (!ST.admin) { f.groups = f.groups.filter(function (g) { return ST.groups.indexOf(g) >= 0; }); if (!f.groups.length) f.groups = [ST.groups[0] || 'pro']; }
-    return '<div class="form"><div class="panel glass-2"><div class="panel-head"><h2>Nouvelle session</h2><p>' + (ui.dupFrom && sessionById(ui.dupFrom) ? ic('copy', 15) + ' Copie de la session du ' + longDate(sessionById(ui.dupFrom).date) + ' : changez la date, puis ajustez les jeux ou le texte si besoin.' : 'Choisissez le jour, l’heure, puis les jeux proposés.') + '</p></div>' +
+    return '<div class="form"><div class="panel glass-2"><button class="btn btn-block new-top" data-act="createSession"' + (sel.length && f.date && f.time ? '' : ' disabled') + '>' + ic('plus', 20) + ' Programmer la session' + (sel.length ? ' · ' + plural(sel.length, 'jeu', 'jeux') : '') + '</button><div class="panel-head"><h2>Nouvelle session</h2><p>' + (ui.dupFrom && sessionById(ui.dupFrom) ? ic('copy', 15) + ' Copie de la session du ' + longDate(sessionById(ui.dupFrom).date) + ' : changez la date, puis ajustez les jeux ou le texte si besoin.' : 'Choisissez le jour, l’heure, puis les jeux proposés.') + '</p></div>' +
       '<div class="form-row"><div class="field"><label for="f-date">Date</label><input class="input" id="f-date" type="date" value="' + esc(f.date) + '"></div><div class="field"><label for="f-time">Heure</label><input class="input" id="f-time" type="time" value="' + esc(f.time) + '"></div></div>' +
       '<p class="hint" style="margin:10px 0 0">À cette heure, les inscriptions se ferment et les tables se composent toutes seules si vous n’avez pas clôturé avant.</p>' +
       '<div class="field" style="margin-top:18px"><label for="f-note">Commentaire pour les joueurs (facultatif)</label><textarea class="input" id="f-note" rows="3" maxlength="280" placeholder="Ex. Lieu, on commence à 20h30...">' + esc(f.note) + '</textarea></div>' +
@@ -4263,7 +4275,7 @@ var Badges = (function () {
     if (e.key === 'Enter' && t.id === 'bg-q') { e.preventDefault(); ACT.bgSearch(); }
   });
   /* met à jour le bouton « Programmer » sans reconstruire la page (sinon le champ perd le focus pendant la saisie) */
-  function syncCreate() { var b = document.querySelector('[data-act="createSession"]'); if (b) b.disabled = !(ui.form.gameIds.length && ui.form.date && ui.form.time); }
+  function syncCreate() { var ok = !(ui.form.gameIds.length && ui.form.date && ui.form.time); document.querySelectorAll('[data-act="createSession"]').forEach(function (b) { b.disabled = ok; }); }
   document.addEventListener('input', function (e) {
     var t = e.target;
     if (t.id === 'reg-name') { NAME = t.value; try { localStorage.setItem(NAMEKEY, NAME); } catch (x) {} updateHeader(); }
