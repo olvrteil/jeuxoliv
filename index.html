@@ -1237,15 +1237,16 @@ html{overflow-x:hidden;max-width:100%}
   /* une seule barre fixe : la navigation du bas se masque quand une barre d'action est affichée */
   body.has-bar .navbar{display:none}
   body.has-bar .app{padding-bottom:28px}
-  .actionbar,body.has-bar .actionbar{bottom:calc(12px + env(safe-area-inset-bottom,0px));flex-direction:row;align-items:center;gap:10px;padding:10px 10px 10px 16px}
-  .actionbar:has(.hint){flex-direction:column;align-items:stretch;padding:14px}
-  .actionbar .progress{flex:1 1 auto}
-  .actionbar .progress strong{font-size:13px;line-height:1.15;max-width:104px}
-  .actionbar:has(.hint) .progress strong{max-width:none}
-  .dots-row{flex-wrap:nowrap;gap:4px}
-  .dots-row i{flex:1 1 0;min-width:4px;max-width:14px;width:auto}
-  .actionbar .row{flex:0 0 auto}
+  .actionbar,body.has-bar .actionbar{bottom:calc(12px + env(safe-area-inset-bottom,0px));flex-direction:column;align-items:stretch;gap:8px;padding:10px 12px 12px}
+  .actionbar{background:color-mix(in srgb,var(--glass-2) 35%,var(--bg))}
+  .actionbar .progress{flex-direction:row;align-items:center;justify-content:space-between;gap:12px}
+  .actionbar:has(.hint) .progress{flex-direction:column;align-items:flex-start;gap:4px}
+  .actionbar .progress strong{font-size:14px;line-height:1.15}
+  .actionbar .row{width:100%}
+  .actionbar .row .btn{flex:1 1 auto;justify-content:center}
   .actionbar .btn-lg{padding:12px 16px;font-size:15px;white-space:nowrap}
+  .dots-row{flex-wrap:nowrap;gap:4px;flex:0 1 auto;min-width:0}
+  .dots-row i{flex:0 1 auto;min-width:4px;max-width:16px;width:16px}
   /* accueil compact */
   .intro{margin-bottom:12px}
   .intro .lede,.intro .steps{display:none}
