@@ -121,6 +121,21 @@ ol,ul{padding:0;list-style:none}
 .mepill input::placeholder{color:var(--muted);font-weight:500}
 .av{--c:var(--p0);flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:800 14px/1 var(--font-d);color:var(--ink);background:var(--glass-2);background:color-mix(in srgb,var(--c) 30%,var(--glass-2));border:2px solid var(--c)}
 .av.sm{width:26px;height:26px;font-size:12px}
+.av.has-photo{padding:0;overflow:hidden;background:var(--c)}
+.av.has-photo img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;-webkit-user-drag:none;user-select:none}
+.prof-av{position:relative;flex:none}
+.prof-cam{position:absolute;right:-4px;bottom:-4px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--bg);border:3px solid var(--bg);cursor:pointer;box-shadow:0 4px 12px rgba(20,16,50,.28);transition:transform .15s}
+.prof-cam:hover,.prof-cam:focus-visible{transform:scale(1.1)}
+.prof-cam .ic{display:block}
+.ph-sheet{width:min(420px,100%);text-align:center}
+.ph-sheet h2{margin:0 0 6px}
+.ph-prev{display:grid;place-items:center;margin:18px 0 14px}
+.av.ph-big{width:168px;height:168px;font-size:76px;border-width:5px;box-shadow:0 0 0 7px color-mix(in srgb,var(--c) 22%,transparent),0 14px 30px rgba(20,16,50,.2)}
+.ph-btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px}
+.ph-btns .btn{cursor:pointer}
+.ph-err{color:var(--red,#d1322f);font-weight:700;margin:0 0 8px}
+.ph-foot{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:20px}
+@media (max-width:520px){.ph-btns .btn{width:100%}.av.ph-big{width:150px;height:150px}}
 main{padding-block:28px 24px;min-height:70vh}
 .foot{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;padding-block:8px 12px}
 .foot button{text-decoration:underline;text-underline-offset:3px;font-weight:600}
@@ -736,6 +751,7 @@ html{overflow-x:hidden;max-width:100%}
 .mepill .av[data-go],.mepill .me-name[data-go]{cursor:pointer}
 .prof-hero{display:flex;gap:18px;align-items:center;padding:22px;margin-bottom:16px}
 .prof-av .av{width:76px;height:76px;font-size:34px;border:3px solid var(--edge)}
+.prof-av .av.has-photo{border-color:var(--c)}
 .prof-id{flex:1;min-width:0}.prof-id h1{font-size:clamp(1.8rem,5vw,2.6rem);margin:0 0 8px;overflow-wrap:anywhere}.prof-id .eyebrow{margin-bottom:8px}
 .prof-next{margin:0 0 8px;color:var(--muted);font-size:.92rem}.prof-next b{color:var(--ink)}
 .bd-bar{height:7px;border-radius:99px;background:var(--hair);overflow:hidden;margin-top:6px}.bd-bar.big{height:10px}
@@ -2136,7 +2152,11 @@ var Badges = (function () {
   };
   var box = function (g) { return '<div class="box">' + art(g) + '</div>'; };
   var hue = function (n) { var h = 0, i; for (i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % 5; return h; };
-  var avatar = function (n, c) { return '<span class="av ' + (c || '') + '" style="--c:var(--p' + hue(n) + ')">' + esc(n.charAt(0).toUpperCase()) + '</span>'; };
+  /* photo de profil : petite image JPEG (data:) dans la fiche de la personne, affichée à la place de l'initiale */
+  var photoOk = {};
+  function photoSafe(p) { if (typeof p !== 'string' || p.length > 60000) return ''; if (photoOk[p] === undefined) photoOk[p] = /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]{100,}$/.test(p); return photoOk[p] ? p : ''; }
+  function photoOf(uid) { var d = uid && M.regs[uid]; return d ? photoSafe(d.photo) : ''; }
+  var avatar = function (n, c, uid) { var ph = photoOf(uid); return '<span class="av ' + (c || '') + (ph ? ' has-photo' : '') + '" style="--c:var(--p' + hue(n) + ')">' + (ph ? '<img src="' + ph + '" alt="" decoding="async" draggable="false">' : esc(n.charAt(0).toUpperCase())) + '</span>'; };
   var weightDots = function (w) { var h = '', i; for (i = 1; i <= 5; i++) h += '<i class="' + (i <= Math.round(w) ? 'on' : '') + '"></i>'; return '<span class="weight" title="Complexité ' + w + ' sur 5">' + h + '</span>'; };
   var facts = function (g, full) {
     return '<div class="facts"><span>' + ic('users', 15) + ' <b>' + (g.min === g.max ? g.min : g.min + '–' + g.max) + '</b> joueurs</span>' + (g.time ? '<span>' + ic('clock', 15) + ' <b>' + g.time + '</b> min</span>' : '') +
@@ -2301,7 +2321,7 @@ var Badges = (function () {
         if (mt && g) {
           var others = mt.ids.filter(function (x) { return !isMe(x); });
           cards.push('<section class="today glass-2 ' + (ui.anim ? 'pop-in' : '') + '"><div class="today-box">' + box(g) + '</div><div class="today-body"><p class="eyebrow">Ma table · ' + when + '</p><h2>Vous jouez à ' + esc(g.name) + '</h2>' +
-            '<div class="players">' + (others.length ? others.slice(0, 6).map(function (u) { return '<span class="pchip">' + avatar(nameOf(u), 'sm') + esc(nameOf(u)) + '</span>'; }).join('') + (others.length > 6 ? '<span class="pchip">+' + (others.length - 6) + '</span>' : '') : '<span class="hint" style="margin:0">Vous êtes seul·e à cette table pour l’instant.</span>') + '</div>' + note + '</div><div class="today-btns">' + (scOn(s) ? '<button class="btn btn-glass" data-act="scOpen" data-sid="' + s.id + '">' + ic('trophy', 17) + ' Scores</button>' : '') + go('btn-teal', 'Ma table') + '</div></section>');
+            '<div class="players">' + (others.length ? others.slice(0, 6).map(function (u) { return '<span class="pchip">' + avatar(nameOf(u), 'sm', u) + esc(nameOf(u)) + '</span>'; }).join('') + (others.length > 6 ? '<span class="pchip">+' + (others.length - 6) + '</span>' : '') : '<span class="hint" style="margin:0">Vous êtes seul·e à cette table pour l’instant.</span>') + '</div>' + note + '</div><div class="today-btns">' + (scOn(s) ? '<button class="btn btn-glass" data-act="scOpen" data-sid="' + s.id + '">' + ic('trophy', 17) + ' Scores</button>' : '') + go('btn-teal', 'Ma table') + '</div></section>');
         } else if (mine) cards.push('<section class="today glass-2"><div class="today-body"><p class="eyebrow">' + when + '</p><h2>' + (waitPos(s, ST.uid) ? 'Pas de place cette fois' : 'Pas de table cette fois') + '</h2><p class="hint" style="margin:0">' + (waitPos(s, ST.uid) ? 'Vous étiez sur la liste d’attente.' : 'Aucune table ne correspondait à vos choix.') + '</p></div>' + go('btn-glass', 'Voir les tables') + '</section>');
       } else if (ph === 'closed' && canManage(s)) {
         cards.push(adminCloseBanner(s, true));
@@ -2321,7 +2341,7 @@ var Badges = (function () {
       '<div class="rv-wait"><div class="rv-dots"><i></i><i></i><i></i></div><p>Votre table est prête…</p></div>' +
       '<div class="rv-confetti" aria-hidden="true">' + cf + '</div>' +
       '<div class="rv-card glass-2" data-act="noop"><div class="rv-box">' + box(g) + '</div><p class="eyebrow">Votre table · ' + hm(s.time) + '</p><h2>Vous jouez à ' + esc(g.name) + '</h2>' +
-      '<div class="rv-mates">' + (others.length ? others.slice(0, 8).map(function (u, k) { return '<span class="pchip" style="--i:' + k + '">' + avatar(nameOf(u), 'sm') + esc(nameOf(u)) + '</span>'; }).join('') : '<span class="hint" style="margin:0">Vous êtes seul·e pour l’instant.</span>') + '</div>' +
+      '<div class="rv-mates">' + (others.length ? others.slice(0, 8).map(function (u, k) { return '<span class="pchip" style="--i:' + k + '">' + avatar(nameOf(u), 'sm', u) + esc(nameOf(u)) + '</span>'; }).join('') : '<span class="hint" style="margin:0">Vous êtes seul·e pour l’instant.</span>') + '</div>' +
       (s.note && s.note.trim() ? '<p class="rv-note">' + esc(s.note.trim()) + '</p>' : '') +
       '<button class="btn btn-lg btn-block" data-act="closeModal">Voir toutes les tables</button></div></div>';
   }
@@ -2431,7 +2451,7 @@ var Badges = (function () {
     return '<section class="panel glass-2 chat" id="chat"><div class="panel-head"><h2>' + ic('chat', 26) + '<span>Messages</span>' + (list.length ? ' <small>(' + list.length + ')</small>' : '') + '</h2><p>Un mot pour les autres joueurs…</p></div>' +
       '<div class="chat-list" id="chat-list">' + (list.length ? list.map(function (m) {
         var me = m.uid === ST.uid, nm = m.name || nameOf(m.uid) || 'Joueur';
-        return '<div class="msg' + (me ? ' me' : '') + '">' + (me ? '' : avatar(nm, 'sm')) + '<div class="msg-b"><div class="msg-h"><b>' + esc(me ? 'Moi' : nm) + '</b><time>' + msgTime(m.ts) + '</time>' + (me || canManage(s) ? '<button class="msg-x" title="Supprimer ce message" aria-label="Supprimer ce message" data-act="chatDel" data-id="' + esc(m.id) + '">' + ic('x', 12) + '</button>' : '') + '</div><p>' + esc(m.text).replace(/\n/g, '<br>') + '</p></div></div>';
+        return '<div class="msg' + (me ? ' me' : '') + '">' + (me ? '' : avatar(nm, 'sm', m.uid)) + '<div class="msg-b"><div class="msg-h"><b>' + esc(me ? 'Moi' : nm) + '</b><time>' + msgTime(m.ts) + '</time>' + (me || canManage(s) ? '<button class="msg-x" title="Supprimer ce message" aria-label="Supprimer ce message" data-act="chatDel" data-id="' + esc(m.id) + '">' + ic('x', 12) + '</button>' : '') + '</div><p>' + esc(m.text).replace(/\n/g, '<br>') + '</p></div></div>';
       }).join('') : '<p class="hint chat-empty">Aucun message pour l’instant. Écrivez le premier !</p>') + '</div>' +
       '<div class="chat-form"><textarea class="input" id="chat-in" rows="1" maxlength="500" placeholder="Écrire un message…" aria-label="Votre message">' + esc(txt) + '</textarea><button class="btn" data-act="chatSend" data-sid="' + s.id + '" aria-label="Envoyer">' + ic('arrow', 18) + '</button></div></section>';
   }
@@ -2616,7 +2636,7 @@ var Badges = (function () {
     } else if (mine) h += '<div class="mv-st"><span>' + ic('check', 16) + ' Vous avez changé de table.</span><button class="link" data-act="mvBack">Revenir à ma table d’origine</button></div>';
     if (inc.length) h += '<div class="mv-inc">' + inc.map(function (x) {
       var g = G(x.from);
-      return '<div class="mv-req">' + avatar(nameOf(x.uid), 'sm') + '<span><b>' + esc(nameOf(x.uid)) + '</b> propose d’échanger sa place' + (g ? ' (' + esc(g.name) + ')' : '') + ' avec la vôtre.</span><button class="btn btn-sm btn-teal" data-act="mvAccept" data-uid="' + esc(x.uid) + '" data-ts="' + x.ts + '">Accepter</button><button class="link" data-act="mvDecline" data-uid="' + esc(x.uid) + '" data-ts="' + x.ts + '">Refuser</button></div>';
+      return '<div class="mv-req">' + avatar(nameOf(x.uid), 'sm', x.uid) + '<span><b>' + esc(nameOf(x.uid)) + '</b> propose d’échanger sa place' + (g ? ' (' + esc(g.name) + ')' : '') + ' avec la vôtre.</span><button class="btn btn-sm btn-teal" data-act="mvAccept" data-uid="' + esc(x.uid) + '" data-ts="' + x.ts + '">Accepter</button><button class="link" data-act="mvDecline" data-uid="' + esc(x.uid) + '" data-ts="' + x.ts + '">Refuser</button></div>';
     }).join('') + '</div>';
     h += '<div class="mv-tabs">' + r.tables.map(function (t) {
       var g = G(t.gid), c = t.ids.length, here = t.gid === me, free = g.max - c;
@@ -2624,7 +2644,7 @@ var Badges = (function () {
         (!here && free > 0 ? '<button class="btn btn-sm" data-act="mvJoin" data-gid="' + g.id + '">Rejoindre</button>' : '') + '</div>' +
         '<div class="mv-pl">' + t.ids.filter(function (u) { return !isLeft(s, u); }).map(function (u) {
           var n = nameOf(u);
-          return '<div class="mv-p"><span class="pchip' + (isMe(u) ? ' me' : '') + '">' + avatar(n, 'sm') + esc(n) + '</span>' + (!here && !isMe(u) && me !== '' ? '<button class="mv-x" data-act="mvSwap" data-uid="' + esc(u) + '" title="Proposer à ' + esc(n) + ' d’échanger les places">' + ic('swap', 14) + ' Échanger</button>' : '') + '</div>';
+          return '<div class="mv-p"><span class="pchip' + (isMe(u) ? ' me' : '') + '">' + avatar(n, 'sm', u) + esc(n) + '</span>' + (!here && !isMe(u) && me !== '' ? '<button class="mv-x" data-act="mvSwap" data-uid="' + esc(u) + '" title="Proposer à ' + esc(n) + ' d’échanger les places">' + ic('swap', 14) + ' Échanger</button>' : '') + '</div>';
         }).join('') + '</div></section>';
     }).join('') + '</div>';
     return '<div class="modal" data-act="closeModal"><div class="sheet mv-sheet glass-2" data-act="noop" role="dialog" aria-modal="true" aria-label="Changer de table"><button class="icon-btn sheet-x" data-act="closeModal" aria-label="Fermer">' + ic('x', 18) + '</button>' +
@@ -2634,7 +2654,7 @@ var Badges = (function () {
     var inc = canMove(s) ? mvIncoming(s) : [];
     if (!inc.length) return '';
     return '<div class="panel glass-2 mv-inc-p">' + inc.map(function (x) {
-      return '<div class="mv-req">' + avatar(nameOf(x.uid), 'sm') + '<span><b>' + esc(nameOf(x.uid)) + '</b> vous propose d’échanger vos places.</span><button class="btn btn-sm btn-teal" data-act="mvAccept" data-uid="' + esc(x.uid) + '" data-ts="' + x.ts + '">Accepter</button><button class="link" data-act="mvDecline" data-uid="' + esc(x.uid) + '" data-ts="' + x.ts + '">Refuser</button></div>';
+      return '<div class="mv-req">' + avatar(nameOf(x.uid), 'sm', x.uid) + '<span><b>' + esc(nameOf(x.uid)) + '</b> vous propose d’échanger vos places.</span><button class="btn btn-sm btn-teal" data-act="mvAccept" data-uid="' + esc(x.uid) + '" data-ts="' + x.ts + '">Accepter</button><button class="link" data-act="mvDecline" data-uid="' + esc(x.uid) + '" data-ts="' + x.ts + '">Refuser</button></div>';
     }).join('') + '</div>';
   }
 
@@ -2672,8 +2692,8 @@ var Badges = (function () {
     if (!rk2.has.length) return '<p class="hint" style="margin:0">Saisissez les scores : le classement apparaît ici.</p>';
     var win = rk2.has.filter(function (x) { return x.rank === 1; });
     return '<div class="sc-win">' + ic('trophy', 22) + '<span>' + (win.length > 1 ? 'Égalité : ' : 'Gagnant·e : ') + '<b>' + win.map(function (x) { return esc(nameOf(x.uid)); }).join(' et ') + '</b></span></div><ol class="sc-rank">' +
-      rk2.has.map(function (x) { return '<li class="r' + Math.min(x.rank, 4) + '"><i class="sc-pos">' + x.rank + '</i>' + avatar(nameOf(x.uid), 'sm') + '<span class="sc-nm">' + esc(nameOf(x.uid)) + '</span><b class="sc-pt">' + scFmt(x.v) + '</b></li>'; }).join('') +
-      rk2.no.map(function (x) { return '<li class="r0"><i class="sc-pos">–</i>' + avatar(nameOf(x.uid), 'sm') + '<span class="sc-nm">' + esc(nameOf(x.uid)) + '</span><span class="sc-pt hint" style="margin:0">pas de score</span></li>'; }).join('') + '</ol>';
+      rk2.has.map(function (x) { return '<li class="r' + Math.min(x.rank, 4) + '"><i class="sc-pos">' + x.rank + '</i>' + avatar(nameOf(x.uid), 'sm', x.uid) + '<span class="sc-nm">' + esc(nameOf(x.uid)) + '</span><b class="sc-pt">' + scFmt(x.v) + '</b></li>'; }).join('') +
+      rk2.no.map(function (x) { return '<li class="r0"><i class="sc-pos">–</i>' + avatar(nameOf(x.uid), 'sm', x.uid) + '<span class="sc-nm">' + esc(nameOf(x.uid)) + '</span><span class="sc-pt hint" style="margin:0">pas de score</span></li>'; }).join('') + '</ol>';
   }
   function scCur(m, s) {
     var r = resultOf(s), tabs = r ? r.tables.filter(function (t) { return G(t.gid); }) : [];
@@ -2696,7 +2716,7 @@ var Badges = (function () {
     } else {
       h += '<div class="sc-rows">' + t.ids.filter(function (u) { return !isLeft(s, u); }).map(function (u) {
         var n = nameOf(u), v = scVal(s, t.gid, u);
-        return '<label class="sc-row' + (isMe(u) ? ' me' : '') + '">' + avatar(n, 'sm') + '<span class="sc-nm">' + esc(n) + '</span><input class="input sc-in" type="number" inputmode="decimal" step="any" min="-99999" max="99999" data-uid="' + esc(u) + '" data-gid="' + g.id + '" value="' + (v === null ? '' : v) + '" placeholder="–" aria-label="Score de ' + esc(n) + '"' + (can ? '' : ' disabled') + '></label>';
+        return '<label class="sc-row' + (isMe(u) ? ' me' : '') + '">' + avatar(n, 'sm', u) + '<span class="sc-nm">' + esc(n) + '</span><input class="input sc-in" type="number" inputmode="decimal" step="any" min="-99999" max="99999" data-uid="' + esc(u) + '" data-gid="' + g.id + '" value="' + (v === null ? '' : v) + '" placeholder="–" aria-label="Score de ' + esc(n) + '"' + (can ? '' : ' disabled') + '></label>';
       }).join('') + '</div>';
     }
     h += '<div class="sc-res" id="sc-res"><div class="small-h">Classement</div><div id="sc-rank">' + scRankHtml(s, t) + '</div></div>';
@@ -2813,7 +2833,7 @@ var Badges = (function () {
     return '<div class="panel glass-2 wd-panel"><div class="panel-head"><h2>' + ic('bell', 18) + ' Demandes de retrait (' + list.length + ')</h2><p>Ces personnes ne sont plus disponibles. Accepter les retire de leur table, sans malus.</p></div>' +
       list.map(function (w) {
         var tb = r && r.tables.filter(function (t) { return t.ids.indexOf(w.uid) >= 0; })[0], g = tb && G(tb.gid), nm = nameOf(w.uid) || w.name || 'Joueur';
-        return '<div class="reg"><div class="who-n">' + avatar(nm) + '<span>' + esc(nm) + (g ? '<small class="wd-game"> · ' + esc(g.name) + '</small>' : '') + (promoFor(s, w.uid) ? '<small class="wd-promo">' + ic('users', 13) + ' ' + esc(nameOf(promoFor(s, w.uid).uid)) + ' (liste d’attente) prendra la place</small>' : '') + '</span></div><div class="row"><button class="btn btn-sm" data-act="wdOk" data-sid="' + s.id + '" data-uid="' + esc(w.uid) + '">' + ic('check', 15) + ' Accepter</button><button class="link danger" data-act="wdKo" data-sid="' + s.id + '" data-uid="' + esc(w.uid) + '">Refuser</button></div></div>';
+        return '<div class="reg"><div class="who-n">' + avatar(nm, '', w.uid) + '<span>' + esc(nm) + (g ? '<small class="wd-game"> · ' + esc(g.name) + '</small>' : '') + (promoFor(s, w.uid) ? '<small class="wd-promo">' + ic('users', 13) + ' ' + esc(nameOf(promoFor(s, w.uid).uid)) + ' (liste d’attente) prendra la place</small>' : '') + '</span></div><div class="row"><button class="btn btn-sm" data-act="wdOk" data-sid="' + s.id + '" data-uid="' + esc(w.uid) + '">' + ic('check', 15) + ' Accepter</button><button class="link danger" data-act="wdKo" data-sid="' + s.id + '" data-uid="' + esc(w.uid) + '">Refuser</button></div></div>';
       }).join('') + '</div>';
   }
   function publishedPanel(s, auto) {
@@ -2840,8 +2860,8 @@ var Badges = (function () {
       '<p><b>' + Math.max(0, seats - n) + '</b> places libres. Le total est la somme des joueurs maximum de chaque jeu proposé.</p></div>' +
       '<div style="margin-top:16px">' + seatStrip(n, seats) + '</div></div>' +
       '<div class="panel glass"><div class="small-h"><span>Inscrits</span><span>' + n + '</span></div>' +
-      (n ? '<div class="who">' + regs.map(function (r) { return '<span class="' + (isMe(r.uid) ? 'me' : '') + '">' + avatar(r.name, 'sm') + esc(r.name) + '</span>'; }).join('') + '</div>' : '<p class="hint" style="margin:0">Personne pour l’instant. Soyez le premier.</p>') + '</div>' +
-      (waitList(s).length ? '<div class="panel glass"><div class="small-h"><span>Liste d’attente</span><span>' + waitList(s).length + '</span></div><div class="who">' + waitList(s).map(function (r, i) { return '<span class="' + (isMe(r.uid) ? 'me' : '') + '">' + avatar(r.name, 'sm') + (i + 1) + '. ' + esc(r.name) + '</span>'; }).join('') + '</div></div>' : '') +
+      (n ? '<div class="who">' + regs.map(function (r) { return '<span class="' + (isMe(r.uid) ? 'me' : '') + '">' + avatar(r.name, 'sm', r.uid) + esc(r.name) + '</span>'; }).join('') + '</div>' : '<p class="hint" style="margin:0">Personne pour l’instant. Soyez le premier.</p>') + '</div>' +
+      (waitList(s).length ? '<div class="panel glass"><div class="small-h"><span>Liste d’attente</span><span>' + waitList(s).length + '</span></div><div class="who">' + waitList(s).map(function (r, i) { return '<span class="' + (isMe(r.uid) ? 'me' : '') + '">' + avatar(r.name, 'sm', r.uid) + (i + 1) + '. ' + esc(r.name) + '</span>'; }).join('') + '</div></div>' : '') +
       '<div class="panel glass"><div class="small-h">Comment les tables sont composées</div><ul class="rules"><li>Les inscriptions se ferment à l’heure de la session, et tout se compose alors tout seul.</li><li>Un jeu n’ouvre que s’il réunit assez de joueurs, et on ouvre le moins de tables possible.</li><li>Votre ordre de préférence est respecté, et jamais un jeu refusé.</li><li>Chaque table vise son nombre idéal de joueurs.</li><li>Si les dernières sessions ne vous ont pas donné vos premiers choix, vous passez un peu avant les autres en cas de conflit pour un jeu.</li></ul></div>';
   }
 
@@ -2861,10 +2881,10 @@ var Badges = (function () {
       '<div class="players">' + t.ids.map(function (uid) {
         var n = nameOf(uid), reg = regOf(s, uid), r = reg ? rankOf(reg, g.id) : 0;
         var isAbs = !!(s.absent && s.absent[uid]), lf = isLeft(s, uid);
-        if (lf) return '<span class="pchip left">' + avatar(n, 'sm') + esc(n) + '<span class="abs-tag lf-tag">retiré·e</span></span>';
-        if (o.abs) return '<button class="pchip abs' + (isAbs ? ' off' : '') + '" data-act="toggleAbsent" data-sid="' + s.id + '" data-uid="' + esc(uid) + '" aria-pressed="' + isAbs + '" title="' + (isAbs ? 'Retirer l’absence de ' : 'Marquer absent·e : ') + esc(n) + '">' + avatar(n, 'sm') + esc(n) + (isAbs ? '<span class="abs-tag">absent·e</span>' : '') + '</button>';
-        return o.edit ? '<button class="pchip" data-act="moveOpen" data-uid="' + esc(uid) + '" title="Déplacer ' + esc(n) + '">' + avatar(n, 'sm') + esc(n) + rk(r) + '</button>'
-          : '<span class="pchip ' + (isMe(uid) ? 'me' : '') + '">' + avatar(n, 'sm') + esc(n) + '</span>';
+        if (lf) return '<span class="pchip left">' + avatar(n, 'sm', uid) + esc(n) + '<span class="abs-tag lf-tag">retiré·e</span></span>';
+        if (o.abs) return '<button class="pchip abs' + (isAbs ? ' off' : '') + '" data-act="toggleAbsent" data-sid="' + s.id + '" data-uid="' + esc(uid) + '" aria-pressed="' + isAbs + '" title="' + (isAbs ? 'Retirer l’absence de ' : 'Marquer absent·e : ') + esc(n) + '">' + avatar(n, 'sm', uid) + esc(n) + (isAbs ? '<span class="abs-tag">absent·e</span>' : '') + '</button>';
+        return o.edit ? '<button class="pchip" data-act="moveOpen" data-uid="' + esc(uid) + '" title="Déplacer ' + esc(n) + '">' + avatar(n, 'sm', uid) + esc(n) + rk(r) + '</button>'
+          : '<span class="pchip ' + (isMe(uid) ? 'me' : '') + '">' + avatar(n, 'sm', uid) + esc(n) + '</span>';
       }).join('') + '</div>' +
       '<div class="tcard-foot">' + seatStrip(c, g.max) + (o.edit ? '<button class="link danger" data-act="cancelTable" data-gid="' + g.id + '">' + ic('x', 15) + ' Annuler la table</button>' : '') + '</div></article>';
   }
@@ -2969,7 +2989,7 @@ var Badges = (function () {
     if (!pm.top.length) return '';
     var medals = ['🥇', '🥈', '🥉'];
     return '<div class="palm"><div class="small-h">Palmarès' + (ST.groups.length > 1 ? ' · ' + grpName(grp) : '') + '</div>' + pm.top.map(function (x, i) {
-      return '<div class="palm-r' + (x.uid === ST.uid ? ' me' : '') + '"><span class="palm-m" aria-hidden="true">' + medals[i] + '</span>' + avatar(nameOf(x.uid), 'sm') + '<span class="nm">' + esc(nameOf(x.uid)) + '</span><b>' + plural(x.w, 'victoire', 'victoires') + '</b></div>';
+      return '<div class="palm-r' + (x.uid === ST.uid ? ' me' : '') + '"><span class="palm-m" aria-hidden="true">' + medals[i] + '</span>' + avatar(nameOf(x.uid), 'sm', x.uid) + '<span class="nm">' + esc(nameOf(x.uid)) + '</span><b>' + plural(x.w, 'victoire', 'victoires') + '</b></div>';
     }).join('') + (pm.last ? '<p class="palm-last">' + ic('trophy', 14) + ' Dernier succès : <b>' + (pm.last.coop ? 'victoire collective' : pm.last.uids.map(function (u) { return esc(nameOf(u)); }).join(' et ')) + '</b> · ' + fr(pm.last.date, { day: 'numeric', month: 'short', year: 'numeric' }).replace('.', '') + '</p>' : '') + '</div>';
   }
   function modalGame(g) {
@@ -3002,6 +3022,7 @@ var Badges = (function () {
         if (cur0 && nw) { var top0 = cur0.scrollTop; cur0.innerHTML = nw.innerHTML; cur0.scrollTop = top0; return; }
       }
     }
+    else if (m && m.type === 'photo') h = modalPhoto(m);
     else if (m && m.type === 'news') { if ($('#modal-root .news-sheet')) return; h = modalNews(); }
     else if (m && m.type === 'filters') { if ($('#modal-root .fsheet')) return; h = modalFilters(); }
     else if (m && m.type === 'badges') { var cb = $('#modal-root').firstElementChild; if (cb && cb.classList.contains('bdcel')) return; h = modalBadges(m); if (!h) ui.modal = null; }
@@ -3118,14 +3139,14 @@ var Badges = (function () {
       GROUPS.map(function (g) { return '<div class="field" style="margin-top:12px"><label for="t-title-' + g[0] + '">' + grpChips([g[0]]) + ' Titre</label><div class="import-row"><input class="input" id="t-title-' + g[0] + '" maxlength="80" autocomplete="off" value="' + esc(grpTitle(g[0])) + '"><button class="btn" data-act="saveTitle" data-g="' + g[0] + '">Enregistrer</button></div></div>'; }).join('') + '</div>' +
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Personnes, groupes et organisateurs</h2><p>Ajoutez une personne à l’autre groupe pour qu’elle soit dans les deux. L’admin est toujours dans les deux groupes. Une personne reste dans au moins un groupe. Un <b>organisateur</b> crée et gère ses propres sessions (pour son ou ses groupes) et peut ajouter des jeux ; il ne touche pas à celles des autres. Vous pouvez lui retirer ce droit à tout moment.</p></div>' +
       (ST.emails ? '<div class="mail-bar"><button type="button" class="chip-btn' + (ST.mailAll ? ' on' : '') + '" data-act="mailAll" aria-pressed="' + ST.mailAll + '">' + ic('mail', 14) + ' ' + (ST.mailAll ? 'Masquer les e-mails' : 'Afficher les e-mails') + '</button><span class="hint">ou touchez un nom</span></div>' : '') + (ST.members && ST.pushUsers ? '<p class="hint push-sum">' + ic('bell', 14) + ' <b>' + ST.members.filter(function (m) { return ST.pushUsers.indexOf(m.id) >= 0; }).length + '</b> sur ' + ST.members.length + ' ont activé les notifications. Les autres ne recevront ni annonce ni alerte « table prête ».</p>' : '') + (ST.members === null ? '<p class="hint">Chargement…</p>' : !ST.members.length ? '<p class="hint">Aucune personne pour l’instant.</p>' : '<div class="reset-list">' + ST.members.map(function (m) {
-        return '<div class="reset-row">' + avatar(m.name || '?', 'sm') + '<div class="reset-who"><b' + (ST.emails ? ' class="mail-t" role="button" tabindex="0" data-act="mailOne" data-uid="' + esc(m.id) + '" title="Afficher l’e-mail"' : '') + '>' + esc(m.name || 'Sans nom') + '</b><small>' + (m.admin ? 'Admin · les deux groupes' : m.organizer ? 'Organisateur · crée ses propres sessions' : '') + '</small>' + pushTag(m.id) + mailLine(m.id) + '</div>' +
+        return '<div class="reset-row">' + avatar(m.name || '?', 'sm', m.id) + '<div class="reset-who"><b' + (ST.emails ? ' class="mail-t" role="button" tabindex="0" data-act="mailOne" data-uid="' + esc(m.id) + '" title="Afficher l’e-mail"' : '') + '>' + esc(m.name || 'Sans nom') + '</b><small>' + (m.admin ? 'Admin · les deux groupes' : m.organizer ? 'Organisateur · crée ses propres sessions' : '') + '</small>' + pushTag(m.id) + mailLine(m.id) + '</div>' +
           (m.admin ? '' : '<div class="gpick">' + GROUPS.map(function (g) { return '<button type="button" class="gpick-b g-' + g[0] + '" aria-pressed="' + (m.groups.indexOf(g[0]) >= 0) + '" data-act="memberGroup" data-uid="' + esc(m.id) + '" data-g="' + g[0] + '"><span class="tick">' + ic('check', 14) + '</span>' + g[1] + '</button>'; }).join('') + '</div><button type="button" class="gpick-b g-org" title="Peut créer et gérer ses propres sessions" aria-pressed="' + !!m.organizer + '" data-act="memberOrg" data-uid="' + esc(m.id) + '"><span class="tick">' + ic('check', 14) + '</span>Organisateur</button>') + '</div>';
       }).join('') + '</div>') + '</div>' +
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Badges et compteurs</h2><p>Remet à zéro, pour tout le monde, les badges, les compteurs de sessions jouées et manquées, et le malus d’absence. Les sessions et les absences déjà saisies ne sont pas supprimées : seules celles d’avant la remise à zéro sont ignorées. Chacun reverra l’écran de célébration pour ses nouveaux badges.</p></div>' +
       (M.settings.badgesReset ? '<p class="hint" style="margin:0 0 12px">Dernière remise à zéro : ' + esc(new Date(M.settings.badgesReset).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })) + '.</p>' : '') +
       '<div class="small-h" style="margin-top:22px">Par personne</div><div class="reset-list">' + Object.keys(M.regs).filter(function (u) { return M.regs[u].name && !M.regs[u].fake; }).sort(function (a, b) { return M.regs[a].name.localeCompare(M.regs[b].name, 'fr'); }).map(function (u) {
         var rs = Badges.compute(badgeEvents(u)), nm = M.regs[u].name, conf = ui.confirm === 'ru:' + u;
-        return '<div class="reset-row">' + avatar(nm, 'sm') + '<div class="reset-who"><b>' + esc(nm) + '</b><small>' + rs.played + ' jouée' + (rs.played > 1 ? 's' : '') + ' · ' + rs.missed + ' manquée' + (rs.missed > 1 ? 's' : '') + ' · ' + rs.earned.length + ' badge' + (rs.earned.length > 1 ? 's' : '') + '</small></div>' +
+        return '<div class="reset-row">' + avatar(nm, 'sm', u) + '<div class="reset-who"><b>' + esc(nm) + '</b><small>' + rs.played + ' jouée' + (rs.played > 1 ? 's' : '') + ' · ' + rs.missed + ' manquée' + (rs.missed > 1 ? 's' : '') + ' · ' + rs.earned.length + ' badge' + (rs.earned.length > 1 ? 's' : '') + '</small></div>' +
           (conf ? '<button class="btn btn-red btn-sm" data-act="resetUser" data-uid="' + esc(u) + '">Confirmer</button><button class="link" data-act="resetBadgesNo">Annuler</button>' : '<button class="btn btn-glass btn-sm" data-act="resetUserAsk" data-uid="' + esc(u) + '">' + ic('undo', 14) + ' Remettre à zéro</button>') + '</div>';
       }).join('') + '</div>' +
       (ui.confirm === 'rb' ? '<div class="tools"><button class="btn btn-red" data-act="resetBadges">' + ic('trash', 16) + ' Oui, tout remettre à zéro</button><button class="link" data-act="resetBadgesNo">Annuler</button></div>' : '<button class="btn btn-glass" data-act="resetBadgesAsk">' + ic('undo', 16) + ' Réinitialiser les badges</button>') + '</div>';
@@ -3510,7 +3531,7 @@ var Badges = (function () {
     if (ph === 'open' || ph === 'pending') {
       var p = seats ? Math.min(100, Math.round(n / seats * 100)) : 0, fakes = Object.keys(M.regs).some(function (u) { return M.regs[u].fake && M.regs[u].s && M.regs[u].s[s.id]; });
       return head + '<div class="cols"><div class="panel glass-2"><div class="panel-head"><h2>Inscrits (' + n + ')</h2><p>Pour chaque inscrit : l’ordre de ses jeux, du préféré au moins préféré. La croix indique un jeu refusé.</p></div>' +
-        (n ? regs.concat(waitList(s)).map(function (r, ri) { return (ri === n ? '<div class="small-h" style="margin:14px 0 6px">Liste d’attente</div>' : '') + '<div class="reg' + (ri >= n ? ' wait' : '') + '"><div class="who-n">' + avatar(r.name) + '<span>' + esc(r.name) + '</span></div><div class="minis">' + miniRanks(r) + '</div><button class="icon-btn" title="Retirer ' + esc(r.name) + '" aria-label="Retirer ' + esc(r.name) + '" data-act="removeReg" data-sid="' + s.id + '" data-uid="' + esc(r.uid) + '">' + ic('x', 16) + '</button></div>'; }).join('')
+        (n ? regs.concat(waitList(s)).map(function (r, ri) { return (ri === n ? '<div class="small-h" style="margin:14px 0 6px">Liste d’attente</div>' : '') + '<div class="reg' + (ri >= n ? ' wait' : '') + '"><div class="who-n">' + avatar(r.name, '', r.uid) + '<span>' + esc(r.name) + '</span></div><div class="minis">' + miniRanks(r) + '</div><button class="icon-btn" title="Retirer ' + esc(r.name) + '" aria-label="Retirer ' + esc(r.name) + '" data-act="removeReg" data-sid="' + s.id + '" data-uid="' + esc(r.uid) + '">' + ic('x', 16) + '</button></div>'; }).join('')
           : '<div class="empty"><svg class="meeple" viewBox="0 0 100 100"><use href="#meeple"/></svg><p>Aucun inscrit pour l’instant.</p></div>') + '</div>' +
         '<aside class="aside"><div class="panel glass-2"><div class="small-h">Clôture et affectation</div><div class="gauge"><div class="ring ' + (n >= seats ? 'full' : '') + '" style="--p:' + p + '"><div><b>' + n + '</b><span>sur ' + seats + '</span></div></div><p>' + (ph === 'pending' ? 'L’heure est passée : la clôture automatique se déclenche dès qu’une personne a la page ouverte.' : 'Clôture automatique à <b>' + hm(s.time) + '</b> si vous ne l’avez pas faite avant. Les tables sont alors publiées tout de suite.') + '</p></div>' +
         '<div class="field" style="margin-top:22px"><label for="balance">Équilibre de l’affectation</label><input class="range" id="balance" type="range" min="0" max="100" step="5" value="' + M.settings.balance + '"><div class="range-l"><span>Une table par envie</span><span>Moins de tables</span></div></div>' +
@@ -3527,7 +3548,7 @@ var Badges = (function () {
     r.tables.forEach(function (t) { t.ids.forEach(function (uid) { placed++; var reg = regOf(s, uid); if (reg && rankOf(reg, t.gid) === 1) first++; }); });
     var notRet = games.filter(function (g) { return !r.tables.some(function (t) { return t.gid === g.id; }); });
     var stats = '<div class="stats"><div class="stat"><b>' + r.tables.length + '<small> / ' + games.length + '</small></b><span>tables ouvertes</span></div><div class="stat"><b>' + placed + '<small> / ' + (placed + r.unplaced.length) + '</small></b><span>joueurs placés</span></div><div class="stat"><b>' + first + '<small> / ' + placed + '</small></b><span>ont leur 1er choix</span></div><div class="stat"><b>' + r.unplaced.length + '</b><span>sans table</span></div></div>';
-    var un = r.unplaced.length ? '<div class="drop-note" style="margin-top:20px"><div class="small-h" style="margin:0">Sans table (' + r.unplaced.length + ')</div><div class="players">' + r.unplaced.map(function (uid) { var nm = nameOf(uid); return edit ? '<button class="pchip" data-act="moveOpen" data-uid="' + esc(uid) + '">' + avatar(nm, 'sm') + esc(nm) + '</button>' : '<span class="pchip">' + avatar(nm, 'sm') + esc(nm) + '</span>'; }).join('') + '</div>' + (edit ? '<p>Touchez un nom pour le placer à une table.</p>' : '') + '</div>' : '';
+    var un = r.unplaced.length ? '<div class="drop-note" style="margin-top:20px"><div class="small-h" style="margin:0">Sans table (' + r.unplaced.length + ')</div><div class="players">' + r.unplaced.map(function (uid) { var nm = nameOf(uid); return edit ? '<button class="pchip" data-act="moveOpen" data-uid="' + esc(uid) + '">' + avatar(nm, 'sm', uid) + esc(nm) + '</button>' : '<span class="pchip">' + avatar(nm, 'sm', uid) + esc(nm) + '</span>'; }).join('') + '</div>' + (edit ? '<p>Touchez un nom pour le placer à une table.</p>' : '') + '</div>' : '';
     var nr = notRet.length ? '<ul class="notretained"><li class="small-h" style="background:none;padding:0;margin:0 0 4px">Jeux non retenus</li>' + notRet.map(function (g) { return '<li><div class="mini">' + box(g) + '</div><span><b>' + esc(g.name) + '</b> · ' + esc(r.notes[g.id] || 'Pas de table') + '</span></li>'; }).join('') + '</ul>' : '';
     var bar;
     var probs = tableProblems(r);
@@ -3629,7 +3650,7 @@ var Badges = (function () {
   }
   /* --- Hall of fame : classement du trimestre, par groupe --- */
   function fameRow(p, me) {
-    return '<div class="fame-row' + (me ? ' me' : '') + '"><span class="fpos">' + p.pos + '</span>' + avatar(nameOf(p.uid), 'sm') + '<span class="nm">' + esc(nameOf(p.uid)) + (me ? ' <i class="sc-me">vous</i>' : '') + '<i>' + plural(p.w, 'victoire', 'victoires') + ' sur ' + plural(p.n, 'partie', 'parties') + (p.prov ? ' · <em class="prov">provisoire</em>' : '') + '</i></span><b class="pc">' + p.pct + '<small> /100</small></b></div>';
+    return '<div class="fame-row' + (me ? ' me' : '') + '"><span class="fpos">' + p.pos + '</span>' + avatar(nameOf(p.uid), 'sm', p.uid) + '<span class="nm">' + esc(nameOf(p.uid)) + (me ? ' <i class="sc-me">vous</i>' : '') + '<i>' + plural(p.w, 'victoire', 'victoires') + ' sur ' + plural(p.n, 'partie', 'parties') + (p.prov ? ' · <em class="prov">provisoire</em>' : '') + '</i></span><b class="pc">' + p.pct + '<small> /100</small></b></div>';
   }
   function viewFame() {
     var grp = ST.groups.indexOf(ui.grp) >= 0 ? ui.grp : (ST.groups[0] || 'pro'), off = ui.fameOff || 0, qt = quarterAt(off), d = fameData(grp, qt), rk = d.rk;
@@ -3643,7 +3664,7 @@ var Badges = (function () {
     var order = top3.length === 3 ? [1, 0, 2] : top3.length === 2 ? [1, 0] : [0];
     h += '<section class="fame-pod n' + top3.length + '">' + order.map(function (i) {
       var p = top3[i], mine = p.uid === ST.uid;
-      return '<div class="fp p' + (i + 1) + (mine ? ' me' : '') + '"><span class="fp-medal" aria-hidden="true">' + medals[i] + '</span><span class="fp-av">' + avatar(nameOf(p.uid)) + '</span><b class="fp-nm">' + esc(nameOf(p.uid)) + '</b><span class="fp-pc">' + p.pct + '<small> /100</small></span><small class="fp-sub">' + p.w + ' victoire' + (p.w > 1 ? 's' : '') + ' sur ' + p.n + (p.prov ? '<em class="prov">provisoire</em>' : '') + '</small><div class="fp-step"><i>' + (i + 1) + '</i></div></div>';
+      return '<div class="fp p' + (i + 1) + (mine ? ' me' : '') + '"><span class="fp-medal" aria-hidden="true">' + medals[i] + '</span><span class="fp-av">' + avatar(nameOf(p.uid), '', p.uid) + '</span><b class="fp-nm">' + esc(nameOf(p.uid)) + '</b><span class="fp-pc">' + p.pct + '<small> /100</small></span><small class="fp-sub">' + p.w + ' victoire' + (p.w > 1 ? 's' : '') + ' sur ' + p.n + (p.prov ? '<em class="prov">provisoire</em>' : '') + '</small><div class="fp-step"><i>' + (i + 1) + '</i></div></div>';
     }).join('') + '</section>';
     if (rk.length > 3) h += '<div class="fame-rows">' + rk.slice(3, 5).map(function (p) { return fameRow(p, p.uid === ST.uid); }).join('') + '</div>';
     return profTabs() + groupSwitch() + h + fameMine(me, myPos) + fameRule();
@@ -3662,7 +3683,7 @@ var Badges = (function () {
     var other = !!pu && pu !== ST.uid, uid = other ? pu : ST.uid;
     var res = Badges.compute(badgeEvents(uid)), nm = other ? nameOf(uid) : (norm(NAME) || ST.profileName || 'Vous'), got = res.list.filter(function (b) { return b.got && !b.neg; }).length, tot = res.list.filter(function (b) { return !b.neg; }).length;
     var nxt = res.list.filter(function (b) { return b.cat === 'part' && !b.got; })[0];
-    var head = (other ? '' : profTabs()) + '<section class="prof-hero glass-2"><div class="prof-av">' + avatar(nm) + '</div><div class="prof-id"><p class="eyebrow">' + (other ? 'Profil joueur' : 'Mon profil') + '</p><h1>' + esc(nm) + '</h1>' +
+    var head = (other ? '' : profTabs()) + '<section class="prof-hero glass-2"><div class="prof-av">' + avatar(nm, '', uid) + (other ? '' : '<button type="button" class="prof-cam" data-act="photoOpen" aria-label="' + (photoOf(uid) ? 'Changer ma photo' : 'Ajouter ma photo') + '" title="' + (photoOf(uid) ? 'Changer ma photo' : 'Ajouter ma photo') + '">' + ic('camera', 15) + '</button>') + '</div><div class="prof-id"><p class="eyebrow">' + (other ? 'Profil joueur' : 'Mon profil') + '</p><h1>' + esc(nm) + '</h1>' +
       (nxt ? '<p class="prof-next">Prochain palier : <b>' + esc(nxt.name) + '</b> · ' + nxt.prog + ' / ' + nxt.goal + '</p><div class="bd-bar big"><i style="width:' + Math.round(nxt.prog / nxt.goal * 100) + '%"></i></div>' : '<p class="prof-next">Tous les paliers de participation sont atteints. Respect.</p>') + '</div></section>' +
       '<div class="prof-stats"><div class="pstat"><b>' + res.played + '</b><span>session' + (res.played > 1 ? 's' : '') + ' jouée' + (res.played > 1 ? 's' : '') + '</span></div><div class="pstat miss"><b>' + res.missed + '</b><span>session' + (res.missed > 1 ? 's' : '') + ' manquée' + (res.missed > 1 ? 's' : '') + '</span></div><div class="pstat"><b>' + got + '<small>/' + tot + '</small></b><span>badges obtenus</span></div></div>';
     var ml = Badges.malus(badgeEvents(uid), D.iso(new Date())), mend = Badges.malusEnd(ml), mnote = '';
@@ -3686,6 +3707,35 @@ var Badges = (function () {
     if (navigator.webdriver && !window.__JDO_NEWS_TEST) return;   /* tests automatisés : pas de fenêtre, sauf test dédié */
     var d = M.regs[ST.uid] || {}; if (d.news === NEWS_ID) return;   /* pas encore de fiche (jamais inscrit·e) : on l'affiche aussi */
     ui.newsShown = true; ui.modal = { type: 'news' };
+  }
+  function modalPhoto(m) {
+    var uid = ST.uid, nm = norm(NAME) || ST.profileName || 'Vous', cur = m.data || photoOf(uid), has = !!photoOf(uid);
+    var big = '<span class="av ph-big' + (cur ? ' has-photo' : '') + '" style="--c:var(--p' + hue(nm) + ')">' + (cur ? '<img src="' + cur + '" alt="Aperçu de votre photo" draggable="false">' : esc(nm.charAt(0).toUpperCase())) + '</span>';
+    return '<div class="modal" data-act="closeModal"><div class="sheet ph-sheet glass-2" data-act="noop" role="dialog" aria-modal="true" aria-label="Ma photo">' +
+      '<h2>' + (m.data ? 'Cette photo vous va bien ?' : 'Ma photo') + '</h2>' +
+      '<p class="hint">' + (m.data ? 'Elle sera recadrée en rond, au centre. Reprenez-la si le visage n’est pas bien placé.' : 'Votre visage remplace l’initiale dans votre pastille de couleur, pour que les autres vous reconnaissent à table.') + '</p>' +
+      '<div class="ph-prev">' + big + '</div>' + (m.err ? '<p class="ph-err" role="alert">' + esc(m.err) + '</p>' : '') +
+      '<div class="ph-btns"><label class="btn ' + (m.data ? 'btn-glass' : 'btn-teal') + '" for="ph-cam">' + ic('camera', 18) + ' Prendre une photo</label><input type="file" id="ph-cam" accept="image/*" capture="user" hidden>' +
+      '<label class="btn btn-glass" for="ph-file">' + ic('upload', 18) + ' Choisir une photo</label><input type="file" id="ph-file" accept="image/*" hidden></div>' +
+      '<div class="ph-foot">' + (m.data ? '<button class="btn btn-glass" data-act="photoCancel">Annuler</button><button class="btn btn-teal" data-act="photoSave">' + ic('check', 18) + ' Enregistrer</button>'
+        : (has ? '<button class="link danger" data-act="photoDel">Supprimer ma photo</button>' : '') + '<button class="btn btn-glass" data-act="closeModal">Fermer</button>') + '</div>' +
+      '</div></div>';
+  }
+  /* recadre au centre en carré, 192 px, JPEG léger (≈ 10 Ko) */
+  function facePhoto(file) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file), im = new Image();
+      im.onload = function () {
+        var S = 192, c = document.createElement('canvas'), ctx = c.getContext('2d'), sw = im.naturalWidth, sh = im.naturalHeight, side = Math.min(sw, sh), q = 0.82, out;
+        URL.revokeObjectURL(url); if (!sw || !sh) return rej(new Error('vide'));
+        c.width = c.height = S; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, S, S);
+        ctx.imageSmoothingQuality = 'high'; ctx.drawImage(im, (sw - side) / 2, (sh - side) / 2, side, side, 0, 0, S, S);
+        out = c.toDataURL('image/jpeg', q); while (out.length > 30000 && q > 0.4) { q -= 0.1; out = c.toDataURL('image/jpeg', q); }
+        photoSafe(out) ? res(out) : rej(new Error('encodage'));
+      };
+      im.onerror = function () { URL.revokeObjectURL(url); rej(new Error('lecture')); };
+      im.src = url;
+    });
   }
   function modalNews() {
     var rows = [
@@ -3840,7 +3890,7 @@ var Badges = (function () {
   function sxRank(o) {
     var rows = Object.keys(o.pl).filter(function (u) { return o.pl[u].n && M.regs[u] && !M.regs[u].fake; }).sort(function (a, b) { return o.pl[b].n - o.pl[a].n || nameOf(a).localeCompare(nameOf(b), 'fr'); }).slice(0, 5);
     if (!rows.length) return '<p class="hint">Pas encore de données.</p>';
-    return '<div class="sx-rnklist">' + rows.map(function (u, i) { var n = o.pl[u].n; return '<div class="sx-rnk" data-act="' + (ST.admin ? 'statsPlayer' : 'noop') + '" data-uid="' + esc(u) + '"' + (ST.admin ? ' role="button" tabindex="0"' : '') + '><span class="pos">' + (i + 1) + '</span>' + avatar(nameOf(u), 'sm') + '<span class="nm">' + esc(nameOf(u)) + '<i>' + n + ' session' + (n > 1 ? 's' : '') + ' sur ' + o.ses + '</i></span><span class="sc">' + pctOf(n, o.ses) + '%</span></div>'; }).join('') + '</div>';
+    return '<div class="sx-rnklist">' + rows.map(function (u, i) { var n = o.pl[u].n; return '<div class="sx-rnk" data-act="' + (ST.admin ? 'statsPlayer' : 'noop') + '" data-uid="' + esc(u) + '"' + (ST.admin ? ' role="button" tabindex="0"' : '') + '><span class="pos">' + (i + 1) + '</span>' + avatar(nameOf(u), 'sm', u) + '<span class="nm">' + esc(nameOf(u)) + '<i>' + n + ' session' + (n > 1 ? 's' : '') + ' sur ' + o.ses + '</i></span><span class="sc">' + pctOf(n, o.ses) + '%</span></div>'; }).join('') + '</div>';
   }
   function statsTabs() {
     var h = '<div class="sx-h"><div><p class="eyebrow">' + (ST.admin ? 'Toutes les sessions' : 'Vos sessions') + '</p><h1>Statistiques</h1></div>';
@@ -3884,7 +3934,7 @@ var Badges = (function () {
     return '<div class="panel glass"><div class="sx-t">' + plural(rows.length, 'joueur', 'joueurs') + '</div><div class="sx-s">' + plural(tp, 'participation', 'participations') + ' au total depuis le début (ou la dernière remise à zéro des badges). Touchez une personne pour voir son profil.</div>' +
       '<div class="sx-sort"><span>Trier par</span><div class="seg" role="group">' + [['part', 'Participations'], ['abs', 'Absences'], ['name', 'Nom']].map(function (t) { return '<button aria-pressed="' + (so === t[0]) + '" data-act="statsSort" data-s="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div></div>' +
       '<div class="sx-plist">' + rows.map(function (r) {
-        return '<div class="sx-prow" role="button" tabindex="0" data-act="statsPlayer" data-uid="' + esc(r.u) + '">' + avatar(r.name, 'sm') + '<div class="sx-who"><b>' + esc(r.name) + '</b><div class="tr"><i style="width:' + Math.round(r.played / mxp * 100) + '%"></i></div></div>' +
+        return '<div class="sx-prow" role="button" tabindex="0" data-act="statsPlayer" data-uid="' + esc(r.u) + '">' + avatar(r.name, 'sm', r.u) + '<div class="sx-who"><b>' + esc(r.name) + '</b><div class="tr"><i style="width:' + Math.round(r.played / mxp * 100) + '%"></i></div></div>' +
           '<div class="nums"><span class="ok" title="Participations"><b>' + r.played + '</b> joué' + (r.played > 1 ? 'es' : 'e') + '</span><span class="' + (r.missed ? 'ko' : 'zero') + '" title="Absences"><b>' + r.missed + '</b> absence' + (r.missed > 1 ? 's' : '') + '</span><span class="bg" title="Badges">🏅 <b>' + r.badges + '</b></span></div><span class="chev">' + ic('arrow', 16) + '</span></div>';
       }).join('') + '</div></div>';
   }
@@ -4211,6 +4261,17 @@ var Badges = (function () {
     pushNo: function () { try { localStorage.setItem('jdo-push-no', '1'); } catch (e) {} ui.pushHide = true; render(); },
     pushHelp: function () { toast('Ouvrez les réglages du site dans votre navigateur (cadenas près de l’adresse), puis autorisez les notifications.'); },
     pickGroup: function (el) { var a = ui.form.groups, g = el.dataset.g, i = a.indexOf(g); if (i >= 0) { if (a.length > 1) a.splice(i, 1); } else a.push(g); render(); },
+    photoOpen: function () { ui.modal = { type: 'photo', data: '', err: '' }; renderModal(); },
+    photoCancel: function () { if (ui.modal && ui.modal.type === 'photo') { ui.modal.data = ''; ui.modal.err = ''; renderModal(); } },
+    photoSave: function () {
+      var m = ui.modal; if (!m || m.type !== 'photo' || !photoSafe(m.data)) return;
+      var d = m.data; ui.modal = null; renderModal();
+      saveMine(function (doc) { doc.photo = d; return doc; }).then(function (ok) { if (ok) { if (M.regs[ST.uid]) M.regs[ST.uid].photo = d; else M.regs[ST.uid] = { name: norm(NAME), s: {}, photo: d }; toast('Photo enregistrée.'); render(true); } });
+    },
+    photoDel: function () {
+      ui.modal = null; renderModal();
+      saveMine(function (doc) { delete doc.photo; return doc; }).then(function (ok) { if (ok) { if (M.regs[ST.uid]) delete M.regs[ST.uid].photo; toast('Photo supprimée.'); render(true); } });
+    },
     newsLater: function () { ui.modal = null; renderModal(); },
     newsOk: function () { ui.modal = null; renderModal(); saveMine(function (doc) { doc.news = NEWS_ID; return doc; }); },
     profTab: function (el) { ui.profTab = el.dataset.t; render(true); window.scrollTo(0, 0); },
@@ -4674,6 +4735,12 @@ var Badges = (function () {
     if (t.id === 'gl-sort') { ui.gl.sort = t.value; var gl = $('#glist'); if (gl) gl.innerHTML = glRows(); return; }
     if ((t.id === 'gf-min' || t.id === 'gf-ideal' || t.id === 'gf-max') && ui.gf) {   /* jamais moins de 1 joueur */
       var nv = Math.round(+t.value); if (t.value !== '' && !(nv >= 2)) { t.value = '2'; ui.gf[GFKEYS[t.id]] = '2'; toast('Un jeu se joue à 2 joueurs minimum.'); }
+      return;
+    }
+    if (t.id === 'ph-cam' || t.id === 'ph-file') {
+      var pf = t.files && t.files[0], pm = ui.modal; t.value = ''; if (!pf || !pm || pm.type !== 'photo') return;
+      if (!/^image\//.test(pf.type)) { pm.err = 'Ce fichier n’est pas une image.'; return renderModal(); }
+      facePhoto(pf).then(function (d) { if (ui.modal !== pm) return; pm.data = d; pm.err = ''; renderModal(); }, function () { if (ui.modal !== pm) return; pm.err = 'Image illisible : essayez une photo JPEG ou PNG.'; renderModal(); });
       return;
     }
     if (t.id === 'bk-file') {
