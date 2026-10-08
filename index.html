@@ -120,7 +120,13 @@ ol,ul{padding:0;list-style:none}
 .mepill input{width:132px;border:0;outline:0;background:none;font-weight:600}
 .mepill input::placeholder{color:var(--muted);font-weight:500}
 .av{--c:var(--p0);flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:800 14px/1 var(--font-d);color:var(--ink);background:var(--glass-2);background:color-mix(in srgb,var(--c) 30%,var(--glass-2));border:2px solid var(--c)}
-.av.sm{width:26px;height:26px;font-size:12px}
+.av.sm{width:38px;height:38px;font-size:16px}
+.av-l{display:block;font-style:normal;text-box:trim-both cap alphabetic}   /* la lettre est centrée sur sa hauteur de capitale, quelle que soit la police */
+.who.gal{gap:16px 10px}
+.who.gal>span{flex-direction:column;background:none;padding:0;width:76px;gap:6px;text-align:center;font-size:13px;line-height:1.2;overflow-wrap:anywhere}
+.who.gal>span .av{width:68px;height:68px;font-size:26px;border-width:3px;box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 25%,transparent)}
+.who.gal>span.me{background:none;color:inherit;font-weight:800}
+.who.gal>span.me .av{box-shadow:0 0 0 4px var(--teal)}
 .av.has-photo{padding:0;overflow:hidden;background:var(--c)}
 .av.has-photo img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;-webkit-user-drag:none;user-select:none}
 .prof-av{position:relative;flex:none}
@@ -292,7 +298,7 @@ h3{font:800 19px/1.15 var(--font-d);letter-spacing:-.02em}
 .gauge p{font-size:13.5px;color:var(--muted)}
 .gauge p b{color:var(--ink)}
 .who{display:flex;flex-wrap:wrap;gap:6px}
-.who span{display:inline-flex;align-items:center;gap:7px;padding:4px 11px 4px 4px;border-radius:999px;background:var(--hair);font-weight:600;font-size:13.5px}
+.who span{display:inline-flex;align-items:center;gap:9px;padding:4px 14px 4px 4px;border-radius:999px;background:var(--hair);font-weight:600;font-size:13.5px}
 .who span.me{background:var(--teal);color:var(--on-teal)}
 .small-h{font:800 12px/1 var(--font-b);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 .rules{display:flex;flex-direction:column;gap:10px;font-size:13.5px;color:var(--muted)}
@@ -319,7 +325,7 @@ h3{font:800 19px/1.15 var(--font-d);letter-spacing:-.02em}
 .tstate{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--muted);margin-top:4px}
 .tstate.ok{color:var(--ok)}.tstate.bad{color:var(--bad)}
 .players{display:flex;flex-wrap:wrap;gap:8px}
-.pchip{display:inline-flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:999px;background:var(--hair);font-weight:600;font-size:14px;transition:background .15s,transform .15s}
+.pchip{display:inline-flex;align-items:center;gap:10px;padding:4px 14px 4px 4px;border-radius:999px;background:var(--hair);font-weight:600;font-size:14px;transition:background .15s,transform .15s}
 button.pchip:hover{background:var(--sun-soft);transform:translateY(-1px)}
 .pchip.me{background:var(--teal);color:var(--on-teal)}
 .rk{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:800 11px/1 var(--font-d);background:var(--ok);color:#fff}
@@ -2156,7 +2162,7 @@ var Badges = (function () {
   var photoOk = {};
   function photoSafe(p) { if (typeof p !== 'string' || p.length > 60000) return ''; if (photoOk[p] === undefined) photoOk[p] = /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]{100,}$/.test(p); return photoOk[p] ? p : ''; }
   function photoOf(uid) { var d = uid && M.regs[uid]; return d ? photoSafe(d.photo) : ''; }
-  var avatar = function (n, c, uid) { var ph = photoOf(uid); return '<span class="av ' + (c || '') + (ph ? ' has-photo' : '') + '" style="--c:var(--p' + hue(n) + ')">' + (ph ? '<img src="' + ph + '" alt="" decoding="async" draggable="false">' : esc(n.charAt(0).toUpperCase())) + '</span>'; };
+  var avatar = function (n, c, uid) { var ph = photoOf(uid); return '<span class="av ' + (c || '') + (ph ? ' has-photo' : '') + '" style="--c:var(--p' + hue(n) + ')">' + (ph ? '<img src="' + ph + '" alt="" decoding="async" draggable="false">' : '<i class="av-l">' + esc(n.charAt(0).toUpperCase()) + '</i>') + '</span>'; };
   var weightDots = function (w) { var h = '', i; for (i = 1; i <= 5; i++) h += '<i class="' + (i <= Math.round(w) ? 'on' : '') + '"></i>'; return '<span class="weight" title="Complexité ' + w + ' sur 5">' + h + '</span>'; };
   var facts = function (g, full) {
     return '<div class="facts"><span>' + ic('users', 15) + ' <b>' + (g.min === g.max ? g.min : g.min + '–' + g.max) + '</b> joueurs</span>' + (g.time ? '<span>' + ic('clock', 15) + ' <b>' + g.time + '</b> min</span>' : '') +
@@ -2860,8 +2866,8 @@ var Badges = (function () {
       '<p><b>' + Math.max(0, seats - n) + '</b> places libres. Le total est la somme des joueurs maximum de chaque jeu proposé.</p></div>' +
       '<div style="margin-top:16px">' + seatStrip(n, seats) + '</div></div>' +
       '<div class="panel glass"><div class="small-h"><span>Inscrits</span><span>' + n + '</span></div>' +
-      (n ? '<div class="who">' + regs.map(function (r) { return '<span class="' + (isMe(r.uid) ? 'me' : '') + '">' + avatar(r.name, 'sm', r.uid) + esc(r.name) + '</span>'; }).join('') + '</div>' : '<p class="hint" style="margin:0">Personne pour l’instant. Soyez le premier.</p>') + '</div>' +
-      (waitList(s).length ? '<div class="panel glass"><div class="small-h"><span>Liste d’attente</span><span>' + waitList(s).length + '</span></div><div class="who">' + waitList(s).map(function (r, i) { return '<span class="' + (isMe(r.uid) ? 'me' : '') + '">' + avatar(r.name, 'sm', r.uid) + (i + 1) + '. ' + esc(r.name) + '</span>'; }).join('') + '</div></div>' : '') +
+      (n ? '<div class="who gal">' + regs.map(function (r) { return '<span class="' + (isMe(r.uid) ? 'me' : '') + '">' + avatar(r.name, 'sm', r.uid) + esc(r.name) + '</span>'; }).join('') + '</div>' : '<p class="hint" style="margin:0">Personne pour l’instant. Soyez le premier.</p>') + '</div>' +
+      (waitList(s).length ? '<div class="panel glass"><div class="small-h"><span>Liste d’attente</span><span>' + waitList(s).length + '</span></div><div class="who gal">' + waitList(s).map(function (r, i) { return '<span class="' + (isMe(r.uid) ? 'me' : '') + '">' + avatar(r.name, 'sm', r.uid) + (i + 1) + '. ' + esc(r.name) + '</span>'; }).join('') + '</div></div>' : '') +
       '<div class="panel glass"><div class="small-h">Comment les tables sont composées</div><ul class="rules"><li>Les inscriptions se ferment à l’heure de la session, et tout se compose alors tout seul.</li><li>Un jeu n’ouvre que s’il réunit assez de joueurs, et on ouvre le moins de tables possible.</li><li>Votre ordre de préférence est respecté, et jamais un jeu refusé.</li><li>Chaque table vise son nombre idéal de joueurs.</li><li>Si les dernières sessions ne vous ont pas donné vos premiers choix, vous passez un peu avant les autres en cas de conflit pour un jeu.</li></ul></div>';
   }
 
@@ -3710,7 +3716,7 @@ var Badges = (function () {
   }
   function modalPhoto(m) {
     var uid = ST.uid, nm = norm(NAME) || ST.profileName || 'Vous', cur = m.data || photoOf(uid), has = !!photoOf(uid);
-    var big = '<span class="av ph-big' + (cur ? ' has-photo' : '') + '" style="--c:var(--p' + hue(nm) + ')">' + (cur ? '<img src="' + cur + '" alt="Aperçu de votre photo" draggable="false">' : esc(nm.charAt(0).toUpperCase())) + '</span>';
+    var big = '<span class="av ph-big' + (cur ? ' has-photo' : '') + '" style="--c:var(--p' + hue(nm) + ')">' + (cur ? '<img src="' + cur + '" alt="Aperçu de votre photo" draggable="false">' : '<i class="av-l">' + esc(nm.charAt(0).toUpperCase()) + '</i>') + '</span>';
     return '<div class="modal" data-act="closeModal"><div class="sheet ph-sheet glass-2" data-act="noop" role="dialog" aria-modal="true" aria-label="Ma photo">' +
       '<h2>' + (m.data ? 'Cette photo vous va bien ?' : 'Ma photo') + '</h2>' +
       '<p class="hint">' + (m.data ? 'Elle sera recadrée en rond, au centre. Reprenez-la si le visage n’est pas bien placé.' : 'Votre visage remplace l’initiale dans votre pastille de couleur, pour que les autres vous reconnaissent à table.') + '</p>' +
