@@ -1163,6 +1163,13 @@ html{overflow-x:hidden;max-width:100%}
 .mv-p{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .mv-x{display:inline-flex;gap:5px;align-items:center;padding:5px 10px;border-radius:999px;border:2px solid var(--hair);font-weight:700;font-size:12.5px;color:var(--muted);flex:none}
 .mv-x:hover{border-color:var(--teal);color:var(--ink)}
+
+/* Équipe : état des notifications */
+.push-tag{display:inline-flex;align-items:center;gap:5px;margin-top:3px;font-size:12px;font-weight:600;line-height:1.2}
+.push-tag svg{flex:none}
+.push-tag.on{color:#1f9d63}
+.push-tag.off{color:var(--muted);opacity:.85}
+.push-sum svg{vertical-align:-2px;margin-right:2px}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -1606,6 +1613,10 @@ html{overflow-x:hidden;max-width:100%}
   B.adminMembers = async function () {
     try { var r = await sb.rpc('jdo_admin_members'); return r.error ? null : (r.data || []); } catch (e) { return null; }
   };
+  /* personnes ayant au moins un appareil abonné aux notifications (admin) ; null si la fonction SQL n'est pas installée */
+  B.adminPushUsers = async function () {
+    try { var r = await sb.rpc('jdo_admin_push_users'); return r.error || !Array.isArray(r.data) ? null : r.data; } catch (e) { return null; }
+  };
   B.setMemberGroup = async function (uid, grp, on) {
     try { var r = await sb.rpc('jdo_set_member_group', { p_uid: uid, p_grp: grp, p_on: !!on }); return !r.error && r.data === true; } catch (e) { return false; }
   };
@@ -2010,7 +2021,7 @@ var Badges = (function () {
 
   /* ---------- État ---------- */
   var M = { groupCfg: {}, games: [], sessions: [], regs: {}, results: {}, drafts: {}, auto: {}, wd: {}, msg: {}, mv: {}, sc: {}, settings: { balance: 30 } };
-  var ST = { db: null, auth: 'boot', cfgErr: '', ready: false, loaded: {}, error: '', uid: null, profileName: '', admin: false, org: false, canWrite: true, teamCode: null, groups: [], codes: null, members: null, started: false };
+  var ST = { db: null, auth: 'boot', cfgErr: '', ready: false, loaded: {}, error: '', uid: null, profileName: '', admin: false, org: false, canWrite: true, teamCode: null, groups: [], codes: null, members: null, pushUsers: null, started: false };
   var NAMEKEY = 'jdo-name', NAME = '';
   try { NAME = localStorage.getItem(NAMEKEY) || ''; } catch (e) {}
   var tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
@@ -3060,8 +3071,8 @@ var Badges = (function () {
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Titre de l’accueil</h2><p>Le texte affiché en haut de l’accueil, propre à chaque groupe.</p></div>' +
       GROUPS.map(function (g) { return '<div class="field" style="margin-top:12px"><label for="t-title-' + g[0] + '">' + grpChips([g[0]]) + ' Titre</label><div class="import-row"><input class="input" id="t-title-' + g[0] + '" maxlength="80" autocomplete="off" value="' + esc(grpTitle(g[0])) + '"><button class="btn" data-act="saveTitle" data-g="' + g[0] + '">Enregistrer</button></div></div>'; }).join('') + '</div>' +
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Personnes, groupes et organisateurs</h2><p>Ajoutez une personne à l’autre groupe pour qu’elle soit dans les deux. L’admin est toujours dans les deux groupes. Une personne reste dans au moins un groupe. Un <b>organisateur</b> crée et gère ses propres sessions (pour son ou ses groupes) et peut ajouter des jeux ; il ne touche pas à celles des autres. Vous pouvez lui retirer ce droit à tout moment.</p></div>' +
-      (ST.members === null ? '<p class="hint">Chargement…</p>' : !ST.members.length ? '<p class="hint">Aucune personne pour l’instant.</p>' : '<div class="reset-list">' + ST.members.map(function (m) {
-        return '<div class="reset-row">' + avatar(m.name || '?', 'sm') + '<div class="reset-who"><b>' + esc(m.name || 'Sans nom') + '</b><small>' + (m.admin ? 'Admin · les deux groupes' : m.organizer ? 'Organisateur · crée ses propres sessions' : '') + '</small></div>' +
+      (ST.members && ST.pushUsers ? '<p class="hint push-sum">' + ic('bell', 14) + ' <b>' + ST.members.filter(function (m) { return ST.pushUsers.indexOf(m.id) >= 0; }).length + '</b> sur ' + ST.members.length + ' ont activé les notifications. Les autres ne recevront ni annonce ni alerte « table prête ».</p>' : '') + (ST.members === null ? '<p class="hint">Chargement…</p>' : !ST.members.length ? '<p class="hint">Aucune personne pour l’instant.</p>' : '<div class="reset-list">' + ST.members.map(function (m) {
+        return '<div class="reset-row">' + avatar(m.name || '?', 'sm') + '<div class="reset-who"><b>' + esc(m.name || 'Sans nom') + '</b><small>' + (m.admin ? 'Admin · les deux groupes' : m.organizer ? 'Organisateur · crée ses propres sessions' : '') + '</small>' + pushTag(m.id) + '</div>' +
           (m.admin ? '' : '<div class="gpick">' + GROUPS.map(function (g) { return '<button type="button" class="gpick-b g-' + g[0] + '" aria-pressed="' + (m.groups.indexOf(g[0]) >= 0) + '" data-act="memberGroup" data-uid="' + esc(m.id) + '" data-g="' + g[0] + '"><span class="tick">' + ic('check', 14) + '</span>' + g[1] + '</button>'; }).join('') + '</div><button type="button" class="gpick-b g-org" title="Peut créer et gérer ses propres sessions" aria-pressed="' + !!m.organizer + '" data-act="memberOrg" data-uid="' + esc(m.id) + '"><span class="tick">' + ic('check', 14) + '</span>Organisateur</button>') + '</div>';
       }).join('') + '</div>') + '</div>' +
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Badges et compteurs</h2><p>Remet à zéro, pour tout le monde, les badges, les compteurs de sessions jouées et manquées, et le malus d’absence. Les sessions et les absences déjà saisies ne sont pas supprimées : seules celles d’avant la remise à zéro sont ignorées. Chacun reverra l’écran de célébration pour ses nouveaux badges.</p></div>' +
@@ -3072,6 +3083,11 @@ var Badges = (function () {
           (conf ? '<button class="btn btn-red btn-sm" data-act="resetUser" data-uid="' + esc(u) + '">Confirmer</button><button class="link" data-act="resetBadgesNo">Annuler</button>' : '<button class="btn btn-glass btn-sm" data-act="resetUserAsk" data-uid="' + esc(u) + '">' + ic('undo', 14) + ' Remettre à zéro</button>') + '</div>';
       }).join('') + '</div>' +
       (ui.confirm === 'rb' ? '<div class="tools"><button class="btn btn-red" data-act="resetBadges">' + ic('trash', 16) + ' Oui, tout remettre à zéro</button><button class="link" data-act="resetBadgesNo">Annuler</button></div>' : '<button class="btn btn-glass" data-act="resetBadgesAsk">' + ic('undo', 16) + ' Réinitialiser les badges</button>') + '</div>';
+  }
+  function pushTag(uid) {
+    if (!ST.pushUsers) return '';
+    var on = ST.pushUsers.indexOf(uid) >= 0;
+    return '<span class="push-tag ' + (on ? 'on' : 'off') + '">' + ic('bell', 12) + (on ? 'Notifications activées' : 'Notifications non activées') + '</span>';
   }
   function tabSessions() {
     var list = sorted().filter(canManage).reverse();   /* du plus récent au plus ancien ; un organisateur ne gère que les siennes */
@@ -4079,6 +4095,7 @@ var Badges = (function () {
       if (ui.adminTab === 'team') {
         if (ST.codes === null) Backend.groupCodes().then(function (c) { ST.codes = c || {}; render(); });
         Backend.adminMembers().then(function (l) { ST.members = l || []; if (ui.adminTab === 'team') render(); });
+        Backend.adminPushUsers().then(function (l) { ST.pushUsers = l; if (ui.adminTab === 'team') render(); });
         loadOps();
       }
     },
