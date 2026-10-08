@@ -1177,6 +1177,9 @@ html{overflow-x:hidden;max-width:100%}
 .push-reg-txt{flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--muted)}
 .push-reg-txt b{font:800 14px/1.25 var(--font-d);color:var(--ink)}
 .push-reg-btns{display:flex;align-items:center;gap:8px;flex:none}
+
+.sx-rec-h{font:800 11.5px/1 var(--font-b);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+.sx-rec-h:first-child{margin-top:2px}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -3715,7 +3718,11 @@ var Badges = (function () {
           var oc = scOutcome(s, tb);
           if (oc) {
             o.tabsDone++;
-            if (oc.mode === 'high') { var bestRow = oc.rows[0], rc = o.rec[tb.gid] || (o.rec[tb.gid] = {}); if (!rc.hi || bestRow.v > rc.hi.v) rc.hi = { v: bestRow.v, uids: oc.rows.filter(function (x) { return x.v === bestRow.v; }).map(function (x) { return x.uid; }), date: s.date }; }
+            /* records : le plus haut score (jeux « plus de points gagne ») et le plus petit (jeux « moins de points gagne ») */
+            if (oc.mode === 'high' || oc.mode === 'low') {
+              var bestRow = oc.rows[0], rc = o.rec[tb.gid] || (o.rec[tb.gid] = {}), key = oc.mode === 'high' ? 'hi' : 'lo';
+              if (!rc[key] || (key === 'hi' ? bestRow.v > rc[key].v : bestRow.v < rc[key].v)) rc[key] = { v: bestRow.v, uids: oc.rows.filter(function (x) { return x.v === bestRow.v; }).map(function (x) { return x.uid; }), date: s.date };
+            }
           }
         }
         tb.ids.forEach(function (u) {
@@ -3772,7 +3779,7 @@ var Badges = (function () {
       '<div class="sx-leg">' + segs.map(function (x) { return '<div><span><i style="background:' + x[2] + '"></i>' + x[0] + '</span><b>' + pctOf(x[1], tot) + '%</b></div>'; }).join('') + '</div></div>';
   }
   function sxGames(o) {
-    var rows = Object.keys(o.games).filter(function (id) { return G(id); }).sort(function (a, b) { return o.games[b].ask - o.games[a].ask; }).slice(0, 6), mx = rows.length ? o.games[rows[0]].ask : 1;
+    var rows = Object.keys(o.games).filter(function (id) { return G(id); }).sort(function (a, b) { return o.games[b].ask - o.games[a].ask; }).slice(0, 10), mx = rows.length ? o.games[rows[0]].ask : 1;
     if (!rows.length) return '<p class="hint">Pas encore de données.</p>';
     return rows.map(function (id) {
       var g = G(id), d = o.games[id];
@@ -3788,12 +3795,17 @@ var Badges = (function () {
     }).join('');
   }
   function sxRecords(o) {
-    var rows = Object.keys(o.rec).filter(function (id) { return G(id) && o.rec[id].hi; }).sort(function (a, b) { return o.rec[b].hi.date < o.rec[a].hi.date ? -1 : 1; }).slice(0, 6);
-    if (!rows.length) return '<p class="hint">Les records apparaîtront dès que des scores seront validés.</p>';
-    return '<div class="sx-rnklist">' + rows.map(function (id) {
-      var g = G(id), r = o.rec[id].hi;
-      return '<div class="sx-rnk rec"><span class="pos">' + ic('trophy', 16) + '</span><span class="scg-art">' + art(g) + '</span><span class="nm">' + esc(g.name) + '<i>' + r.uids.map(function (u) { return esc(nameOf(u)); }).join(' et ') + ' · ' + fr(r.date, { day: 'numeric', month: 'short' }).replace('.', '') + '</i></span><span class="sc">' + scFmt(r.v) + '</span></div>';
-    }).join('') + '</div>';
+    function list(key, title) {
+      var rows = Object.keys(o.rec).filter(function (id) { return G(id) && o.rec[id][key]; }).sort(function (a, b) { return o.rec[b][key].date < o.rec[a][key].date ? -1 : 1; }).slice(0, 6);
+      if (!rows.length) return '';
+      return '<div class="sx-rec-h">' + title + '</div><div class="sx-rnklist">' + rows.map(function (id) {
+        var g = G(id), r = o.rec[id][key];
+        return '<div class="sx-rnk rec"><span class="pos">' + ic('trophy', 16) + '</span><span class="scg-art">' + art(g) + '</span><span class="nm">' + esc(g.name) + '<i>' + r.uids.map(function (u) { return esc(nameOf(u)); }).join(' et ') + ' · ' + fr(r.date, { day: 'numeric', month: 'short' }).replace('.', '') + '</i></span><span class="sc">' + scFmt(r.v) + '</span></div>';
+      }).join('') + '</div>';
+    }
+    var hi = list('hi', 'Le plus de points'), lo = list('lo', 'Le moins de points');
+    if (!hi && !lo) return '<p class="hint">Les records apparaîtront dès que des scores seront validés.</p>';
+    return hi + lo;
   }
   function sxRank(o) {
     var rows = Object.keys(o.pl).filter(function (u) { return o.pl[u].n && M.regs[u] && !M.regs[u].fake; }).sort(function (a, b) { return o.pl[b].n - o.pl[a].n || nameOf(a).localeCompare(nameOf(b), 'fr'); }).slice(0, 5);
@@ -3828,7 +3840,7 @@ var Badges = (function () {
       '<div class="panel glass"><div class="sx-t">Satisfaction</div><div class="sx-s">Rang du vœu obtenu après affectation</div>' + sxDonut(c) + '</div>' +
       '<div class="panel glass"><div class="sx-t">Jeux les plus demandés</div><div class="sx-s">Demandes en 1er vœu, et part obtenue</div>' + sxGames(c) + '</div>' +
       '<div class="panel glass"><div class="sx-t">Jeux les plus joués</div><div class="sx-s">Nombre de tables sur la période</div>' + sxPlayed(c) + '</div>' +
-      '<div class="panel glass"><div class="sx-t">Records</div><div class="sx-s">Meilleur score par jeu (jeux « plus de points gagne »)</div>' + sxRecords(c) + '</div>' +
+      '<div class="panel glass"><div class="sx-t">Records</div><div class="sx-s">Meilleur score par jeu : le plus haut et le plus petit</div>' + sxRecords(c) + '</div>' +
       '<div class="panel glass"><div class="sx-t">Les plus assidus</div><div class="sx-s">Part des sessions jouées sur la période</div>' + sxRank(c) + '</div></section>' +
       '<p class="sx-foot">Calculé à partir des inscriptions existantes. Aucun suivi individuel ni traceur externe.</p>';
   }
