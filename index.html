@@ -649,6 +649,12 @@ html{overflow-x:hidden;max-width:100%}
 .pill-wait::before{display:none}.pill-wait{display:inline-flex;align-items:center;gap:5px}
 
 /* « Ma table » du jour */
+.adm-close{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 16px;border-radius:20px;margin-bottom:16px;background:rgba(224,141,28,.14);border:2px solid #e08d1c}
+.adm-close-home{margin-bottom:26px}
+.adm-ico{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#e08d1c;color:#fff;flex:none}
+.adm-t{flex:1;min-width:200px;display:flex;flex-direction:column;gap:2px}
+.adm-t span{font-size:.88rem;opacity:.75}
+@media(max-width:640px){.adm-close .btn{width:100%}}
 .today{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;padding:18px 20px;border-radius:26px;margin-bottom:26px;border:2px solid var(--teal);box-shadow:0 0 0 5px rgba(10,154,137,.14)}
 .today:not(:has(.today-box)){grid-template-columns:minmax(0,1fr) auto;border-color:var(--hair);box-shadow:none}
 .today-box{width:84px}
@@ -2297,6 +2303,8 @@ var Badges = (function () {
           cards.push('<section class="today glass-2 ' + (ui.anim ? 'pop-in' : '') + '"><div class="today-box">' + box(g) + '</div><div class="today-body"><p class="eyebrow">Ma table · ' + when + '</p><h2>Vous jouez à ' + esc(g.name) + '</h2>' +
             '<div class="players">' + (others.length ? others.slice(0, 6).map(function (u) { return '<span class="pchip">' + avatar(nameOf(u), 'sm') + esc(nameOf(u)) + '</span>'; }).join('') + (others.length > 6 ? '<span class="pchip">+' + (others.length - 6) + '</span>' : '') : '<span class="hint" style="margin:0">Vous êtes seul·e à cette table pour l’instant.</span>') + '</div>' + note + '</div><div class="today-btns">' + (scOn(s) ? '<button class="btn btn-glass" data-act="scOpen" data-sid="' + s.id + '">' + ic('trophy', 17) + ' Scores</button>' : '') + go('btn-teal', 'Ma table') + '</div></section>');
         } else if (mine) cards.push('<section class="today glass-2"><div class="today-body"><p class="eyebrow">' + when + '</p><h2>' + (waitPos(s, ST.uid) ? 'Pas de place cette fois' : 'Pas de table cette fois') + '</h2><p class="hint" style="margin:0">' + (waitPos(s, ST.uid) ? 'Vous étiez sur la liste d’attente.' : 'Aucune table ne correspondait à vos choix.') + '</p></div>' + go('btn-glass', 'Voir les tables') + '</section>');
+      } else if (ph === 'closed' && canManage(s)) {
+        cards.push(adminCloseBanner(s, true));
       } else if (mine) {
         var wp = waitPos(s, ST.uid);
         cards.push('<section class="today glass-2"><div class="today-body"><p class="eyebrow">' + when + '</p><h2>' + (wp ? 'Liste d’attente : n°' + wp : 'Vous êtes inscrit·e') + '</h2><p class="hint" style="margin:0">' + (ph === 'open' ? 'Les tables se composent à ' + hm(s.time) + '.' : 'Les tables se composent à l’instant.') + '</p>' + note + '</div>' + go('btn-glass', 'Ma session') + '</section>');
@@ -2492,8 +2500,12 @@ var Badges = (function () {
     if (low) return cancel;
     return '<button class="btn btn-red btn-lg btn-block" style="margin-top:22px" data-act="closeSession" data-sid="' + s.id + '">' + ic('lock', 19) + ' Clôturer et affecter maintenant</button>' + cancel;
   }
+  function adminCloseBanner(s, home) {
+    if (!canManage(s) || phase(s) !== 'closed') return '';
+    return '<div class="adm-close' + (home ? ' adm-close-home glass-2' : '') + '" role="status"><span class="adm-ico">' + ic('lock', 20) + '</span><div class="adm-t"><strong>Inscriptions clôturées : composez et publiez les tables</strong><span>Les joueurs attendent. Vérifiez les tables puis publiez-les.</span></div><button class="btn btn-teal" data-act="manage" data-sid="' + s.id + '">Composer les tables ' + ic('arrow', 16) + '</button></div>';
+  }
   function closedPanel(s, mine, games, pending) {
-    return '<div class="panel glass-2"><div class="ok-head"><span class="ok-ico" style="background:var(--ink);color:var(--bg);box-shadow:none">' + ic('lock', 22) + '</span><div><h2>' + (pending ? 'Clôture en cours' : 'Inscriptions clôturées') + '</h2><p class="hint" style="margin:4px 0 0">' + (pending ? 'L’heure est passée : les tables se composent à l’instant. Cela prend quelques secondes.' : 'Les tables seront annoncées dès que l’organisateur les aura publiées.') + '</p></div></div>' +
+    return adminCloseBanner(s) + '<div class="panel glass-2"><div class="ok-head"><span class="ok-ico" style="background:var(--ink);color:var(--bg);box-shadow:none">' + ic('lock', 22) + '</span><div><h2>' + (pending ? 'Clôture en cours' : 'Inscriptions clôturées') + '</h2><p class="hint" style="margin:4px 0 0">' + (pending ? 'L’heure est passée : les tables se composent à l’instant. Cela prend quelques secondes.' : 'Les tables seront annoncées dès que l’organisateur les aura publiées.') + '</p></div></div>' +
       (mine ? '<div class="small-h">Vos choix</div>' + choicesList(mine) : '') + '</div>';
   }
 
@@ -4271,7 +4283,7 @@ var Badges = (function () {
       Backend.importAll(f.rows).then(function (n) { ui.bk = null; toast(n == null ? 'Import impossible.' : n + ' éléments importés.'); ST.db.reload && ST.db.reload(); render(); });
     },
     bkImportNo: function () { ui.bkFile = null; render(); },
-    manage: function (el) { ui.msid = el.dataset.sid; ui.confirm = null; render(true); window.scrollTo(0, 0); },
+    manage: function (el) { ui.route = 'admin'; ui.adminTab = 'sessions'; ui.sid = null; ui.msid = el.dataset.sid; ui.confirm = null; render(true); window.scrollTo(0, 0); },
     mBack: function () { ui.msid = null; ui.confirm = null; render(true); window.scrollTo(0, 0); },
     fake: function (el) {
       var s = sessionById(el.dataset.sid), cnt = +el.dataset.n, seats = seatsOf(s), have = regList(s).length, added = 0, jobs = [], used = {};
