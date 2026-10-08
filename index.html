@@ -4690,7 +4690,7 @@ var Badges = (function () {
     if (!el) return;
     if (el.dataset.go) { go(el.dataset.go); return; }
     var f = ACT[el.dataset.act];
-    if (f) { e.preventDefault(); f(el, e); }
+    if (f) { if (!(e.target.closest && e.target.closest('label, input[type=file]'))) e.preventDefault(); f(el, e); }   /* un libellé de fichier garde son comportement (ouvre le sélecteur / l'appareil photo) */
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && ui.modal) { ui.modal = null; renderModal(); return; }
