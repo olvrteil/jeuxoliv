@@ -1079,6 +1079,8 @@ html{overflow-x:hidden;max-width:100%}
 .news-list b{display:block;font:800 16px/1.2 var(--font-d);margin-bottom:3px}
 .news-list li div span{display:block;font-size:13.5px;line-height:1.4;color:var(--muted)}
 .news-foot{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 18px 18px;border-top:1px solid var(--hair);background:var(--glass-2)}
+.news-foot{align-items:stretch}
+.news-foot .news-go{grid-column:1/-1}
 .news-foot .btn{justify-content:center;padding-inline:10px;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.news-cup,.news-sp i,.news-list li{animation:none}}
 /* ----- v1.20 : badges de victoire, hall of fame, palmarès ----- */
@@ -1239,7 +1241,7 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.20 - octobre 2026 - Olvrteil</span>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.21 - octobre 2026 - Olvrteil</span>
     <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API : logo officiel « Powered by BGG », qui renvoie vers BoardGameGeek. -->
     <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><img src="powered-by-bgg.png" width="252" height="56" alt="Powered by BGG" decoding="async"></a>
     <button type="button" id="pushLink" hidden></button></footer>
@@ -3709,7 +3711,7 @@ var Badges = (function () {
   /* --- « Nouveautés » : fenêtre à l'ouverture de l'accueil tant que la personne n'a pas cliqué sur OK ---
      OK : mémorisé dans sa fiche (champ news), plus jamais affichée pour cette version.
      « Revoir plus tard » (ou fermeture autrement) : réaffichée à la prochaine ouverture de l'appli. */
-  var NEWS_ID = 'v1.20';
+  var NEWS_ID = 'v1.21';
   function maybeNews() {
     if (ui.route !== 'home' || ui.modal || ui.newsShown || ST.auth !== 'in' || !ST.uid || !ST.ready || !ST.loaded.results || !ST.loaded.auto) return;
     if (navigator.webdriver && !window.__JDO_NEWS_TEST) return;   /* tests automatisés : pas de fenêtre, sauf test dédié */
@@ -3747,16 +3749,16 @@ var Badges = (function () {
   }
   function modalNews() {
     var rows = [
-      ['🏆', 'Notez les scores', 'Depuis « Ma table », bouton Scores : plus de points, moins de points ou coopératif. Tout le monde à la table peut saisir.'],
-      ['🔄', 'Changez de table', 'Au dernier moment : place libre ou échange avec un joueur.'],
-      ['🎖️', '12 nouveaux badges', 'Victoires, séries, bon perdant… à retrouver dans votre profil.'],
-      ['👑', 'Le Hall of fame du trimestre', 'Classement des meilleurs, remis à zéro tous les 3 mois, et palmarès dans la fiche de chaque jeu.']
+      ['📸', 'Ajoutez votre photo', 'Dans votre profil, touchez l’appareil photo : selfie ou image de votre choix.'],
+      ['🟡', 'À la place de l’initiale', 'Votre visage remplace l’initiale dans votre pastille : tables, scores, messages…'],
+      ['👀', 'Reconnaissez-vous à table', 'Les inscrits d’une session s’affichent en galerie de visages.'],
+      ['🔒', 'Vous gardez la main', 'Facultative, modifiable ou supprimable à tout moment. Visible par l’équipe seulement.']
     ], sp = '';
     for (var i = 0; i < 9; i++) sp += '<i style="--x:' + (i % 2 ? 86 + (i * 3) % 9 : 4 + (i * 3) % 9) + '%;--y:' + (14 + i * 9) + '%;--d:' + (i * .35).toFixed(2) + 's;--s:' + (8 + (i % 3) * 5) + 'px"></i>';
     return '<div class="modal news" data-act="newsLater"><div class="sheet news-sheet glass-2" data-act="noop" role="dialog" aria-modal="true" aria-label="Nouveautés">' +
-      '<div class="news-hero"><span class="news-sp" aria-hidden="true">' + sp + '</span><span class="news-chip">Nouveauté · ' + NEWS_ID + '</span><span class="news-cup" aria-hidden="true">🏆</span><h2>Jouez, notez, gagnez !</h2><p>Les scores arrivent à la table, avec classement et badges.</p></div>' +
+      '<div class="news-hero"><span class="news-sp" aria-hidden="true">' + sp + '</span><span class="news-chip">Nouveauté · ' + NEWS_ID + '</span><span class="news-cup" aria-hidden="true">📸</span><h2>Montrez votre tête !</h2><p>Votre photo à la place de l’initiale.</p></div>' +
       '<ul class="news-list">' + rows.map(function (r, i) { return '<li style="--i:' + i + '"><span class="news-ic c' + i + '" aria-hidden="true">' + r[0] + '</span><div><b>' + r[1] + '</b><span>' + r[2] + '</span></div></li>'; }).join('') + '</ul>' +
-      '<div class="news-foot"><button class="btn btn-glass" data-act="newsLater">Revoir plus tard</button><button class="btn btn-teal" data-act="newsOk">OK</button></div></div></div>';
+      '<div class="news-foot"><button class="btn btn-teal news-go" data-act="newsPhoto">' + ic('camera', 18) + ' Ajouter ma photo</button><button class="btn btn-glass" data-act="newsLater">Revoir plus tard</button><button class="btn btn-glass" data-act="newsOk">OK</button></div></div></div>';
   }
   function maybeBadges() {
     if (ui.route !== 'home' || ui.modal || ui.badgeDone || ST.auth !== 'in' || !ST.uid || !ST.ready || !ST.loaded.results || !ST.loaded.auto) return;
@@ -4281,6 +4283,7 @@ var Badges = (function () {
       saveMine(function (doc) { delete doc.photo; return doc; }).then(function (ok) { if (ok) { if (M.regs[ST.uid]) delete M.regs[ST.uid].photo; toast('Photo supprimée.'); render(true); } });
     },
     newsLater: function () { ui.modal = null; renderModal(); },
+    newsPhoto: function () { saveMine(function (doc) { doc.news = NEWS_ID; return doc; }); ui.modal = { type: 'photo', data: '', err: '' }; renderModal(); },
     newsOk: function () { ui.modal = null; renderModal(); saveMine(function (doc) { doc.news = NEWS_ID; return doc; }); },
     profTab: function (el) { ui.profTab = el.dataset.t; render(true); window.scrollTo(0, 0); },
     fameQ: function (el) { ui.fameOff = Math.max(0, (ui.fameOff || 0) + (+el.dataset.d)); render(true); },
