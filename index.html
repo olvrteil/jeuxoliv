@@ -3247,13 +3247,17 @@ var Badges = (function () {
   function tabSessions() {
     var list = sorted().filter(canManage).reverse();   /* du plus récent au plus ancien ; un organisateur ne gère que les siennes */
     if (!list.length) return '<div class="panel glass empty"><svg class="meeple" viewBox="0 0 100 100"><use href="#meeple"/></svg><h2>Aucune session</h2><p>Programmez la première dans l’onglet « Programmer ».</p></div>';
-    return '<div class="arows">' + list.map(function (s) {
+    var today = D.iso(new Date()), curL = list.filter(function (s) { return s.date >= today; }), pastL = list.filter(function (s) { return s.date < today; });
+    var row = function (s) {
       var games = gamesOf(s), seats = seatsOf(s), confirming = ui.confirm === 'del:' + s.id, open = ui.cardMenu === s.id || confirming;
       return '<article class="arow glass">' + ticket(s, 'mini') + '<div><h3>' + longDate(s.date) + ' · ' + hm(s.time) + ' ' + grpChips(groupsOf(s)) + '</h3><div class="minis">' + games.map(function (g) { return '<div title="' + esc(g.name) + '">' + box(g) + '</div>'; }).join('') + '</div></div>' +
         '<div class="arow-side">' + statusPill(s) + (wdOpenList(s).filter(function (w) { return !isLeft(s, w.uid); }).length ? '<span class="wd-chip">' + ic('bell', 13) + ' ' + wdOpenList(s).filter(function (w) { return !isLeft(s, w.uid); }).length + ' demande de retrait</span>' : '') + '<span class="seat-num"><b>' + regList(s).length + '</b> / ' + seats + ' places</span><div class="row"><button class="btn btn-sm" data-act="manage" data-sid="' + s.id + '">Gérer ' + ic('arrow', 16) + '</button>' +
         '<div class="kebab-wrap"><button class="kebab" data-act="cardMenu" data-sid="' + s.id + '" aria-haspopup="true" aria-expanded="' + (open) + '" aria-label="Plus d’actions">' + '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>' + '</button>' +
         (open ? '<div class="kebab-menu" role="menu"><button role="menuitem" data-act="dupSession" data-sid="' + s.id + '">' + ic('copy', 17) + ' Dupliquer</button><button role="menuitem" class="danger" data-act="delSession" data-sid="' + s.id + '">' + ic('trash', 17) + ' ' + (confirming ? 'Confirmer la suppression' : 'Supprimer') + '</button></div>' : '') + '</div></div></div></article>';
-    }).join('') + '</div>';
+    };
+    var rows = function (l) { return '<div class="arows">' + l.map(row).join('') + '</div>'; };
+    return (curL.length ? rows(curL) : '<p class="hint" style="margin:0 0 14px">Aucune session aujourd’hui ni à venir.</p>') +
+      (pastL.length ? '<section class="archives"><button class="arch-toggle" data-act="toggleArchAdm" aria-expanded="' + (ui.archAdm ? 'true' : 'false') + '">' + ic('cal', 18) + '<span>Sessions passées</span><small>' + pastL.length + '</small><i class="chev">' + (ui.archAdm ? '–' : '+') + '</i></button>' + (ui.archAdm ? rows(pastL) : '') + '</section>' : '');
   }
   function normQ(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
   function filterPicker() {
@@ -4221,6 +4225,7 @@ var Badges = (function () {
     gameInfo: function (el) { ui.modal = { type: 'game', gid: el.dataset.gid }; renderModal(); },
     toggleArch: function () { ui.archOpen = !ui.archOpen; render(); },
     howto: function () { ui.how = !ui.how; render(); },
+    toggleArchAdm: function () { ui.archAdm = !ui.archAdm; ui.cardMenu = null; render(); },
     tabMenu: function () { ui.tabMenu = !ui.tabMenu; ui.cardMenu = null; render(); },
     cardMenu: function (el) { ui.cardMenu = ui.cardMenu === el.dataset.sid ? null : el.dataset.sid; ui.tabMenu = false; ui.confirm = null; render(); },
     closeModal: function () { var m = ui.modal; ui.modal = null; renderModal(); if (m && m.type === 'badges') saveBadgesSeen(m.all); },
