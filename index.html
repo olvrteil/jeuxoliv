@@ -1170,6 +1170,13 @@ html{overflow-x:hidden;max-width:100%}
 .push-tag.on{color:#1f9d63}
 .push-tag.off{color:var(--muted);opacity:.85}
 .push-sum svg{vertical-align:-2px;margin-right:2px}
+
+/* Invitation aux notifications après l'inscription */
+.push-reg{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px;padding:10px 12px;border-radius:16px;background:var(--hair)}
+.push-reg-ico{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:var(--sun);color:var(--on-sun);flex:none}
+.push-reg-txt{flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--muted)}
+.push-reg-txt b{font:800 14px/1.25 var(--font-d);color:var(--ink)}
+.push-reg-btns{display:flex;align-items:center;gap:8px;flex:none}
 </style></head><body>
 
 <div class="stage" aria-hidden="true">
@@ -2234,13 +2241,23 @@ var Badges = (function () {
   function myTableOf(s) { var r = resultOf(s); return r && ST.uid ? r.tables.filter(function (t) { return t.ids.indexOf(ST.uid) >= 0; })[0] : null; }
   /* ---------- Notifications ---------- */
   function refreshPush() { Backend.push.state().then(function (st) { ST.push = st; render(); updatePushLink(); }); }
-  function pushHidden() { if (ui.pushHide) return true; try { return Date.now() - (+localStorage.getItem('jdo-push-hide') || 0) < 14 * 864e5; } catch (e) { return false; } }
+  /* Proposition de la carte d'accueil : espacée de 14 jours, 3 fois au maximum, jamais après un « Non merci » */
+  var PUSH_MAX = 3;
+  function pushAsked() { try { return +localStorage.getItem('jdo-push-n') || 0; } catch (e) { return 0; } }
+  function pushNoThanks() { try { return localStorage.getItem('jdo-push-no') === '1'; } catch (e) { return false; } }
+  function pushHidden() { if (ui.pushHide || pushNoThanks() || pushAsked() >= PUSH_MAX) return true; try { return Date.now() - (+localStorage.getItem('jdo-push-hide') || 0) < 14 * 864e5; } catch (e) { return false; } }
+  /* Invitation discrète juste après l'inscription à une session (le moment où l'intérêt est évident) */
+  function pushRegPrompt() {
+    var st = ST.push; if (!ST.uid || pushNoThanks() || (st !== 'off' && st !== 'ios-install')) return '';
+    return '<div class="push-reg"><span class="push-reg-ico">' + ic('bell', 18) + '</span><div class="push-reg-txt"><b>Être prévenu·e quand votre table est prête ?</b>' + (st === 'ios-install' ? '<span>Sur iPhone, installez d’abord l’appli : Partager, puis Sur l’écran d’accueil.</span>' : '') + '</div><div class="push-reg-btns">' +
+      (st === 'off' ? '<button class="btn btn-sm" data-act="pushOn">Activer</button>' : '') + '<button class="link" data-act="pushNo">Non merci</button></div></div>';
+  }
   function updatePushLink() {
     var l = $('#pushLink'); if (!l) return;
-    var st = ST.push, show = ST.auth === 'in' && (st === 'on' || st === 'off' || st === 'ios-install');
+    var st = ST.push, show = ST.auth === 'in' && (st === 'on' || st === 'off' || st === 'ios-install' || st === 'denied');
     l.hidden = !show; if (!show) return;
-    l.dataset.act = st === 'on' ? 'pushOff' : st === 'off' ? 'pushOn' : 'noop';
-    l.textContent = st === 'on' ? 'Notifications activées · Désactiver' : st === 'off' ? 'Activer les notifications' : 'Notifications : installez d’abord l’appli';
+    l.dataset.act = st === 'on' ? 'pushOff' : st === 'off' ? 'pushOn' : st === 'denied' ? 'pushHelp' : 'noop';
+    l.textContent = st === 'on' ? 'Notifications activées · Désactiver' : st === 'off' ? 'Activer les notifications' : st === 'denied' ? 'Notifications bloquées : comment les réautoriser' : 'Notifications : installez d’abord l’appli';
   }
   function notifyCard() {
     var st = ST.push; if (!ST.uid || pushHidden() || (st !== 'off' && st !== 'ios-install')) return '';
@@ -2431,7 +2448,7 @@ var Badges = (function () {
       choicesList(mine) +
       '<div class="row"><button class="btn btn-glass" data-act="editReg">' + ic('swap', 17) + ' Modifier mes choix</button>' +
       '<button class="link danger" data-act="unreg" data-sid="' + s.id + '">' + ic('x', 16) + ' ' + (confirming ? 'Confirmer' : (wp ? 'Quitter la liste d’attente' : 'Me désinscrire')) + '</button></div>' +
-      '<p class="hint">Vous pouvez changer d’avis jusqu’à ' + hm(s.time) + ', heure de clôture des inscriptions.</p></div>';
+      pushRegPrompt() + '<p class="hint">Vous pouvez changer d’avis jusqu’à ' + hm(s.time) + ', heure de clôture des inscriptions.</p></div>';
   }
   function fullPanel(s, games) {
     return '<div class="panel glass-2"><div class="empty"><svg class="meeple" viewBox="0 0 100 100"><use href="#meeple"/></svg><h2>Session complète</h2><p>Toutes les places sont prises. Si quelqu’un se désinscrit, une place se libère ici.</p></div></div>' + gameInfoPanel(games);
@@ -4145,7 +4162,9 @@ var Badges = (function () {
       });
     },
     pushOff: function () { Backend.push.forget(ST.uid, true).then(function () { toast('Notifications désactivées sur cet appareil.'); refreshPush(); }); },
-    pushLater: function () { try { localStorage.setItem('jdo-push-hide', String(Date.now())); } catch (e) {} ui.pushHide = true; render(); },
+    pushLater: function () { try { localStorage.setItem('jdo-push-hide', String(Date.now())); localStorage.setItem('jdo-push-n', String(pushAsked() + 1)); } catch (e) {} ui.pushHide = true; render(); },
+    pushNo: function () { try { localStorage.setItem('jdo-push-no', '1'); } catch (e) {} ui.pushHide = true; render(); },
+    pushHelp: function () { toast('Ouvrez les réglages du site dans votre navigateur (cadenas près de l’adresse), puis autorisez les notifications.'); },
     pickGroup: function (el) { var a = ui.form.groups, g = el.dataset.g, i = a.indexOf(g); if (i >= 0) { if (a.length > 1) a.splice(i, 1); } else a.push(g); render(); },
     newsLater: function () { ui.modal = null; renderModal(); },
     newsOk: function () { ui.modal = null; renderModal(); saveMine(function (doc) { doc.news = NEWS_ID; return doc; }); },
