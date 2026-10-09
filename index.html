@@ -1222,6 +1222,40 @@ html{overflow-x:hidden;max-width:100%}
 .mail-line{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:12.5px;font-weight:600;color:var(--cobalt);min-width:0;user-select:text}
 .mail-line svg{flex:none}.mail-line span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+/* ---------- v1.23 : domaines ---------- */
+.gchip,.gchip.g-perso{background:var(--gc,#CFE0FF)}
+.gpick-b[aria-pressed="true"],.gpick-b.g-perso[aria-pressed="true"]{background:var(--gc,#CFE0FF)}
+.gpick-b.g-org[aria-pressed="true"]{background:#FFE08A}
+.gdot{width:10px;height:10px;border-radius:50%;background:var(--gc,#CFE0FF);display:inline-block;flex:none;box-shadow:inset 0 0 0 1.5px rgba(21,19,46,.28)}
+.gswitch{max-width:100%;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.gswitch::-webkit-scrollbar{display:none}
+.gswitch button{white-space:nowrap;display:inline-flex;align-items:center;gap:7px;flex:none}
+.dom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px}
+@media (max-width:560px){.dom-grid{gap:10px}.dom-card{padding:12px 10px 11px 16px}.dom-card .dn{font-size:.98rem;padding-right:4px}.dom-card .dc{font-size:.78rem;letter-spacing:.08em;padding:5px 8px}.dom-add{min-height:100px}}
+.dom-card{position:relative;display:grid;gap:7px;align-content:start;text-align:left;padding:14px 14px 13px 20px;border-radius:18px;background:var(--hair);border:2px solid transparent;cursor:pointer;color:var(--ink);font:inherit;overflow:hidden;transition:transform .15s,border-color .15s,box-shadow .15s}
+.dom-card::before{content:"";position:absolute;inset:0 auto 0 0;width:8px;background:var(--gc)}
+.dom-card::after{content:"";position:absolute;right:-28px;top:-28px;width:84px;height:84px;border-radius:50%;background:var(--gc);opacity:.35}
+.dom-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px -12px var(--shadow)}
+.dom-card[aria-expanded="true"]{border-color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+.dom-card .dn{position:relative;font:800 1.08rem/1.15 var(--font-d);padding-right:14px;overflow-wrap:break-word;hyphens:auto}
+.dom-card .dm{position:relative;color:var(--muted);font-size:.8rem;font-weight:700;display:flex;align-items:center;gap:5px}
+.dom-card .dc{position:relative;justify-self:start;font:800 .9rem/1 var(--font-d);letter-spacing:.12em;padding:6px 10px;border-radius:10px;background:var(--gc);color:#15132E}
+.dom-add{display:grid;place-items:center;align-content:center;gap:6px;min-height:118px;border:2px dashed var(--hair);border-radius:18px;background:none;color:var(--muted);font:700 .95rem/1.2 var(--font-b);cursor:pointer;transition:border-color .15s,color .15s}
+.dom-add:hover{border-color:var(--ink);color:var(--ink)}
+.dom-add small{font-weight:600;font-size:.75rem}
+.dom-edit{margin-top:14px;padding:18px;border-radius:20px;background:var(--glass-2);border:2px solid var(--ink);box-shadow:0 4px 0 var(--gc);display:grid;gap:14px}
+.dom-edit h3{margin:0;font:800 1.15rem/1.2 var(--font-d);display:flex;align-items:center;gap:9px}
+.dom-edit h3 .gdot{width:14px;height:14px}
+.dom-edit .field{margin:0}
+.swatches{display:flex;gap:9px;flex-wrap:wrap}
+.swatch{width:32px;height:32px;border-radius:50%;background:var(--gc);border:2px solid transparent;box-shadow:inset 0 0 0 1.5px rgba(21,19,46,.2);cursor:pointer;display:grid;place-items:center;color:#15132E;transition:transform .12s}
+.swatch .tick{display:none}.swatch[aria-pressed="true"]{border-color:var(--ink);transform:scale(1.12)}.swatch[aria-pressed="true"] .tick{display:grid}
+.mem-flt{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 12px}.mem-flt::-webkit-scrollbar{display:none}
+.mem-flt .chip-btn{flex:none;white-space:nowrap}
+.mem-flt .chip-btn.on{background:var(--ink);color:var(--bg)}
+.mem-flt .chip-btn .n{font-weight:800;padding:2px 6px;border-radius:99px;background:var(--hair);font-size:11px}
+.mem-doms{margin-top:5px}.mem-doms .gchips{margin-left:0;flex-wrap:wrap}
+.mem-edit-b{flex:none}
+.mem-edit{flex-basis:100%;display:grid;gap:10px;padding:12px 2px 4px;border-top:1.5px dashed var(--hair);margin-top:2px}
 /* ---------- v1.22 : ergonomie mobile ---------- */
 .top-in::before{background:color-mix(in srgb,var(--glass-2) 35%,var(--bg))}
 .howto,.tabsmenu{display:none}
@@ -1311,7 +1345,7 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.22 - octobre 2026 - Olvrteil</span>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.23 - octobre 2026 - Olvrteil</span>
     <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API : logo officiel « Powered by BGG », qui renvoie vers BoardGameGeek. -->
     <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><img src="powered-by-bgg.png" width="252" height="56" alt="Powered by BGG" decoding="async"></a>
     <button type="button" id="pushLink" hidden></button></footer>
@@ -1742,6 +1776,13 @@ html{overflow-x:hidden;max-width:100%}
   B.adminEmails = async function () {
     try { var r = await sb.rpc('jdo_admin_emails'); return r.error || !r.data || typeof r.data !== 'object' ? null : r.data; } catch (e) { return null; }
   };
+  /* domaines : création / suppression (admin) ; renvoie 'ok' ou un motif ('full', 'taken', 'members', 'sessions', 'last', 'error'...) */
+  B.addGroup = async function (grp, code) {
+    try { var r = await sb.rpc('jdo_add_group', { p_grp: grp, p_code: code }); return r.error ? 'error' : String(r.data || 'error'); } catch (e) { return 'error'; }
+  };
+  B.deleteGroup = async function (grp) {
+    try { var r = await sb.rpc('jdo_delete_group', { p_grp: grp }); return r.error ? 'error' : String(r.data || 'error'); } catch (e) { return 'error'; }
+  };
   B.setMemberGroup = async function (uid, grp, on) {
     try { var r = await sb.rpc('jdo_set_member_group', { p_uid: uid, p_grp: grp, p_on: !!on }); return !r.error && r.data === true; } catch (e) { return false; }
   };
@@ -2151,7 +2192,7 @@ var Badges = (function () {
   var NAMEKEY = 'jdo-name', NAME = '';
   try { NAME = localStorage.getItem(NAMEKEY) || ''; } catch (e) {}
   var tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
-  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: ['pro', 'perso'], target: 'all', sid: '' }, route: 'home', gl: { q: '', sort: 'dateAsc' }, flt: { p: [], d: [], w: [] }, grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
+  var ui = { nt: { title: '', text: '', blob: null, preview: '', err: '', busy: false, confirm: false, aud: null, groups: [], target: 'all', sid: '' }, route: 'home', gl: { q: '', sort: 'dateAsc' }, flt: { p: [], d: [], w: [] }, grp: 'pro', sid: null, msid: null, adminTab: 'sessions', draft: null, confirm: null, modal: null, q: '', anim: false,
     form: { date: D.iso(tmr), time: '12:15', note: '', gameIds: [], groups: ['pro'], q: '', single: false }, imp: { q: '', hit: null, miss: false }, gs: gsNew(), bg: bgNew(),
     auth: { mode: 'in', email: '', name: '', code: '', msg: '', ok: false, busy: false }, addMode: 'auto', gf: null };
   ui.stats = { days: 90, view: 'main', pid: null, sort: 'part' };
@@ -3132,7 +3173,7 @@ var Badges = (function () {
     return { today: all.filter(function (x) { return x.date === today; }).sort(function (a, b) { return startMs(a) - startMs(b); }), rest: all.filter(function (x) { return x.date !== today; }) };
   }
   function ntLabel(x) {
-    var g = (x.groups || []).map(function (k) { var f = GROUPS.filter(function (y) { return y[0] === k; })[0]; return f ? f[1] : k; }).join(' + ');
+    var g = (x.groups || []).map(grpName).join(' + ');
     return cap(fr(x.date, { weekday: 'short', day: 'numeric', month: 'short' })) + ' · ' + hm(x.time || '12:00') + (g ? ' · ' + g : '') + ' · ' + plural(allRegs(x).length, 'inscrit', 'inscrits') + (cancelInfo(x) ? ' · annulée' : '');
   }
   function ntLoadAud() {
@@ -3208,24 +3249,59 @@ var Badges = (function () {
           (cf ? '<button class="btn btn-sm btn-red" data-act="bkRestore" data-id="' + b.id + '">Confirmer : tout remplacer</button><button class="link" data-act="bkNo">Annuler</button>' : '<button class="btn btn-sm btn-glass" data-act="bkRestore" data-id="' + b.id + '">Restaurer</button>') + '</div>';
       }).join('') + '</div>' : '') + '</div>';
   }
+  /* ---------- Équipe : domaines (cartes + un seul éditeur) et personnes (filtre + édition à la demande) ---------- */
+  function domCount(g) { return (ST.members || []).filter(function (m) { return !m.admin && m.groups.indexOf(g) >= 0; }).length; }
+  function domainsPanel() {
+    var gs = allGroups(), ed = ui.domEdit, dr = ui.domDraft || {};
+    if (ed && ed !== '__new' && gs.indexOf(ed) < 0) ed = ui.domEdit = null;
+    var cards = gs.map(function (g) {
+      var cd = ST.codes && ST.codes[g], n = ST.members ? domCount(g) : null;
+      return '<button type="button" class="dom-card"' + gstyle(g) + ' aria-expanded="' + (ed === g) + '" data-act="domEdit" data-g="' + g + '"><span class="dn">' + esc(grpName(g)) + '</span>' +
+        '<span class="dm">' + ic('users', 14) + (n === null ? '…' : plural(n, 'personne', 'personnes')) + '</span><span class="dc">' + (ST.codes === null ? '…' : esc(cd || '—')) + '</span></button>';
+    }).join('') + (gs.length < GMAX ? '<button type="button" class="dom-add" aria-expanded="' + (ed === '__new') + '" data-act="domEdit" data-g="__new">' + ic('plus', 22) + '<span>Nouveau domaine</span><small>' + (GMAX - gs.length) + ' possible' + (GMAX - gs.length > 1 ? 's' : '') + ' encore</small></button>' : '');
+    var box = '';
+    if (ed) {
+      var isNew = ed === '__new', c = isNew ? { name: '', title: '' } : gcfg(ed), col = ui.domColor, cd = !isNew && ST.codes && ST.codes[ed];
+      var val = function (k, d) { return esc(dr[k] != null ? dr[k] : d); }, del = ui.confirm === 'dd:' + ed;
+      box = '<div class="dom-edit" style="--gc:' + GCOL[col] + '"><h3><span class="gdot"></span>' + (isNew ? 'Nouveau domaine' : esc(grpName(ed))) + '</h3>' +
+        '<div class="field"><label for="d-name">Nom</label><input class="input" id="d-name" maxlength="30" autocomplete="off" placeholder="Ex. : Collègues de Léa" value="' + val('name', c.name) + '"></div>' +
+        '<div class="field"><label for="d-title">Titre de l’accueil</label><input class="input" id="d-title" maxlength="80" autocomplete="off" placeholder="Ex. : Les parties du jeudi soir" value="' + val('title', c.title) + '"></div>' +
+        '<div class="field"><label>Couleur</label><div class="swatches" role="group" aria-label="Couleur">' + GCOL.map(function (x, i) { return '<button type="button" class="swatch" style="--gc:' + x + '" aria-pressed="' + (i === col) + '" aria-label="Couleur ' + (i + 1) + '" data-act="domColor" data-i="' + i + '"><span class="tick">' + ic('check', 14) + '</span></button>'; }).join('') + '</div></div>' +
+        (isNew ? '<p class="hint" style="margin:0">Un code d’inscription est créé automatiquement ; vous pourrez le changer ensuite.</p>' :
+          '<div class="field"><label for="d-code">Code d’inscription</label><div class="copyrow" style="margin-top:0"><code class="bigcode">' + (ST.codes === null ? '…' : esc(cd || 'indisponible')) + '</code>' + (cd ? '<button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(cd) + '">' + ic('copy', 16) + ' Copier</button>' : '') + '</div>' +
+          '<input class="input" id="d-code" style="margin-top:8px;max-width:320px" maxlength="30" autocomplete="off" autocapitalize="characters" placeholder="Nouveau code (4 caractères min.)" aria-label="Nouveau code" value="' + val('code', '') + '"></div>' +
+          '<p class="hint" style="margin:0">Les codes des domaines sont tous différents. Changer un code ne sort personne du domaine : il ne sert qu’aux nouveaux arrivants.</p>') +
+        '<div class="tools" style="margin:0"><button class="btn btn-red" data-act="domSave">' + ic('check', 16) + ' ' + (isNew ? 'Créer le domaine' : 'Enregistrer') + '</button><button class="link" data-act="domEdit" data-g="' + ed + '">Fermer</button>' +
+        (!isNew && gs.length > 1 ? (del ? '<button class="btn btn-sm btn-red" data-act="domDelGo" data-g="' + ed + '">Confirmer la suppression</button><button class="link" data-act="domDelNo">Annuler</button>'
+          : '<button class="btn btn-sm btn-glass" style="margin-left:auto" data-act="domDel" data-g="' + ed + '">' + ic('trash', 14) + ' Supprimer</button>') : '') + '</div>' +
+        (!isNew && gs.length > 1 ? '<p class="hint" style="margin:0">On ne peut supprimer qu’un domaine vide : sans personne ni session (même passée). Sinon, renommez-le.</p>' : '') + '</div>';
+    }
+    return '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Domaines</h2><p>Chaque domaine a son code d’inscription, son titre d’accueil et son classement. Une session n’est vue que par les domaines choisis. Touchez un domaine pour le modifier.</p></div>' +
+      '<div class="dom-grid">' + cards + '</div>' + box + '</div>';
+  }
+  function membersPanel() {
+    var gs = allGroups(), flt = ui.memFlt || 'all'; if (flt !== 'all' && gs.indexOf(flt) < 0) flt = 'all';
+    var L = ST.members || [], shown = L.filter(function (m) { return flt === 'all' || m.admin || m.groups.indexOf(flt) >= 0; });
+    var chips = L.length && gs.length > 1 ? '<div class="mem-flt" role="group" aria-label="Filtrer par domaine"><button type="button" class="chip-btn' + (flt === 'all' ? ' on' : '') + '" aria-pressed="' + (flt === 'all') + '" data-act="memFlt" data-g="all">Tous <span class="n">' + L.length + '</span></button>' +
+      gs.map(function (g) { return '<button type="button" class="chip-btn' + (flt === g ? ' on' : '') + '"' + gstyle(g) + ' aria-pressed="' + (flt === g) + '" data-act="memFlt" data-g="' + g + '"><span class="gdot"></span>' + esc(grpName(g)) + ' <span class="n">' + domCount(g) + '</span></button>'; }).join('') + '</div>' : '';
+    return '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Personnes</h2><p>Touchez « Modifier » pour choisir les domaines d’une personne (elle en garde au moins un) ou en faire un·e <b>organisateur·trice</b> : elle crée et gère ses propres sessions, pour ses domaines, et peut ajouter des jeux. L’admin est dans tous les domaines.</p></div>' +
+      chips + (ST.emails ? '<div class="mail-bar"><button type="button" class="chip-btn' + (ST.mailAll ? ' on' : '') + '" data-act="mailAll" aria-pressed="' + ST.mailAll + '">' + ic('mail', 14) + ' ' + (ST.mailAll ? 'Masquer les e-mails' : 'Afficher les e-mails') + '</button><span class="hint">ou touchez un nom</span></div>' : '') +
+      (ST.members && ST.pushUsers ? '<p class="hint push-sum">' + ic('bell', 14) + ' <b>' + L.filter(function (m) { return ST.pushUsers.indexOf(m.id) >= 0; }).length + '</b> sur ' + L.length + ' ont activé les notifications. Les autres ne recevront ni annonce ni alerte « table prête ».</p>' : '') +
+      (ST.members === null ? '<p class="hint">Chargement…</p>' : !L.length ? '<p class="hint">Aucune personne pour l’instant.</p>' : !shown.length ? '<p class="hint">Personne dans ce domaine pour l’instant.</p>' : '<div class="reset-list">' + shown.map(function (m) {
+        var open = ui.memEdit === m.id;
+        return '<div class="reset-row">' + avatar(m.name || '?', 'sm', m.id) + '<div class="reset-who"><b' + (ST.emails ? ' class="mail-t" role="button" tabindex="0" data-act="mailOne" data-uid="' + esc(m.id) + '" title="Afficher l’e-mail"' : '') + '>' + esc(m.name || 'Sans nom') + '</b>' +
+          (m.admin ? '<small>Admin · tous les domaines</small>' : (m.organizer ? '<small>Organisateur·trice · crée ses propres sessions</small>' : '') + '<div class="mem-doms">' + grpChips(m.groups) + '</div>') + pushTag(m.id) + mailLine(m.id) + '</div>' +
+          (m.admin ? '' : '<button type="button" class="btn btn-sm btn-glass mem-edit-b" aria-expanded="' + open + '" data-act="memEdit" data-uid="' + esc(m.id) + '">' + ic(open ? 'x' : 'edit', 14) + ' ' + (open ? 'Fermer' : 'Modifier') + '</button>' +
+            (open ? '<div class="mem-edit"><div class="small-h" style="margin:0">Domaines</div>' + groupPicker(m.groups, 'memberGroup').replace(/data-act="memberGroup"/g, 'data-act="memberGroup" data-uid="' + esc(m.id) + '"') +
+              '<div class="small-h" style="margin:4px 0 0">Rôle</div><div class="gpick"><button type="button" class="gpick-b g-org" title="Peut créer et gérer ses propres sessions" aria-pressed="' + !!m.organizer + '" data-act="memberOrg" data-uid="' + esc(m.id) + '"><span class="tick">' + ic('check', 14) + '</span>Organisateur·trice</button></div></div>' : '')) + '</div>';
+      }).join('') + '</div>') + '</div>';
+  }
   function tabTeam() { return tabTeam0() + backupPanel(); }
   function tabTeam0() {
     var link = location.href.split('#')[0].split('?')[0];
-    return '<div class="panel glass-2 team"><div class="panel-head"><h2>Inviter vos collègues</h2><p>Chacun crée son compte sur le lien ci-dessous, puis saisit le code d’inscription de son groupe (Pro ou Perso). Sans code, personne ne voit ni ne modifie rien.</p></div>' +
-      '<div class="label">Lien de l’application</div><div class="copyrow"><code>' + esc(link) + '</code><button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(link) + '">' + ic('copy', 16) + ' Copier</button></div>' +
-      GROUPS.map(function (g) {
-        var cd = ST.codes && ST.codes[g[0]];
-        return '<div class="label" style="margin-top:20px">Code d’inscription · ' + grpChips([g[0]]) + '</div><div class="copyrow"><code class="bigcode">' + (ST.codes === null ? '…' : esc(cd || 'indisponible')) + '</code>' + (cd ? '<button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(cd) + '">' + ic('copy', 16) + ' Copier</button>' : '') + '</div>' +
-          '<div class="field" style="margin-top:10px;max-width:360px"><div class="import-row"><input class="input" id="t-code-' + g[0] + '" maxlength="30" autocomplete="off" autocapitalize="characters" placeholder="Nouveau code ' + g[1] + ' (4 caractères min.)" aria-label="Nouveau code ' + g[1] + '"><button class="btn" data-act="saveCode" data-g="' + g[0] + '">Enregistrer</button></div></div>';
-      }).join('') +
-      '<p class="hint" style="margin:16px 0 0">Le code utilisé à l’inscription décide du groupe. Les deux codes doivent être différents. Les personnes déjà inscrites restent dans leur groupe quand vous changez un code : il ne sert qu’aux nouveaux arrivants. Mot de passe oublié : chacun peut le réinitialiser seul depuis l’écran de connexion (lien reçu par e-mail). Le code d’inscription est limité à 10 essais ratés par 24 h et par compte.</p></div>' +
-      '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Titre de l’accueil</h2><p>Le texte affiché en haut de l’accueil, propre à chaque groupe.</p></div>' +
-      GROUPS.map(function (g) { return '<div class="field" style="margin-top:12px"><label for="t-title-' + g[0] + '">' + grpChips([g[0]]) + ' Titre</label><div class="import-row"><input class="input" id="t-title-' + g[0] + '" maxlength="80" autocomplete="off" value="' + esc(grpTitle(g[0])) + '"><button class="btn" data-act="saveTitle" data-g="' + g[0] + '">Enregistrer</button></div></div>'; }).join('') + '</div>' +
-      '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Personnes, groupes et organisateurs</h2><p>Ajoutez une personne à l’autre groupe pour qu’elle soit dans les deux. L’admin est toujours dans les deux groupes. Une personne reste dans au moins un groupe. Un <b>organisateur</b> crée et gère ses propres sessions (pour son ou ses groupes) et peut ajouter des jeux ; il ne touche pas à celles des autres. Vous pouvez lui retirer ce droit à tout moment.</p></div>' +
-      (ST.emails ? '<div class="mail-bar"><button type="button" class="chip-btn' + (ST.mailAll ? ' on' : '') + '" data-act="mailAll" aria-pressed="' + ST.mailAll + '">' + ic('mail', 14) + ' ' + (ST.mailAll ? 'Masquer les e-mails' : 'Afficher les e-mails') + '</button><span class="hint">ou touchez un nom</span></div>' : '') + (ST.members && ST.pushUsers ? '<p class="hint push-sum">' + ic('bell', 14) + ' <b>' + ST.members.filter(function (m) { return ST.pushUsers.indexOf(m.id) >= 0; }).length + '</b> sur ' + ST.members.length + ' ont activé les notifications. Les autres ne recevront ni annonce ni alerte « table prête ».</p>' : '') + (ST.members === null ? '<p class="hint">Chargement…</p>' : !ST.members.length ? '<p class="hint">Aucune personne pour l’instant.</p>' : '<div class="reset-list">' + ST.members.map(function (m) {
-        return '<div class="reset-row">' + avatar(m.name || '?', 'sm', m.id) + '<div class="reset-who"><b' + (ST.emails ? ' class="mail-t" role="button" tabindex="0" data-act="mailOne" data-uid="' + esc(m.id) + '" title="Afficher l’e-mail"' : '') + '>' + esc(m.name || 'Sans nom') + '</b><small>' + (m.admin ? 'Admin · les deux groupes' : m.organizer ? 'Organisateur · crée ses propres sessions' : '') + '</small>' + pushTag(m.id) + mailLine(m.id) + '</div>' +
-          (m.admin ? '' : '<div class="gpick">' + GROUPS.map(function (g) { return '<button type="button" class="gpick-b g-' + g[0] + '" aria-pressed="' + (m.groups.indexOf(g[0]) >= 0) + '" data-act="memberGroup" data-uid="' + esc(m.id) + '" data-g="' + g[0] + '"><span class="tick">' + ic('check', 14) + '</span>' + g[1] + '</button>'; }).join('') + '</div><button type="button" class="gpick-b g-org" title="Peut créer et gérer ses propres sessions" aria-pressed="' + !!m.organizer + '" data-act="memberOrg" data-uid="' + esc(m.id) + '"><span class="tick">' + ic('check', 14) + '</span>Organisateur</button>') + '</div>';
-      }).join('') + '</div>') + '</div>' +
+    return '<div class="panel glass-2 team"><div class="panel-head"><h2>Inviter vos collègues</h2><p>Chacun crée son compte sur le lien ci-dessous, puis saisit le code d’inscription de son domaine (touchez un domaine plus bas pour voir son code). Sans code, personne ne voit ni ne modifie rien.</p></div>' +
+      '<div class="label">Lien de l’application</div><div class="copyrow"><code>' + esc(link) + '</code><button class="btn btn-sm btn-glass" data-act="copy" data-v="' + esc(link) + '">' + ic('copy', 16) + ' Copier</button></div></div>' +
+      domainsPanel() + membersPanel() +
       '<div class="panel glass-2 team" style="margin-top:16px"><div class="panel-head"><h2>Badges et compteurs</h2><p>Remet à zéro, pour tout le monde, les badges, les compteurs de sessions jouées et manquées, et le malus d’absence. Les sessions et les absences déjà saisies ne sont pas supprimées : seules celles d’avant la remise à zéro sont ignorées. Chacun reverra l’écran de célébration pour ses nouveaux badges.</p></div>' +
       (M.settings.badgesReset ? '<p class="hint" style="margin:0 0 12px">Dernière remise à zéro : ' + esc(new Date(M.settings.badgesReset).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })) + '.</p>' : '') +
       '<div class="small-h" style="margin-top:22px">Par personne</div><div class="reset-list">' + Object.keys(M.regs).filter(function (u) { return M.regs[u].name && !M.regs[u].fake; }).sort(function (a, b) { return M.regs[a].name.localeCompare(M.regs[b].name, 'fr'); }).map(function (u) {
@@ -3273,7 +3349,7 @@ var Badges = (function () {
       '<div class="form-row"><div class="field"><label for="f-date">Date</label><input class="input" id="f-date" type="date" value="' + esc(f.date) + '"></div><div class="field"><label for="f-time">Heure</label><input class="input" id="f-time" type="time" value="' + esc(f.time) + '"></div></div>' +
       '<p class="hint" style="margin:10px 0 0">À cette heure, les inscriptions se ferment et les tables se composent toutes seules si vous n’avez pas clôturé avant.</p>' +
       '<div class="field" style="margin-top:18px"><label for="f-note">Commentaire pour les joueurs (facultatif)</label><textarea class="input" id="f-note" rows="3" maxlength="280" placeholder="Ex. Lieu, on commence à 20h30...">' + esc(f.note) + '</textarea></div>' +
-      '<div class="label" style="margin-top:24px">Pour quel groupe ?</div>' + groupPicker(f.groups, 'pickGroup') + '<p class="hint" style="margin:8px 0 0">Seules les personnes du ou des groupes choisis voient la session.</p>' +
+      '<div class="label" style="margin-top:24px">Pour quel domaine ?</div>' + groupPicker(f.groups, 'pickGroup') + '<p class="hint" style="margin:8px 0 0">Seules les personnes du ou des domaines choisis voient la session.</p>' +
       '<div class="label" style="margin-top:24px">Type de session</div><button class="opt-single" type="button" role="switch" aria-checked="' + (!!f.single) + '" data-act="pickSingle"><span class="sw"></span><span><strong>Un seul jeu retenu</strong><small>Tout le monde joue au même jeu, choisi à la clôture selon le nombre de joueurs et les préférences. Les places sont celles du jeu qui en accepte le plus.</small></span></button>' +
       '<div class="label" style="margin-top:24px">Jeux proposés</div>' +
       '<div class="gsearch">' + ic('search', 18) + '<input class="input" id="f-q" type="search" placeholder="Rechercher un jeu (nom, catégorie…)" autocomplete="off" value="' + esc(f.q || '') + '"><small id="f-qn"></small></div>' +
@@ -3617,7 +3693,7 @@ var Badges = (function () {
     var s = sessionById(ui.msid);
     if (!s || !canManage(s)) { ui.msid = null; return viewAdmin(); }
     var games = gamesOf(s), seats = seatsOf(s), regs = regList(s), n = regs.length, ph = phase(s);
-    var head = '<button class="back" data-act="mBack">' + ic('back', 18) + ' Toutes les sessions</button><div class="sess-head">' + ticket(s, 'big') + '<div><h1>' + longDate(s.date) + '</h1><div class="sub">' + statusPill(s) + '<span>' + hm(s.time) + '</span><span>' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</span></div></div></div>' + '<div class="panel glass-2 sess-groups"><div class="small-h">Groupes destinataires</div>' + groupPicker(groupsOf(s), 'sessGroup').replace(/data-act="sessGroup"/g, 'data-act="sessGroup" data-sid="' + s.id + '"') + '</div>' + noteEditor(s) + '<div class="dup-row"><button class="btn btn-glass btn-sm" data-act="dupSession" data-sid="' + s.id + '">' + ic('copy', 16) + ' Dupliquer sur une autre date</button></div>';
+    var head = '<button class="back" data-act="mBack">' + ic('back', 18) + ' Toutes les sessions</button><div class="sess-head">' + ticket(s, 'big') + '<div><h1>' + longDate(s.date) + '</h1><div class="sub">' + statusPill(s) + '<span>' + hm(s.time) + '</span><span>' + games.map(function (g) { return esc(g.name); }).join(' · ') + '</span></div></div></div>' + '<div class="panel glass-2 sess-groups"><div class="small-h">Domaines destinataires</div>' + groupPicker(groupsOf(s), 'sessGroup').replace(/data-act="sessGroup"/g, 'data-act="sessGroup" data-sid="' + s.id + '"') + '</div>' + noteEditor(s) + '<div class="dup-row"><button class="btn btn-glass btn-sm" data-act="dupSession" data-sid="' + s.id + '">' + ic('copy', 16) + ' Dupliquer sur une autre date</button></div>';
     if (ph === 'cancelled') return head + cancelledPanel(s, null, true);
     if (ph === 'open' || ph === 'pending') {
       var p = seats ? Math.min(100, Math.round(n / seats * 100)) : 0, fakes = Object.keys(M.regs).some(function (u) { return M.regs[u].fake && M.regs[u].s && M.regs[u].s[s.id]; });
@@ -3651,34 +3727,48 @@ var Badges = (function () {
     return stats + (edit ? '' : wdPanel(s)) + absHint + '<div class="tables">' + r.tables.map(function (t, i) { return tableCard(s, t, { edit: edit, i: i, abs: canAbs }); }).join('') + '</div>' + un + nr + bar;
   }
 
-  /* ---------- Groupes Pro / Perso ---------- */
-  var GROUPS = [['pro', 'Pro'], ['perso', 'Perso']];
-  var GRP_TITLE = { pro: 'Parties du midi - DSC tour Saint Gobain', perso: 'Ça joue à Benney' };
+  /* ---------- Domaines (ex-groupes Pro / Perso) : jusqu'à 8, nom / couleur / titre dans settings/groups ---------- */
+  var GCOL = ['#CFE0FF', '#FFD9A8', '#BDEFD8', '#FFC9DE', '#DCCFFF', '#D6F29E', '#B8ECF2', '#F3D6B6'];
+  var GDEF = { pro: { name: 'Pro', color: 0, pos: 0, title: 'Parties du midi - DSC tour Saint Gobain' }, perso: { name: 'Perso', color: 1, pos: 1, title: 'Ça joue à Benney' } };
+  var GMAX = 8;
   var GRPKEY = 'jdo-grp';
   function canHost() { return !!(ST.admin || ST.org); }
   function canManage(s) { return !!(s && (ST.admin || (ST.org && s.owner && s.owner === ST.uid))); }
   function canEditGame(g) { return !!(g && (ST.admin || (ST.org && g.owner && g.owner === ST.uid))); }
   var groupsOf = function (s) { return s.groups && s.groups.length ? s.groups : ['pro']; };
   var inGroup = function (s, g) { return groupsOf(s).indexOf(g) >= 0; };
-  var grpName = function (g) { return g === 'perso' ? 'Perso' : 'Pro'; };
-  function grpTitle(g) { var c = M.groupCfg && M.groupCfg[g]; return (c && c.title && String(c.title).trim()) || GRP_TITLE[g] || GRP_TITLE.pro; }
+  function gcfg(g) {
+    var c = (M.groupCfg && M.groupCfg[g]) || {}, d = GDEF[g] || {};
+    return { name: String(c.name || d.name || 'Domaine').trim(), color: c.color != null ? +c.color || 0 : (d.color || 0),
+      pos: c.pos != null ? +c.pos : (d.pos != null ? d.pos : 9e15), title: (c.title && String(c.title).trim()) || d.title || '' };
+  }
+  var grpName = function (g) { return gcfg(g).name; };
+  function grpColor(g) { var i = gcfg(g).color; return GCOL[((i % GCOL.length) + GCOL.length) % GCOL.length]; }
+  function gstyle(g) { return ' style="--gc:' + grpColor(g) + '"'; }
+  function grpTitle(g) { return gcfg(g).title || grpName(g); }
+  function orderGroups(list) { return list.slice().sort(function (a, b) { var x = gcfg(a), y = gcfg(b); return (x.pos - y.pos) || x.name.localeCompare(y.name, 'fr'); }); }
+  /* domaines de la personne connectée (l'admin les a tous, renvoyés par le serveur), dans l'ordre de création */
+  function allGroups() { return orderGroups(ST.groups || []); }
   function pickGrp() {
     var saved = ''; try { saved = localStorage.getItem(GRPKEY) || ''; } catch (e) {}
-    ui.grp = ST.groups.indexOf(saved) >= 0 ? saved : (ST.groups.indexOf('pro') >= 0 ? 'pro' : (ST.groups[0] || 'pro'));
+    ui.grp = ST.groups.indexOf(saved) >= 0 ? saved : (ST.groups.indexOf('pro') >= 0 ? 'pro' : (allGroups()[0] || 'pro'));
+    if (!ui.nt.groups.length) ui.nt.groups = ST.groups.slice();
   }
-  function grpChips(list) { return '<span class="gchips">' + list.map(function (g) { return '<span class="gchip g-' + g + '">' + grpName(g) + '</span>'; }).join('') + '</span>'; }
+  function grpChips(list) { return '<span class="gchips">' + orderGroups(list).map(function (g) { return '<span class="gchip g-' + esc(g) + '"' + gstyle(g) + '>' + esc(grpName(g)) + '</span>'; }).join('') + '</span>'; }
   function groupSwitch() {
     if (ST.groups.length < 2) return '';
-    return '<div class="gswitch" role="group" aria-label="Groupe">' + GROUPS.filter(function (g) { return ST.groups.indexOf(g[0]) >= 0; }).map(function (g) { return '<button class="g-' + g[0] + '" aria-pressed="' + (ui.grp === g[0]) + '" data-act="setGrp" data-g="' + g[0] + '">' + g[1] + '</button>'; }).join('') + '</div>';
+    return '<div class="gswitch" role="group" aria-label="Domaine">' + allGroups().map(function (g) { return '<button class="g-' + g + '"' + gstyle(g) + ' aria-pressed="' + (ui.grp === g) + '" data-act="setGrp" data-g="' + g + '"><span class="gdot"></span>' + esc(grpName(g)) + '</button>'; }).join('') + '</div>';
   }
   function groupPicker(sel, act) {
-    return '<div class="gpick">' + GROUPS.filter(function (g) { return ST.admin || ST.groups.indexOf(g[0]) >= 0; }).map(function (g) { return '<button type="button" class="gpick-b g-' + g[0] + '" aria-pressed="' + (sel.indexOf(g[0]) >= 0) + '" data-act="' + act + '" data-g="' + g[0] + '"><span class="tick">' + ic('check', 14) + '</span>' + g[1] + '</button>'; }).join('') + '</div>';
+    return '<div class="gpick">' + allGroups().map(function (g) { return '<button type="button" class="gpick-b g-' + g + '"' + gstyle(g) + ' aria-pressed="' + (sel.indexOf(g) >= 0) + '" data-act="' + act + '" data-g="' + g + '"><span class="tick">' + ic('check', 14) + '</span>' + esc(grpName(g)) + '</button>'; }).join('') + '</div>';
   }
   function saveGroupCfg(patch) {
     var c = clone(M.groupCfg || {}); Object.keys(patch).forEach(function (g) { c[g] = Object.assign({}, c[g] || {}, patch[g]); });
     M.groupCfg = c; return ST.db.doc('settings/groups').set(c);
   }
-  function loadGroups() { return Backend.status().then(function (st) { if (!st.error) { ST.groups = st.admin ? ['pro', 'perso'] : st.groups; ST.org = !!st.organizer; pickGrp(); } }); }
+  function dropGroupCfg(g) { var c = clone(M.groupCfg || {}); delete c[g]; M.groupCfg = c; return ST.db.doc('settings/groups').set(c); }
+  function setGroupsFromStatus(st) { ST.groups = (st.groups || []).slice(); ST.org = !!st.organizer; pickGrp(); }
+  function loadGroups() { return Backend.status().then(function (st) { if (!st.error) setGroupsFromStatus(st); }); }
 
   /* ---------- Badges, profil et célébration ---------- */
   function saveSettings() { return ST.db.doc('settings/main').set({ balance: M.settings.balance, badgesReset: M.settings.badgesReset || 0 }); }
@@ -4305,6 +4395,65 @@ var Badges = (function () {
         loadOps();
       }
     },
+    domEdit: function (el) {
+      var g = el.dataset.g; ui.confirm = null; ui.domDraft = null;
+      if (ui.domEdit === g) { ui.domEdit = null; return render(); }
+      ui.domEdit = g;
+      if (g === '__new') { var used = allGroups().map(function (x) { return gcfg(x).color; }); ui.domColor = 0; for (var i = 0; i < GCOL.length; i++) if (used.indexOf(i) < 0) { ui.domColor = i; break; } }
+      else ui.domColor = ((gcfg(g).color % GCOL.length) + GCOL.length) % GCOL.length;
+      render();
+    },
+    domColor: function (el) {
+      ui.domDraft = { name: ($('#d-name') || {}).value, title: ($('#d-title') || {}).value, code: ($('#d-code') || {}).value };
+      ui.domColor = +el.dataset.i || 0; render();
+    },
+    domSave: function () {
+      var g = ui.domEdit; if (!g) return;
+      var name = (($('#d-name') || {}).value || '').trim(), title = (($('#d-title') || {}).value || '').trim(), code = (($('#d-code') || {}).value || '').trim(), col = ui.domColor || 0;
+      if (!name) return toast('Donnez un nom au domaine.');
+      if (allGroups().some(function (x) { return x !== g && grpName(x).toLowerCase() === name.toLowerCase(); })) return toast('Un autre domaine porte déjà ce nom.');
+      if (g === '__new') {
+        if (allGroups().length >= GMAX) return toast('Vous avez déjà ' + GMAX + ' domaines.');
+        var id = 'd' + Date.now().toString(36), mk = function () { var a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = ''; for (var i = 0; i < 8; i++) r += a[Math.floor(Math.random() * a.length)]; return r; };
+        var go = function (tries) {
+          var cd = mk();
+          Backend.addGroup(id, cd).then(function (r) {
+            if (r === 'taken' && tries < 3) return go(tries + 1);
+            if (r !== 'ok') return toast(r === 'full' ? 'Vous avez déjà ' + GMAX + ' domaines.' : 'Création impossible. La mise à jour « domaines » de la base n’est peut-être pas encore installée.');
+            ST.codes = Object.assign({}, ST.codes || {}); ST.codes[id] = cd;
+            if (ST.groups.indexOf(id) < 0) ST.groups.push(id);
+            var p = {}; p[id] = { name: name, title: title, color: col, pos: Date.now() };
+            ui.domEdit = id; ui.domDraft = null; ui.nt.groups.push(id);
+            wr(saveGroupCfg(p), 'Domaine « ' + name + ' » créé. Code d’inscription : ' + cd + '.');
+          });
+        };
+        return go(0);
+      }
+      var p = {}; p[g] = { name: name, title: title, color: col };
+      var fin = function () { ui.domDraft = null; wr(saveGroupCfg(p), 'Domaine « ' + name + ' » enregistré.'); };
+      if (code && code.toUpperCase() !== ((ST.codes || {})[g] || '')) {
+        if (code.length < 4) return toast('Le code doit faire 4 caractères au moins.');
+        return Backend.setGroupCode(g, code).then(function (ok) {
+          if (!ok) return toast('Code refusé : il est peut-être déjà utilisé par un autre domaine.');
+          ST.codes = Object.assign({}, ST.codes || {}); ST.codes[g] = code.toUpperCase(); fin();
+        });
+      }
+      fin();
+    },
+    domDel: function (el) { ui.confirm = 'dd:' + el.dataset.g; render(); },
+    domDelNo: function () { ui.confirm = null; render(); },
+    domDelGo: function (el) {
+      var g = el.dataset.g, nm = grpName(g); ui.confirm = null;
+      Backend.deleteGroup(g).then(function (r) {
+        if (r !== 'ok') { render(); return toast(r === 'members' ? '« ' + nm + ' » compte encore des personnes : retirez-les d’abord.' : r === 'sessions' ? 'Des sessions sont destinées à « ' + nm + ' » : renommez-le plutôt.' : r === 'last' ? 'Il faut garder au moins un domaine.' : 'Suppression impossible.'); }
+        ST.groups = ST.groups.filter(function (x) { return x !== g; }); if (ST.codes) delete ST.codes[g];
+        ui.nt.groups = ui.nt.groups.filter(function (x) { return x !== g; }); if (!ui.nt.groups.length) ui.nt.groups = ST.groups.slice();
+        if (ui.memFlt === g) ui.memFlt = 'all'; ui.domEdit = null; if (ui.grp === g) pickGrp();
+        wr(dropGroupCfg(g), 'Domaine « ' + nm + ' » supprimé.');
+      });
+    },
+    memFlt: function (el) { ui.memFlt = el.dataset.g; render(); },
+    memEdit: function (el) { var u = el.dataset.uid; ui.memEdit = ui.memEdit === u ? null : u; render(); },
     saveCode: function (el) {
       var g = el.dataset.g, v = (($('#t-code-' + g) || {}).value || '').trim();
       if (v.length < 4) return toast('Le code doit faire 4 caractères au moins.');
@@ -4320,9 +4469,9 @@ var Badges = (function () {
       var uid = el.dataset.uid, g = el.dataset.g, m = (ST.members || []).filter(function (x) { return x.id === uid; })[0]; if (!m) return;
       var on = m.groups.indexOf(g) < 0;
       Backend.setMemberGroup(uid, g, on).then(function (ok) {
-        if (!ok) return toast(on ? 'Modification impossible.' : 'Une personne doit rester dans au moins un groupe.');
+        if (!ok) return toast(on ? 'Modification impossible.' : 'Une personne doit rester dans au moins un domaine.');
         if (on) m.groups.push(g); else m.groups.splice(m.groups.indexOf(g), 1);
-        toast(m.name + (on ? ' ajouté·e au groupe ' : ' retiré·e du groupe ') + grpName(g) + '.'); render();
+        toast(m.name + (on ? ' ajouté·e au domaine ' : ' retiré·e du domaine ') + grpName(g) + '.'); render();
       });
     },
     memberOrg: function (el) {
@@ -4377,8 +4526,8 @@ var Badges = (function () {
     sessGroup: function (el) {
       var s = sessionById(el.dataset.sid); if (!s || !canManage(s)) return;
       var a = groupsOf(s).slice(), g = el.dataset.g, i = a.indexOf(g);
-      if (i >= 0) { if (a.length < 2) return toast('Une session doit être destinée à au moins un groupe.'); a.splice(i, 1); } else a.push(g);
-      wr(ST.db.doc('sessions/' + s.id).update({ groups: a }), 'Groupes de la session modifiés.');
+      if (i >= 0) { if (a.length < 2) return toast('Une session doit être destinée à au moins un domaine.'); a.splice(i, 1); } else a.push(g);
+      wr(ST.db.doc('sessions/' + s.id).update({ groups: a }), 'Domaines de la session modifiés.');
     },
     pickSingle: function () { ui.form.single = !ui.form.single; render(); },
     toggleSingle: function (el) {
@@ -4918,7 +5067,7 @@ var Badges = (function () {
       else jmsg = jr === 'limit' ? LIMIT_MSG : 'Le code saisi n’est pas le bon. Demandez-le à l’organisateur.';
     }
     if (!member) { ui.auth.busy = false; ui.auth.msg = jmsg; ui.auth.ok = false; ST.triesLeft = await Backend.triesLeft(); ST.auth = 'join'; return render(true); }
-    ST.groups = st.admin ? ['pro', 'perso'] : (st.groups || []); ST.org = !!st.organizer; pickGrp();
+    setGroupsFromStatus(st);
     ui.auth.busy = false; startApp();
   }
   document.addEventListener('submit', function (e) {
