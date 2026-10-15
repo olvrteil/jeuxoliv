@@ -1222,6 +1222,15 @@ html{overflow-x:hidden;max-width:100%}
 .mail-line{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:12.5px;font-weight:600;color:var(--cobalt);min-width:0;user-select:text}
 .mail-line svg{flex:none}.mail-line span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+/* ---------- v1.24 : jeu forcé ---------- */
+.forced-tag{display:inline-flex;align-items:center;gap:4px;font:800 10.5px/1 var(--font-b);letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:99px;background:var(--ink);color:var(--bg);margin-left:8px;vertical-align:middle;white-space:nowrap}
+.force-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 14px}
+.fc-list{display:grid;gap:8px;margin-top:14px;max-height:min(52vh,420px);overflow:auto;padding:2px}
+.fc-item[hidden]{display:none}
+.fc-item strong{font:700 15px/1.2 var(--font-d)}
+.fc-head{display:flex;gap:14px;align-items:center;margin:4px 0 6px}.fc-head .box{width:64px;flex:none}.fc-head h3{font:800 1.25rem/1.15 var(--font-d);margin:0}
+.fc-mode{display:grid;gap:10px;margin-top:16px}.fc-mode .btn{justify-content:flex-start;text-align:left}
+.sx-f{display:block;font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
 /* ---------- v1.23 : domaines ---------- */
 .gchip,.gchip.g-perso{background:var(--gc,#CFE0FF)}
 .gpick-b[aria-pressed="true"],.gpick-b.g-perso[aria-pressed="true"]{background:var(--gc,#CFE0FF)}
@@ -1345,7 +1354,7 @@ html{overflow-x:hidden;max-width:100%}
     <div class="mepill" id="mepill"><span class="av" id="meAv" data-go="profile" role="link" tabindex="0" aria-label="Mon profil">?</span><span class="me-name" id="meName" data-go="profile"></span><span class="role-tag" id="meRole" hidden>Admin</span><button class="mini-out" id="meOut" data-act="logout" hidden aria-label="Se déconnecter" title="Se déconnecter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
   </div></div></header>
   <main class="wrap" id="view"></main>
-  <footer class="wrap foot"><span>Jeux d'Oliv v1.23 - octobre 2026 - Olvrteil</span>
+  <footer class="wrap foot"><span>Jeux d'Oliv v1.24 - octobre 2026 - Olvrteil</span>
     <!-- Mention exigée par BoardGameGeek pour les applications utilisant son API : logo officiel « Powered by BGG », qui renvoie vers BoardGameGeek. -->
     <a class="bgg-pw" href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" aria-label="Powered by BGG - BoardGameGeek (nouvel onglet)"><img src="powered-by-bgg.png" width="252" height="56" alt="Powered by BGG" decoding="async"></a>
     <button type="button" id="pushLink" hidden></button></footer>
@@ -2123,7 +2132,7 @@ var Badges = (function () {
     ev.forEach(function (e) {
       if (e.absent || !e.entry || !e.entry.order || !e.entry.order.length) return;
       if (ref - dayNum(e.date) > EQ_DAYS) return;
-      if (e.gid) { if (!e.mine) return; var i = e.entry.order.indexOf(e.gid); list.push(i < 0 ? 3 : Math.min(i, 3)); }
+      if (e.gid) { if (!e.mine || e.forced) return; var i = e.entry.order.indexOf(e.gid); list.push(i < 0 ? 3 : Math.min(i, 3)); }
       else list.push(3);
     });
     list = list.slice(-EQ_N);
@@ -2698,7 +2707,7 @@ var Badges = (function () {
   }
   function applyMoves(s, r) {
     var rows = mvRows(s); if (!rows.length) return r;
-    var t = r.tables.map(function (x) { return { gid: x.gid, ids: x.ids.slice() }; }), un = r.unplaced.slice(), by = {}, base = {}, done = {};
+    var t = r.tables.map(function (x) { return x.forced ? { gid: x.gid, ids: x.ids.slice(), forced: true } : { gid: x.gid, ids: x.ids.slice() }; }), un = r.unplaced.slice(), by = {}, base = {}, done = {};
     r.tables.forEach(function (x) { x.ids.forEach(function (u) { base[u] = x.gid; }); }); r.unplaced.forEach(function (u) { base[u] = ''; });
     rows.forEach(function (m) { by[m.uid] = m; });
     function tb(gid) { return t.filter(function (x) { return x.gid === gid; })[0]; }
@@ -2724,7 +2733,7 @@ var Badges = (function () {
     t.sort(function (a, b) { return s.gameIds.indexOf(a.gid) - s.gameIds.indexOf(b.gid); });
     return { tables: t, unplaced: un, notes: r.notes, adjusted: r.adjusted };
   }
-  function canMove(s) { var ph = phase(s); return !!(ST.uid && ST.auth === 'in' && (ph === 'published' || ph === 'auto') && dayCardLive(s) && !isLeft(s, ST.uid)); }
+  function canMove(s) { var ph = phase(s); return !!(ST.uid && ST.auth === 'in' && (ph === 'published' || ph === 'auto') && dayCardLive(s) && !isLeft(s, ST.uid) && !onForced(s)); }
   function myMv(s) { return ST.uid ? M.mv[s.id + '_' + ST.uid] || null : null; }
   /* demandes d'échange reçues et encore valables */
   function mvIncoming(s) {
@@ -2760,7 +2769,7 @@ var Badges = (function () {
       var g = G(x.from);
       return '<div class="mv-req">' + avatar(nameOf(x.uid), 'sm', x.uid) + '<span><b>' + esc(nameOf(x.uid)) + '</b> propose d’échanger sa place' + (g ? ' (' + esc(g.name) + ')' : '') + ' avec la vôtre.</span><button class="btn btn-sm btn-teal" data-act="mvAccept" data-uid="' + esc(x.uid) + '" data-ts="' + x.ts + '">Accepter</button><button class="link" data-act="mvDecline" data-uid="' + esc(x.uid) + '" data-ts="' + x.ts + '">Refuser</button></div>';
     }).join('') + '</div>';
-    h += '<div class="mv-tabs">' + r.tables.map(function (t) {
+    h += '<div class="mv-tabs">' + r.tables.filter(function (t) { return !t.forced; }).map(function (t) {
       var g = G(t.gid), c = t.ids.length, here = t.gid === me, free = g.max - c;
       return '<section class="mv-t' + (here ? ' here' : '') + '"><div class="mv-th"><div class="mini">' + box(g) + '</div><div><b>' + esc(g.name) + '</b><small>' + c + '/' + g.max + ' joueurs' + (here ? ' · votre table' : free > 0 ? ' · ' + plural(free, 'place libre', 'places libres') : ' · complète') + '</small></div>' +
         (!here && free > 0 ? '<button class="btn btn-sm" data-act="mvJoin" data-gid="' + g.id + '">Rejoindre</button>' : '') + '</div>' +
@@ -2998,10 +3007,10 @@ var Badges = (function () {
     else st = { cls: '', txt: plural(c - g.ideal, 'joueur', 'joueurs') + ' de plus que l’idéal' };
     var warn = o.edit && (c < g.min || c > g.max);
     return '<article class="tcard ' + (mineHere ? 'mine' : '') + ' ' + (warn ? 'warn' : '') + ' ' + (ui.anim ? 'pop-in' : '') + '" style="animation-delay:' + ((o.i || 0) * 70) + 'ms">' + (mineHere ? '<span class="ribbon">Votre table</span>' : '') +
-      '<div class="tcard-head"><div class="box" style="cursor:pointer" role="button" tabindex="0" data-act="gameInfo" data-gid="' + g.id + '">' + art(g) + '</div><div><h3>' + esc(g.name) + '</h3><div class="tstate ' + st.cls + '">' + (st.cls === 'ok' ? ic('check', 15) : '') + st.txt + '</div>' +
+      '<div class="tcard-head"><div class="box" style="cursor:pointer" role="button" tabindex="0" data-act="gameInfo" data-gid="' + g.id + '">' + art(g) + '</div><div><h3>' + esc(g.name) + (t.forced ? forcedTag() : '') + '</h3><div class="tstate ' + st.cls + '">' + (st.cls === 'ok' ? ic('check', 15) : '') + st.txt + '</div>' +
       '<div class="facts" style="margin-top:4px"><span>' + ic('users', 14) + ' ' + g.min + '–' + g.max + ' joueurs</span></div></div></div>' +
       '<div class="players">' + t.ids.map(function (uid) {
-        var n = nameOf(uid), reg = regOf(s, uid), r = reg ? rankOf(reg, g.id) : 0;
+        var n = nameOf(uid), reg = regOf(s, uid), r = reg && !t.forced ? rankOf(reg, g.id) : 0;
         var isAbs = !!(s.absent && s.absent[uid]), lf = isLeft(s, uid);
         if (lf) return '<span class="pchip left">' + avatar(n, 'sm', uid) + esc(n) + '<span class="abs-tag lf-tag">retiré·e</span></span>';
         if (o.abs) return '<button class="pchip abs' + (isAbs ? ' off' : '') + '" data-act="toggleAbsent" data-sid="' + s.id + '" data-uid="' + esc(uid) + '" aria-pressed="' + isAbs + '" title="' + (isAbs ? 'Retirer l’absence de ' : 'Marquer absent·e : ') + esc(n) + '">' + avatar(n, 'sm', uid) + esc(n) + (isAbs ? '<span class="abs-tag">absent·e</span>' : '') + '</button>';
@@ -3119,22 +3128,56 @@ var Badges = (function () {
       '<div class="sheet-grid">' + bigBox(g) + '<div><p class="eyebrow">Fiche du jeu</p><h2>' + esc(g.name) + '</h2>' + facts(g, true) + '<p class="full">' + (g.summary ? esc(g.summary) : '<span class="hint">Pas encore de résumé pour ce jeu.</span>') + '</p><div class="tags">' + (g.tags || []).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</div>' + palmHtml(g) +
       '<p class="credit">' + (g.bgg ? 'Données et image : BoardGameGeek.' : g.manual ? 'Fiche saisie par l’organisateur.' : 'Données : BoardGameGeek, résumé traduit. Affiche d’exemple dans cette version.') + '</p></div></div></div></div>';
   }
+  /* jeux proposés pour un déplacement : ceux de la session, plus les tables forcées (même hors liste) */
+  function moveGames(s, tables) {
+    var lst = gamesOf(s);
+    tables.forEach(function (t) { if (t.forced && G(t.gid) && !lst.some(function (g) { return g.id === t.gid; })) lst.push(G(t.gid)); });
+    return lst;
+  }
   function modalMove(m) {
     var s = sessionById(m.sid), r = s && M.drafts[s.id];
     if (!r) return '';
     var tables = r.tables || [], cur = tables.filter(function (t) { return t.ids.indexOf(m.uid) >= 0; })[0];
     return '<div class="modal" data-act="closeModal"><div class="sheet glass-2" data-act="noop" style="width:min(460px,100%)" role="dialog" aria-modal="true" aria-label="Déplacer un joueur"><button class="icon-btn sheet-x" data-act="closeModal" aria-label="Fermer">' + ic('x', 18) + '</button>' +
-      '<p class="eyebrow">Ajuster à la main</p><h2 style="font-size:1.7rem">Déplacer ' + esc(nameOf(m.uid)) + '</h2><div class="moves">' + gamesOf(s).map(function (g) {
+      '<p class="eyebrow">Ajuster à la main</p><h2 style="font-size:1.7rem">Déplacer ' + esc(nameOf(m.uid)) + '</h2><div class="moves">' + moveGames(s, tables).map(function (g) {
         var t = tables.filter(function (x) { return x.gid === g.id; })[0], c = t ? t.ids.length : 0, here = cur && cur.gid === g.id, reg = regOf(s, m.uid), rr = reg ? rankOf(reg, g.id) : 0;
-        var dis = here, full = !here && c >= g.max;
-        return '<button class="btn btn-glass" data-act="moveTo" data-gid="' + g.id + '"' + (dis ? ' disabled' : '') + '><span>' + esc(g.name) + (t ? '' : ' (ouvrir une table)') + '</span><span class="row" style="gap:8px">' + (rr === 0 ? '<small>refusé</small>' : rk(rr)) + '<small' + (full ? ' style="color:var(--bad);font-weight:700" title="Dépassera le maximum"' : '') + '>' + c + '/' + g.max + (full ? ' · complet' : '') + '</small></span></button>';
+        var dis = here, full = !here && c >= g.max, fc = t && t.forced;
+        return '<button class="btn btn-glass" data-act="moveTo" data-gid="' + g.id + '"' + (dis ? ' disabled' : '') + '><span>' + esc(g.name) + (fc ? forcedTag() : '') + (t ? '' : ' (ouvrir une table)') + '</span><span class="row" style="gap:8px">' + (rr === 0 ? '<small>refusé</small>' : rk(rr)) + '<small' + (full ? ' style="color:var(--bad);font-weight:700" title="Dépassera le maximum"' : '') + '>' + c + '/' + g.max + (full ? ' · complet' : '') + '</small></span></button>';
       }).join('') + '<button class="btn btn-glass" data-act="moveTo" data-gid=""' + (!cur ? ' disabled' : '') + '><span>Sans table</span></button></div></div></div>';
+  }
+  /* ---------- Jeu forcé : l'admin impose un jeu de toute la ludothèque (même hors de la liste) à la clôture ---------- */
+  var forcedTag = function () { return '<span class="forced-tag" title="Jeu imposé par l’admin">' + ic('lock', 11) + ' Forcé</span>'; };
+  function onForced(s) {
+    var r = ST.uid ? resultOf(s) : null, t = r && r.tables.filter(function (x) { return x.ids.indexOf(ST.uid) >= 0; })[0];
+    return !!(t && t.forced);
+  }
+  function modalForce(m) {
+    var s = sessionById(m.sid), r = s && M.drafts[s.id]; if (!s || !r || phase(s) !== 'closed') return '';
+    var g = m.gid && G(m.gid), body;
+    if (!g) {
+      body = '<p class="eyebrow">Jeu forcé</p><h2 style="font-size:1.7rem">Quel jeu imposer ?</h2><p class="hint" style="margin:0">Toute la ludothèque est proposée, même les jeux qui ne sont pas dans la session.</p>' +
+        '<div class="gsearch">' + ic('search', 18) + '<input class="input" id="fc-q" type="search" placeholder="Rechercher un jeu" autocomplete="off"></div>' +
+        '<div class="fc-list">' + M.games.slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'fr'); }).map(function (x) {
+          return '<button type="button" class="ag-item fc-item" data-q="' + esc(normQ(x.name + ' ' + (x.tags || ''))) + '" data-act="forcePick" data-gid="' + esc(x.id) + '">' + box(x) + '<span><strong>' + esc(x.name) + '</strong><em>' + x.min + '–' + x.max + ' joueurs · ' + ((s.gameIds || []).indexOf(x.id) >= 0 ? 'dans la session' : 'hors session') + '</em></span>' + ic('arrow', 16) + '</button>';
+        }).join('') + '</div>';
+    } else {
+      var n = regList(s).length, k = Math.min(g.max, n), ex = r.tables.filter(function (t) { return t.gid === g.id; })[0];
+      body = '<p class="eyebrow">Jeu forcé</p><div class="fc-head">' + box(g) + '<div><h3>' + esc(g.name) + '</h3><div class="facts" style="margin:4px 0 0"><span>' + ic('users', 14) + ' <b>' + g.min + '–' + g.max + '</b> joueurs</span></div></div></div>' +
+        (ex ? '<p class="hint" style="margin:8px 0 0">Ce jeu a déjà une table dans le brouillon : elle sera marquée « Forcé ».</p>' : '') +
+        (k < g.min ? '<p class="hint pub-warn" style="margin:8px 0 0">Ce jeu demande au moins ' + g.min + ' joueurs (' + n + ' inscrit' + (n > 1 ? 's' : '') + ') : vous ne pourrez pas publier sans les atteindre.</p>' : '') +
+        '<div class="fc-mode">' + (k > 0 ? '<button class="btn btn-teal" data-act="forceGo" data-mode="all">' + ic('users', 17) + ' Y mettre ' + (k === n ? 'tous les inscrits' : 'les ' + k + ' premiers inscrits') + '</button>' : '') +
+        '<button class="btn btn-glass" data-act="forceGo" data-mode="empty">' + ic('lock', 17) + ' ' + (ex ? 'Marquer cette table comme forcée' : 'Table vide : je place les joueurs moi-même') + '</button>' +
+        '<button class="link" data-act="forceBack">Choisir un autre jeu</button></div>' +
+        '<p class="hint" style="margin:14px 0 0">Les joueurs déplacés quittent leur table ; vous pouvez ensuite ajuster à la main comme d’habitude.</p>';
+    }
+    return '<div class="modal" data-act="closeModal"><div class="sheet force-sheet glass-2" data-step="' + (g ? '2' : '1') + '" data-act="noop" style="width:min(520px,100%)" role="dialog" aria-modal="true" aria-label="Forcer un jeu"><button class="icon-btn sheet-x" data-act="closeModal" aria-label="Fermer">' + ic('x', 18) + '</button>' + body + '</div></div>';
   }
   function renderModal() {
     var h = '', m = ui.modal;
     if (m && m.type === 'game' && G(m.gid)) h = modalGame(G(m.gid));
     else if (m && m.type === 'move') h = modalMove(m);
     else if (m && m.type === 'swap') h = modalSwap(m);
+    else if (m && m.type === 'force') { var cf = $('#modal-root .force-sheet'); if (cf && cf.dataset.step === (m.gid ? '2' : '1')) return; h = modalForce(m); if (!h) ui.modal = null; }
     else if (m && m.type === 'scores') {
       if ($('#modal-root .sc-in:focus')) { scRefresh(); return; }
       h = modalScores(m); if (!h) ui.modal = null;
@@ -3712,9 +3755,10 @@ var Badges = (function () {
     var r = resultOf(s);
     if (!r) return '<div class="panel glass-2 empty"><p>Résultat en cours de chargement…</p></div>';
     var edit = ph === 'closed', placed = 0, first = 0, regs = regList(s);
-    r.tables.forEach(function (t) { t.ids.forEach(function (uid) { placed++; var reg = regOf(s, uid); if (reg && rankOf(reg, t.gid) === 1) first++; }); });
+    var placedNF = 0, extraF = r.tables.filter(function (t) { return t.forced && !games.some(function (g) { return g.id === t.gid; }); }).length;
+    r.tables.forEach(function (t) { t.ids.forEach(function (uid) { placed++; if (t.forced) return; placedNF++; var reg = regOf(s, uid); if (reg && rankOf(reg, t.gid) === 1) first++; }); });
     var notRet = games.filter(function (g) { return !r.tables.some(function (t) { return t.gid === g.id; }); });
-    var stats = '<div class="stats"><div class="stat"><b>' + r.tables.length + '<small> / ' + games.length + '</small></b><span>tables ouvertes</span></div><div class="stat"><b>' + placed + '<small> / ' + (placed + r.unplaced.length) + '</small></b><span>joueurs placés</span></div><div class="stat"><b>' + first + '<small> / ' + placed + '</small></b><span>ont leur 1er choix</span></div><div class="stat"><b>' + r.unplaced.length + '</b><span>sans table</span></div></div>';
+    var stats = '<div class="stats"><div class="stat"><b>' + r.tables.length + '<small> / ' + (games.length + extraF) + '</small></b><span>tables ouvertes</span></div><div class="stat"><b>' + placed + '<small> / ' + (placed + r.unplaced.length) + '</small></b><span>joueurs placés</span></div><div class="stat"><b>' + first + '<small> / ' + placedNF + '</small></b><span>ont leur 1er choix</span></div><div class="stat"><b>' + r.unplaced.length + '</b><span>sans table</span></div></div>';
     var un = r.unplaced.length ? '<div class="drop-note" style="margin-top:20px"><div class="small-h" style="margin:0">Sans table (' + r.unplaced.length + ')</div><div class="players">' + r.unplaced.map(function (uid) { var nm = nameOf(uid); return edit ? '<button class="pchip" data-act="moveOpen" data-uid="' + esc(uid) + '">' + avatar(nm, 'sm', uid) + esc(nm) + '</button>' : '<span class="pchip">' + avatar(nm, 'sm', uid) + esc(nm) + '</span>'; }).join('') + '</div>' + (edit ? '<p>Touchez un nom pour le placer à une table.</p>' : '') + '</div>' : '';
     var nr = notRet.length ? '<ul class="notretained"><li class="small-h" style="background:none;padding:0;margin:0 0 4px">Jeux non retenus</li>' + notRet.map(function (g) { return '<li><div class="mini">' + box(g) + '</div><span><b>' + esc(g.name) + '</b> · ' + esc(r.notes[g.id] || 'Pas de table') + '</span></li>'; }).join('') + '</ul>' : '';
     var bar;
@@ -3724,7 +3768,8 @@ var Badges = (function () {
     else bar = '<div class="actionbar glass-2"><div class="progress"><strong>Tables publiées</strong><span class="hint" style="margin:0">Les joueurs voient leur table.</span></div><button class="btn btn-glass" data-act="unpublish" data-sid="' + s.id + '">' + ic('undo', 17) + ' Annuler la publication</button></div>';
     var canAbs = !edit && canManage(s) && (ph === 'published' || ph === 'auto') && Date.now() >= startMs(s);
     var absHint = canAbs ? '<p class="abs-hint">' + ic('ghost', 16) + ' Un·e inscrit·e n’est pas venu·e ? Touchez son nom pour le marquer absent·e (touchez à nouveau pour annuler). Cela alimente son profil et ses badges.</p>' : '';
-    return stats + (edit ? '' : wdPanel(s)) + absHint + '<div class="tables">' + r.tables.map(function (t, i) { return tableCard(s, t, { edit: edit, i: i, abs: canAbs }); }).join('') + '</div>' + un + nr + bar;
+    var forceRow = edit && ST.admin ? '<div class="force-row"><button class="btn btn-glass" data-act="forceOpen" data-sid="' + s.id + '">' + ic('lock', 16) + ' Forcer un jeu</button><span class="hint" style="margin:0">Imposez n’importe quel jeu de la ludothèque, même hors de la liste de la session.</span></div>' : '';
+    return stats + (edit ? '' : wdPanel(s)) + absHint + forceRow + '<div class="tables">' + r.tables.map(function (t, i) { return tableCard(s, t, { edit: edit, i: i, abs: canAbs }); }).join('') + '</div>' + un + nr + bar;
   }
 
   /* ---------- Domaines (ex-groupes Pro / Perso) : jusqu'à 8, nom / couleur / titre dans settings/groups ---------- */
@@ -3790,7 +3835,7 @@ var Badges = (function () {
         var row = o.rows.filter(function (x) { return x.uid === uid; })[0];
         if (row) sc = { mode: o.mode, rank: row.rank, n: o.n, v: row.v, win: row.rank === 1, last: o.max > 1 && row.rank === o.max, gid: t2.gid };
       });
-      out.push({ sid: s.id, start: startMs(s), date: s.date, created: s.created || 0, mine: !!tb && !isLeft(s, uid), absent: !!ab[uid], gid: tb ? tb.gid : null, gname: g ? g.name : '',
+      out.push({ sid: s.id, start: startMs(s), date: s.date, created: s.created || 0, mine: !!tb && !isLeft(s, uid), absent: !!ab[uid], gid: tb ? tb.gid : null, forced: !!(tb && tb.forced), gname: g ? g.name : '',
         mates: tb ? tb.ids.filter(function (u) { return u !== uid && !ab[u] && !isLeft(s, u); }) : [], entry: entryOf(uid, s.id), sc: sc, scVal: scVal2 });
     });
     return out;
@@ -3962,7 +4007,7 @@ var Badges = (function () {
   /* ---------- Statistiques (admin : tout ; organisateur : ses sessions) ---------- */
   function wkKey(iso) { var d = toDate(iso), k = (d.getDay() + 6) % 7; d.setDate(d.getDate() - k); return D.iso(d); }
   function statsAgg(scope, lo, hi) {
-    var o = { ses: 0, cx: { auto: 0, man: 0 }, regs: 0, seats: 0, rank: [0, 0, 0], uns: 0, weeks: {}, games: {}, pl: {}, tabs: 0, tabsDone: 0, played: {}, rec: {} };
+    var o = { ses: 0, cx: { auto: 0, man: 0 }, regs: 0, seats: 0, rank: [0, 0, 0], uns: 0, weeks: {}, games: {}, pl: {}, tabs: 0, tabsDone: 0, played: {}, fplayed: {}, fTabs: 0, rec: {} };
     function P(u) { return o.pl[u] || (o.pl[u] = { n: 0, abs: 0 }); }
     function W(k) { return o.weeks[k] || (o.weeks[k] = { n: 0, cx: 0, ses: 0 }); }
     function GM(g) { return o.games[g] || (o.games[g] = { ask: 0, got: 0 }); }
@@ -3975,7 +4020,7 @@ var Badges = (function () {
       o.ses++; w.ses++; o.seats += seatsOf(s);
       r.tables.forEach(function (tb) {
         if (G(tb.gid) && tb.ids.some(function (u) { return !isLeft(s, u); })) {
-          o.tabs++; o.played[tb.gid] = (o.played[tb.gid] || 0) + 1;
+          o.tabs++; o.played[tb.gid] = (o.played[tb.gid] || 0) + 1; if (tb.forced) { o.fTabs++; o.fplayed[tb.gid] = (o.fplayed[tb.gid] || 0) + 1; }
           var oc = scOutcome(s, tb);
           if (oc) {
             o.tabsDone++;
@@ -3990,7 +4035,7 @@ var Badges = (function () {
           if (isLeft(s, u)) return;
           o.regs++; w.n++;
           var e = entryOf(u, s.id), first = e && e.order && e.order[0];
-          if (first) { GM(first).ask++; if (tb.gid === first) GM(first).got++; var rk = rankOf(e, tb.gid); o.rank[rk <= 1 ? 0 : rk === 2 ? 1 : 2]++; }
+          if (first && !tb.forced) { GM(first).ask++; if (tb.gid === first) GM(first).got++; var rk = rankOf(e, tb.gid); o.rank[rk <= 1 ? 0 : rk === 2 ? 1 : 2]++; }
           if (s.absent && s.absent[u]) P(u).abs++; else P(u).n++;
         });
       });
@@ -4052,7 +4097,7 @@ var Badges = (function () {
     if (!rows.length) return '<p class="hint">Pas encore de données.</p>';
     return rows.map(function (id) {
       var g = G(id);
-      return '<div class="sx-hb"><span class="sx-gm">' + art(g) + '</span><div><div class="nm">' + esc(g.name) + '</div><div class="tr" style="--c:var(--p' + hue(g.name) + ')"><b style="width:' + Math.round(o.played[id] / mx * 100) + '%"></b></div></div><span class="n">' + o.played[id] + '</span></div>';
+      return '<div class="sx-hb"><span class="sx-gm">' + art(g) + '</span><div><div class="nm">' + esc(g.name) + '</div><div class="tr" style="--c:var(--p' + hue(g.name) + ')"><b style="width:' + Math.round(o.played[id] / mx * 100) + '%"></b></div></div><span class="n">' + o.played[id] + (o.fplayed && o.fplayed[id] ? '<small class="sx-f">dont ' + o.fplayed[id] + ' forcé' + (o.fplayed[id] > 1 ? 's' : '') + '</small>' : '') + '</span></div>';
     }).join('');
   }
   function sxRecords(o) {
@@ -4100,7 +4145,7 @@ var Badges = (function () {
       '<div class="panel glass"><div class="sx-t">Participation par semaine</div><div class="sx-s">Inscrits par semaine, sessions terminées</div>' + sxWeekChart(c) + cxl + '</div>' +
       '<div class="panel glass"><div class="sx-t">Satisfaction</div><div class="sx-s">Rang du vœu obtenu après affectation</div>' + sxDonut(c) + '</div>' +
       '<div class="panel glass"><div class="sx-t">Jeux les plus demandés</div><div class="sx-s">Demandes en 1er vœu, et part obtenue</div>' + sxGames(c) + '</div>' +
-      '<div class="panel glass"><div class="sx-t">Jeux les plus joués</div><div class="sx-s">Nombre de tables sur la période</div>' + sxPlayed(c) + '</div>' +
+      '<div class="panel glass"><div class="sx-t">Jeux les plus joués</div><div class="sx-s">Nombre de tables sur la période' + (c.fTabs ? ' · dont ' + c.fTabs + ' forcée' + (c.fTabs > 1 ? 's' : '') : '') + '</div>' + sxPlayed(c) + '</div>' +
       '<div class="panel glass"><div class="sx-t">Records</div><div class="sx-s">Meilleur score par jeu : le plus haut et le plus petit</div>' + sxRecords(c) + '</div>' +
       '<div class="panel glass"><div class="sx-t">Les plus assidus</div><div class="sx-s">Part des sessions jouées sur la période</div>' + sxRank(c) + '</div></section>' +
       '<p class="sx-foot">Calculé à partir des inscriptions existantes. Aucun suivi individuel ni traceur externe.</p>';
@@ -4196,11 +4241,21 @@ var Badges = (function () {
     var evs = badgeEvents(uid).filter(function (e) { return e.start < startMs(s); });
     return Badges.malus(evs, s.date).weight * Badges.equity(evs, s.date).weight;   /* malus d'absence × équité dans le temps */
   }
-  function computeResult(s) {
-    var games = gamesOf(s).map(function (g) { return { id: g.id, min: g.min, max: g.max, ideal: g.ideal }; });
-    var players = regList(s).map(function (r) { return { name: r.uid, order: r.order, veto: r.veto, weight: malusOf(r.uid, s) }; });
+  /* keep : tables forcées à conserver telles quelles (leurs joueurs et leur jeu sortent du calcul) */
+  function computeResult(s, keep) {
+    keep = keep || [];
+    var used = {}, usedG = {}; keep.forEach(function (t) { usedG[t.gid] = 1; t.ids.forEach(function (u) { used[u] = 1; }); });
+    var games = gamesOf(s).filter(function (g) { return !usedG[g.id]; }).map(function (g) { return { id: g.id, min: g.min, max: g.max, ideal: g.ideal }; });
+    var players = regList(s).filter(function (r) { return !used[r.uid]; }).map(function (r) { return { name: r.uid, order: r.order, veto: r.veto, weight: malusOf(r.uid, s) }; });
     var out = E.solve(players, games, { tablePenalty: M.settings.balance, single: !!s.single });
-    return { tables: out.tables.map(function (t) { return { gid: t.gid, ids: t.names }; }), unplaced: out.unplaced, notes: out.notes, adjusted: false };
+    var res = { tables: out.tables.map(function (t) { return { gid: t.gid, ids: t.names }; }), unplaced: out.unplaced, notes: out.notes, adjusted: false };
+    keep.forEach(function (t) { res.tables.push({ gid: t.gid, ids: t.ids.slice(), forced: true }); });
+    sortTables(res, s);
+    return res;
+  }
+  function sortTables(r, s) {
+    var ix = function (x) { var i = (s.gameIds || []).indexOf(x.gid); return x.forced || i < 0 ? 999 : i; };
+    r.tables.sort(function (a, b) { return ix(a) - ix(b); });
   }
   function tableProblems(r) {
     var bad = [];
@@ -4222,8 +4277,8 @@ var Badges = (function () {
     r.tables.forEach(function (x) { x.ids = x.ids.filter(function (n) { return n !== uid; }); });
     r.unplaced = r.unplaced.filter(function (n) { return n !== uid; });
     if (gid) { if (!t) { t = { gid: gid, ids: [] }; r.tables.push(t); } t.ids.push(uid); } else r.unplaced.push(uid);
-    r.tables = r.tables.filter(function (x) { return x.ids.length > 0; });
-    r.tables.sort(function (a, b) { return s.gameIds.indexOf(a.gid) - s.gameIds.indexOf(b.gid); });
+    r.tables = r.tables.filter(function (x) { return x.ids.length > 0 || x.forced; });
+    sortTables(r, s);
     return true;
   }
 
@@ -4711,7 +4766,8 @@ var Badges = (function () {
       var s = sessionById(el.dataset.sid), k = 'rerun:' + s.id, r = resultOf(s);
       if (r && r.adjusted && ui.confirm !== k) { ui.confirm = k; return render(); }
       ui.confirm = null; ui.anim = true;
-      wr(ST.db.doc('drafts/' + s.id).set(computeResult(s)), 'Affectation recalculée.');
+      var keep = ((r && r.tables) || []).filter(function (t) { return t.forced; });
+      wr(ST.db.doc('drafts/' + s.id).set(computeResult(s, keep)), keep.length ? 'Affectation recalculée ; les tables forcées sont conservées.' : 'Affectation recalculée.');
     },
     reopen: function (el) {
       var s = sessionById(el.dataset.sid);
@@ -4728,6 +4784,24 @@ var Badges = (function () {
       var s = sessionById(el.dataset.sid), r = resultOf(s); if (!r) return;
       r.adjusted = false;
       wr(ST.db.doc('drafts/' + s.id).set(r).then(function () { return ST.db.doc('sessions/' + s.id).update({ status: 'closed' }); }), 'Vous avez repris la main. Les joueurs ne voient plus les tables.');
+    },
+    forceOpen: function (el) {
+      var s = sessionById(el.dataset.sid); if (!s || !ST.admin || phase(s) !== 'closed') return;
+      ui.modal = { type: 'force', sid: s.id, gid: '' }; renderModal();
+    },
+    forcePick: function (el) { if (!ui.modal || ui.modal.type !== 'force' || !G(el.dataset.gid)) return; ui.modal.gid = el.dataset.gid; renderModal(); },
+    forceBack: function () { if (!ui.modal || ui.modal.type !== 'force') return; ui.modal.gid = ''; renderModal(); },
+    forceGo: function (el) {
+      var m = ui.modal, s = m && m.type === 'force' && sessionById(m.sid), g = s && G(m.gid); if (!g || !ST.admin || phase(s) !== 'closed') return;
+      var all = el.dataset.mode === 'all', moved = 0;
+      ui.modal = null; renderModal(); ui.anim = true;
+      saveDraft(s, function (d) {
+        var t = d.tables.filter(function (x) { return x.gid === g.id; })[0];
+        if (!t) { t = { gid: g.id, ids: [] }; d.tables.push(t); }
+        t.forced = true;
+        if (all) regList(s).forEach(function (r) { if (t.ids.length >= g.max || t.ids.indexOf(r.uid) >= 0) return; moveUid(d, s, r.uid, g.id); moved++; });
+        sortTables(d, s);
+      }).then(function () { toast(g.name + ' forcé' + (moved ? ' : ' + plural(moved, 'joueur placé', 'joueurs placés') + '.' : '. Placez maintenant les joueurs.')); });
     },
     moveOpen: function (el) { ui.modal = { type: 'move', sid: ui.msid, uid: el.dataset.uid }; renderModal(); },
     moveTo: function (el) {
@@ -4958,6 +5032,7 @@ var Badges = (function () {
     }
     else if (t.id === 'nt-title' || t.id === 'nt-text') { ui.nt[t.id === 'nt-title' ? 'title' : 'text'] = t.value; ui.nt.confirm = false; syncNotif(); }
     else if (t.id === 'chat-in') { ui.chatText = ui.chatText || {}; ui.chatText[ui.sid] = t.value; t.style.height = 'auto'; t.style.height = Math.min(140, t.scrollHeight) + 'px'; }
+    else if (t.id === 'fc-q') { var qf = normQ(t.value.trim()); document.querySelectorAll('#modal-root .fc-item').forEach(function (it) { it.hidden = !!qf && it.getAttribute('data-q').indexOf(qf) < 0; }); }
     else if (t.id === 'a-email') ui.auth.email = t.value;
     else if (t.id === 'a-name') ui.auth.name = t.value;
     else if (t.id === 'a-code') ui.auth.code = t.value;
